@@ -9,11 +9,11 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface SearchRepository extends JpaRepository<Place, Integer> {
+public interface SearchRepository extends JpaRepository<Place, String> {
     @Query("SELECT p.placeId, COUNT(r.reviewId) as reviewCount " +
             "FROM Place p LEFT JOIN Review r ON p.placeId = r.placeId " +
             "WHERE p.placeId IN :placeIds " +
             "GROUP BY p.placeId")
-    List<Object[]> findReviewCountsByPlaceIds(@Param("placeIds") List<Integer> placeIds);
+    List<Object[]> findReviewCountsByPlaceIds(@Param("placeIds") List<String> placeIds);
 }
 

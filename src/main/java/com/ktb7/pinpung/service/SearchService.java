@@ -21,7 +21,7 @@ public class SearchService {
         this.tagRepository = tagRepository;
     }
 
-    public List<SearchResponseDto> getPlacesWithReviewCountsAndTags(List<Integer> placeIds) {
+    public List<SearchResponseDto> getPlacesWithReviewCountsAndTags(List<String> placeIds) {
         // 리뷰 개수 조회
         List<Object[]> reviewCounts = searchRepository.findReviewCountsByPlaceIds(placeIds);
 
@@ -29,16 +29,16 @@ public class SearchService {
         List<Object[]> tags = tagRepository.findTagsByPlaceIds(placeIds);
 
         // 리뷰 개수 맵으로 변환
-        Map<Integer, Long> reviewCountMap = reviewCounts.stream()
+        Map<String, Long> reviewCountMap = reviewCounts.stream()
                 .collect(Collectors.toMap(
-                        row -> (Integer) row[0],  // placeId
+                        row -> (String) row[0],  // placeId
                         row -> (Long) row[1]      // reviewCount
                 ));
 
         // 태그 맵으로 변환
-        Map<Integer, List<String>> tagMap = tags.stream()
+        Map<String, List<String>> tagMap = tags.stream()
                 .collect(Collectors.groupingBy(
-                        row -> (Integer) row[0],              // placeId
+                        row -> (String) row[0],              // placeId
                         Collectors.mapping(row -> (String) row[1], Collectors.toList()) // tagName
                 ));
 

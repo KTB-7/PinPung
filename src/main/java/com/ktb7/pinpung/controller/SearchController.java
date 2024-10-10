@@ -22,9 +22,8 @@ public class SearchController {
 
     @GetMapping("/places")
     public ResponseEntity<List<SearchResponseDto>> getPlacesWithReviewCountsAndTags(
-            @RequestParam List<Integer> placeIds) {
+            @RequestParam List<String> placeIds) {
         List<SearchResponseDto> places = searchService.getPlacesWithReviewCountsAndTags(placeIds);
         return ResponseEntity.ok(places);
     }
-
 }
