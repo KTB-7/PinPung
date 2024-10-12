@@ -11,6 +11,6 @@ import java.util.Optional;
 @Repository
 public interface PungRepository extends JpaRepository<Pung, Long> {
 
-    @Query(value = "SELECT p.imageUrl FROM Pung p WHERE p.placeId = :placeId AND p.createdAt >= :yesterday ORDER BY p.createdAt DESC LIMIT 1", nativeQuery = true)
-    Optional<String> findLatestImageByPlaceIdWithin24Hours(String placeId, LocalDateTime yesterday);
+    @Query(value = "SELECT p FROM Pung p WHERE p.placeId = :placeId AND p.createdAt >= :yesterday ORDER BY p.createdAt DESC LIMIT 1")
+    Optional<Pung> findLatestByPlaceIdWithin24Hours(String placeId, LocalDateTime yesterday);
 }

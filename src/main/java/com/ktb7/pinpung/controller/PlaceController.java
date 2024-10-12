@@ -1,14 +1,13 @@
 package com.ktb7.pinpung.controller;
 
+import com.ktb7.pinpung.dto.PlaceInfoResponseDto;
 import com.ktb7.pinpung.dto.PlaceNearbyResponseDto;
 import com.ktb7.pinpung.dto.SearchResponseDto;
 import com.ktb7.pinpung.entity.Place;
 import com.ktb7.pinpung.service.PlaceService;
+import org.apache.coyote.Response;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -26,5 +25,11 @@ public class PlaceController {
             @RequestParam List<String> placeIds) {
         List<PlaceNearbyResponseDto> places = placeService.getPlacesWithRepresentativeImage(placeIds);
         return ResponseEntity.ok(places);
+    }
+
+    @GetMapping("/{placeId}")
+    public ResponseEntity<PlaceInfoResponseDto> getPlaceInfo(@PathVariable String placeId) {
+        PlaceInfoResponseDto placeInfo = placeService.getPlaceInfo(placeId);
+        return ResponseEntity.ok(placeInfo);
     }
 }

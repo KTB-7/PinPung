@@ -4,6 +4,7 @@ import com.ktb7.pinpung.dto.SearchResponseDto;
 import com.ktb7.pinpung.repository.SearchRepository;
 import com.ktb7.pinpung.repository.TagRepository;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -36,6 +37,7 @@ class SearchServiceTest {
     }
 
     @Test
+    @DisplayName("review count, tag 가져오기")
     void testGetPlacesWithReviewCountsAndTags() {
         // given
         List<String> placeIds = Arrays.asList("1abc", "2def", "3ghi");
