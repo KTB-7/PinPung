@@ -4,25 +4,26 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.text.DateFormat;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "Review")
+@Table(name = "Pung")
 @Getter
 @Setter
-public class Review {
+public class Pung {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "reviewId")
-    private Integer reviewId;
+    private Integer pungId;
 
-    @Column(name = "userId")
+    @Column(name = "userId", nullable = false)
     private Integer userId;
 
-    @Column(name = "placeId")
+    @Column(name = "placeId", nullable = false)
     private String placeId;
+
+    @Column(name = "imageUrl")
+    private String imageUrl;
 
     @Column(name = "text")
     private String text;
@@ -32,4 +33,6 @@ public class Review {
 
     @Column(name = "updatedAt", nullable = false)
     private LocalDateTime updatedAt;
+
 }
+
