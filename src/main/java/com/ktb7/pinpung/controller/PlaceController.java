@@ -2,10 +2,7 @@ package com.ktb7.pinpung.controller;
 
 import com.ktb7.pinpung.dto.PlaceInfoResponseDto;
 import com.ktb7.pinpung.dto.PlaceNearbyResponseDto;
-import com.ktb7.pinpung.dto.SearchResponseDto;
-import com.ktb7.pinpung.entity.Place;
 import com.ktb7.pinpung.service.PlaceService;
-import org.apache.coyote.Response;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
