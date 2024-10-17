@@ -20,11 +20,10 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.when;
 
 public class PungServiceTest {
@@ -63,10 +62,10 @@ public class PungServiceTest {
         List<Pung> pungs = Arrays.asList(pung1, pung2, pung3);
 
         Page<Pung> pungsPage = new PageImpl<>(pungs, pageable, 3);
-        when(pungRepository.findByPlaceIdAndCreatedAtAfter(anyString(), any(LocalDateTime.class), any(Pageable.class)))
+        when(pungRepository.findByPlaceIdAndCreatedAtAfter(anyLong(), any(LocalDateTime.class), any(Pageable.class)))
                 .thenReturn(pungsPage);
         // When
-        PungsResponseDto response = pungService.getPungsByPlaceId("testPlaceId", pageable);
+        PungsResponseDto response = pungService.getPungsByPlaceId(1L, pageable);
 
         // Then
         assertEquals(3, response.getPungCount());
@@ -87,23 +86,23 @@ public class PungServiceTest {
 
         // 첫 번째 페이지
         Page<Pung> firstPage = new PageImpl<>(firstPagePungs, PageRequest.of(0, 3), 4);
-        when(pungRepository.findByPlaceIdAndCreatedAtAfter(anyString(), any(LocalDateTime.class), eq(PageRequest.of(0, 3))))
+        when(pungRepository.findByPlaceIdAndCreatedAtAfter(anyLong(), any(LocalDateTime.class), eq(PageRequest.of(0, 3))))
                 .thenReturn(firstPage);
 
         // 두 번째 페이지
         Page<Pung> secondPage = new PageImpl<>(secondPagePungs, PageRequest.of(1, 3), 4);
-        when(pungRepository.findByPlaceIdAndCreatedAtAfter(anyString(), any(LocalDateTime.class), eq(PageRequest.of(1, 3))))
+        when(pungRepository.findByPlaceIdAndCreatedAtAfter(anyLong(), any(LocalDateTime.class), eq(PageRequest.of(1, 3))))
                 .thenReturn(secondPage);
 
         // When - 첫 번째 페이지 요청
-        PungsResponseDto firstPageResponse = pungService.getPungsByPlaceId("testPlaceId", PageRequest.of(0, 3));
+        PungsResponseDto firstPageResponse = pungService.getPungsByPlaceId(1L, PageRequest.of(0, 3));
         // Then
         assertEquals(4, firstPageResponse.getPungCount());
         assertEquals(0, firstPageResponse.getCurrentPage());  // 첫 번째 페이지
         assertEquals(3, firstPageResponse.getPungs().size());  // 첫 번째 페이지에는 3개의 펑이 있음
 
         // When - 두 번째 페이지 요청
-        PungsResponseDto secondPageResponse = pungService.getPungsByPlaceId("testPlaceId", PageRequest.of(1, 3));
+        PungsResponseDto secondPageResponse = pungService.getPungsByPlaceId(1L, PageRequest.of(1, 3));
         // Then
         assertEquals(4, secondPageResponse.getPungCount());
         assertEquals(1, secondPageResponse.getCurrentPage());  // 두 번째 페이지

@@ -26,7 +26,7 @@ public class PungService {
    GET pungs/{placeId}
    place id를 받아 해당 장소의 펑 모음 반환
    */
-    public PungsResponseDto getPungsByPlaceId(String placeId, Pageable pageable) {
+    public PungsResponseDto getPungsByPlaceId(Long placeId, Pageable pageable) {
         LocalDateTime yesterday = LocalDateTime.now(clock).minusDays(1);
         Page<Pung> pungsPage = pungRepository.findByPlaceIdAndCreatedAtAfter(placeId, yesterday, pageable);
 

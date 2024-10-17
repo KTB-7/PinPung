@@ -33,8 +33,13 @@ dependencies {
 	runtimeOnly 'com.mysql:mysql-connector-j'
 	implementation 'com.mysql:mysql-connector-j'
 
-	// for html
-	implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
+	// for login html
+//	implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
+
+	// aws sdk
+	implementation(platform("software.amazon.awssdk:bom:2.27.21"))
+	implementation("software.amazon.awssdk:s3")
+	implementation 'io.awspring.cloud:spring-cloud-aws-s3:3.0.2'
 
 }
 

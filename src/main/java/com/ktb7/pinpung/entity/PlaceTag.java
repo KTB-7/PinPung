@@ -12,9 +12,12 @@ public class PlaceTag {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
+    private Integer id;
+
     @Column(name = "tagId")
     private Integer tagId;
 
     @Column(name = "placeId")
-    private String placeId;
+    private Long placeId;
 }

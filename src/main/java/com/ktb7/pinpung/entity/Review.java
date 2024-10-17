@@ -15,14 +15,14 @@ public class Review {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "reviewId")
-    private Integer reviewId;
+    @Column(name = "id")
+    private Integer id;
 
     @Column(name = "userId")
     private Integer userId;
 
     @Column(name = "placeId")
-    private String placeId;
+    private Long placeId;
 
     @Column(name = "text")
     private String text;

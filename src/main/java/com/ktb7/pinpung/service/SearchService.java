@@ -27,7 +27,7 @@ public class SearchService {
    GET search/places
    place id 리스트를 받아 장소별 리뷰 개수, 태그 조회
    */
-    public List<SearchResponseDto> getPlacesWithReviewCountsAndTags(List<String> placeIds) {
+    public List<SearchResponseDto> getPlacesWithReviewCountsAndTags(List<Long> placeIds) {
         // 리뷰 개수 조회
         List<Object[]> reviewCounts = searchRepository.findReviewCountsByPlaceIds(placeIds);
 
@@ -35,17 +35,17 @@ public class SearchService {
         List<Object[]> tags = tagRepository.findTagsByPlaceIds(placeIds);
 
         // 리뷰 개수 맵으로 변환
-        Map<String, Long> reviewCountMap = reviewCounts.stream()
+        Map<Long, Long> reviewCountMap = reviewCounts.stream()
                 .collect(Collectors.toMap(
-                        row -> (String) row[0],  // placeId
+                        row -> (Long) row[0],  // placeId
                         row -> (Long) row[1]     // reviewCount
                 ));
         log.info("/search/places review counts: {}", reviewCountMap);
 
         // 태그 맵으로 변환
-        Map<String, List<String>> tagMap = tags.stream()
+        Map<Long, List<String>> tagMap = tags.stream()
                 .collect(Collectors.groupingBy(
-                        row -> (String) row[0],              // placeId
+                        row -> (Long) row[0],              // placeId
                         Collectors.mapping(row -> (String) row[1], Collectors.toList()) // tagName
                 ));
         log.info("/search/tags tags: {}", tagMap);

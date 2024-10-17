@@ -12,8 +12,11 @@ public class Place {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
+    private Long placeId;
+
     @Column(name = "placeId")
-    private String placeId;
+    private String kakaoPlaceId;
 
     @Column(name = "placeName")
     private String placeName;

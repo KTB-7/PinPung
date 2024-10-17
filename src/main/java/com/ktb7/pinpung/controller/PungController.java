@@ -19,7 +19,7 @@ public class PungController {
 
     @GetMapping("/{placeId}")
     public ResponseEntity<PungsResponseDto> getPungs(
-            @PathVariable String placeId,
+            @PathVariable Long placeId,
             @RequestParam(defaultValue = "0") int page, // page 쿼리 파라미터, 기본값 0
             @RequestParam(defaultValue = "3") int size  // size는 3으로 고정 (한 페이지에 3개의 펑)
     ) {

@@ -4,18 +4,18 @@ import java.util.List;
 
 public class SearchResponseDto {
 
-    private String placeId;
+    private Long placeId;
     private List<String> tags;
     private Long reviewCount;
 
-    public SearchResponseDto(String placeId, List<String> tags, Long reviewCount) {
+    public SearchResponseDto(Long placeId, List<String> tags, Long reviewCount) {
         this.placeId = placeId;
         this.tags = tags;
         this.reviewCount = reviewCount;
     }
 
     // for test
-    public String getPlaceId() {
+    public Long getPlaceId() {
         return placeId;
     }
 

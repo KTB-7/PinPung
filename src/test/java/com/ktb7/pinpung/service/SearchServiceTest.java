@@ -40,22 +40,22 @@ class SearchServiceTest {
     @DisplayName("review count, tag 가져오기")
     void testGetPlacesWithReviewCountsAndTags() {
         // given
-        List<String> placeIds = Arrays.asList("1abc", "2def", "3ghi");
+        List<Long> placeIds = Arrays.asList(1L, 2L, 3L);
 
         // Mock reviewCounts 결과
         List<Object[]> mockReviewCounts = Arrays.asList(
-                new Object[]{"1abc", 3L},
-                new Object[]{"2def", 5L},
-                new Object[]{"3ghi", 0L}
+                new Object[]{1L, 3L},
+                new Object[]{2L, 5L},
+                new Object[]{3L, 0L}
         );
         when(searchRepository.findReviewCountsByPlaceIds(placeIds)).thenReturn(mockReviewCounts);
 
         // Mock tags 결과
         List<Object[]> mockTags = Arrays.asList(
-                new Object[]{"1abc", "태그1"},
-                new Object[]{"1abc", "태그2"},
-                new Object[]{"2def", "태그2"},
-                new Object[]{"3ghi", "태그3"}
+                new Object[]{1L, "태그1"},
+                new Object[]{1L, "태그2"},
+                new Object[]{2L, "태그2"},
+                new Object[]{3L, "태그3"}
         );
         when(tagRepository.findTagsByPlaceIds(placeIds)).thenReturn(mockTags);
 
@@ -78,19 +78,19 @@ class SearchServiceTest {
 
         // 첫 번째 장소 검증
         SearchResponseDto place1 = result.get(0);
-        assertEquals("1abc", place1.getPlaceId());
+        assertEquals(1L, place1.getPlaceId());
         assertEquals(Arrays.asList("태그1", "태그2"), place1.getTags());
         assertEquals(3L, place1.getReviewCount());
 
         // 두 번째 장소 검증
         SearchResponseDto place2 = result.get(1);
-        assertEquals("2def", place2.getPlaceId());
+        assertEquals(2L, place2.getPlaceId());
         assertEquals(Collections.singletonList("태그2"), place2.getTags());
         assertEquals(5L, place2.getReviewCount());
 
         // 세 번째 장소 검증
         SearchResponseDto place3 = result.get(2);
-        assertEquals("3ghi", place3.getPlaceId());
+        assertEquals(3L, place3.getPlaceId());
         assertEquals(Collections.singletonList("태그3"), place3.getTags());
         assertEquals(0L, place3.getReviewCount());
     }

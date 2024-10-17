@@ -19,13 +19,13 @@ public class PlaceController {
 
     @GetMapping("/nearby")
     public ResponseEntity<List<PlaceNearbyResponseDto>> getPlacesWithRepresentativeImage(
-            @RequestParam List<String> placeIds) {
+            @RequestParam List<Long> placeIds) {
         List<PlaceNearbyResponseDto> places = placeService.getPlacesWithRepresentativeImage(placeIds);
         return ResponseEntity.ok(places);
     }
 
     @GetMapping("/{placeId}")
-    public ResponseEntity<PlaceInfoResponseDto> getPlaceInfo(@PathVariable String placeId) {
+    public ResponseEntity<PlaceInfoResponseDto> getPlaceInfo(@PathVariable Long placeId) {
         PlaceInfoResponseDto placeInfo = placeService.getPlaceInfo(placeId);
         return ResponseEntity.ok(placeInfo);
     }
