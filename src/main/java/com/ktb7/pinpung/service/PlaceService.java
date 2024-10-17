@@ -50,7 +50,7 @@ public class PlaceService {
                     .map(Pung::getImageUrl)
                     .orElse(null);
 
-            log.info("places/nearby imageUrl: {}", imageUrl);
+            log.info("places/nearby placeId imageUrl: {} {}", placeId, imageUrl);
             return new PlaceNearbyResponseDto(placeId, imageUrl);
         }).collect(Collectors.toList());
     }
@@ -65,6 +65,7 @@ public class PlaceService {
         // place info 조회
         Place place = placeRepository.findById(placeId)
                 .orElseThrow(() -> new IllegalArgumentException("Invalid placeId: " + placeId));
+        log.info("places/{placeId} placeId placeInfo: {} {}", placeId, place);
 
         // tags 조회
         List<Object[]> tagObjects = tagRepository.findTagsByPlaceIds(Collections.singletonList(placeId));
@@ -73,13 +74,15 @@ public class PlaceService {
         List<String> tags = tagObjects.stream()
                 .map(tagObj -> (String) tagObj[1]) // 두 번째 요소(tagName)를 가져옴
                 .collect(Collectors.toList());
+        log.info("places/{placeId} tags {}", tags);
 
         // representative pung 조회
         Optional<Pung> representativePung = pungRepository.findLatestByPlaceIdWithin24Hours(placeId, yesterday);
-        log.info("representativePung: {}", representativePung);
+        log.info("places/{placeId} representativePung: {}", representativePung);
 
         // reviews 조회
         List<Review> reviews = reviewRepository.findByPlaceId(placeId);
+        log.info("places/{placeId} reviews {}", reviews);
 
         // PlaceInfoResponseDto로 반환
         return new PlaceInfoResponseDto(

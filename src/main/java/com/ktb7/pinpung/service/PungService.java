@@ -32,8 +32,7 @@ public class PungService {
 
         int pungCount = (int) pungsPage.getTotalElements();
         int currentPage = pungsPage.getNumber();
-        log.info("pungCount, currentPage: {} {}", pungCount, currentPage);
-
+        log.info("pungs/{placeId} pungCount, currentPage: {} {}", pungCount, currentPage);
 
         return new PungsResponseDto(pungCount, currentPage, pungsPage.getContent());
     }
