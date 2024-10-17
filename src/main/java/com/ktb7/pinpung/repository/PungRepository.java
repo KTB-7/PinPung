@@ -15,7 +15,7 @@ public interface PungRepository extends JpaRepository<Pung, Long> {
 
     @Query(value = "SELECT p FROM Pung p WHERE p.placeId = :placeId AND p.createdAt >= :yesterday ORDER BY p.createdAt DESC LIMIT 1")
     Optional<Pung> findLatestByPlaceIdWithin24Hours(String placeId, LocalDateTime yesterday);
-    Page<Pung> findByPlaceIdAndCreatedAtAfter(Long placeId, LocalDateTime createdAt, Pageable pageable);
+    Page<Pung> findByPlaceIdAndCreatedAtAfter(String placeId, LocalDateTime createdAt, Pageable pageable);
 }
 
 

@@ -9,6 +9,7 @@ import com.ktb7.pinpung.repository.PlaceRepository;
 import com.ktb7.pinpung.repository.PungRepository;
 import com.ktb7.pinpung.repository.ReviewRepository;
 import com.ktb7.pinpung.repository.TagRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -19,6 +20,7 @@ import java.time.Clock;
 import java.util.Collections;
 
 @Service
+@Slf4j
 public class PlaceService {
 
     private final PungRepository pungRepository;
@@ -48,6 +50,7 @@ public class PlaceService {
                     .map(Pung::getImageUrl)
                     .orElse(null);
 
+            log.info("places/nearby imageUrl: {}", imageUrl);
             return new PlaceNearbyResponseDto(placeId, imageUrl);
         }).collect(Collectors.toList());
     }
@@ -73,6 +76,7 @@ public class PlaceService {
 
         // representative pung 조회
         Optional<Pung> representativePung = pungRepository.findLatestByPlaceIdWithin24Hours(placeId, yesterday);
+        log.info("representativePung: {}", representativePung);
 
         // reviews 조회
         List<Review> reviews = reviewRepository.findByPlaceId(placeId);

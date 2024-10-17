@@ -3,6 +3,7 @@ package com.ktb7.pinpung.service;
 import com.ktb7.pinpung.entity.Pung;
 import com.ktb7.pinpung.dto.PungsResponseDto;
 import com.ktb7.pinpung.repository.PungRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -10,6 +11,7 @@ import org.springframework.stereotype.Service;
 import java.time.Clock;
 import java.time.LocalDateTime;
 
+@Slf4j
 @Service
 public class PungService {
     private final PungRepository pungRepository;
@@ -20,12 +22,16 @@ public class PungService {
         this.clock = clock;
     }
 
-    // placeId를 받아서 24시간 내의 펑을 페이지네이션을 적용해 가져오는 로직
-    public PungsResponseDto getPungsByPlaceId(Long placeId, Pageable pageable) {
+    // placeId를 받아서 24시간 내의 펑을 페이지네이션을 적용해 가져오기
+    public PungsResponseDto getPungsByPlaceId(String placeId, Pageable pageable) {
         LocalDateTime yesterday = LocalDateTime.now(clock).minusDays(1);
         Page<Pung> pungsPage = pungRepository.findByPlaceIdAndCreatedAtAfter(placeId, yesterday, pageable);
 
-        return new PungsResponseDto(pungsPage.getContent());
+        int pungCount = (int) pungsPage.getTotalElements();
+        int currentPage = pungsPage.getNumber();
+        log.info("pungCount, currentPage: {} {}", pungCount, currentPage);
+
+
+        return new PungsResponseDto(pungCount, currentPage, pungsPage.getContent());
     }
 }
-
