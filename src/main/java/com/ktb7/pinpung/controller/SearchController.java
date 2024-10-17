@@ -22,7 +22,7 @@ public class SearchController {
 
     @GetMapping("/places")
     public ResponseEntity<List<SearchResponseDto>> getPlacesWithReviewCountsAndTags(
-            @RequestParam List<String> placeIds) {
+            @RequestParam List<Long> placeIds) {
         List<SearchResponseDto> places = searchService.getPlacesWithReviewCountsAndTags(placeIds);
         return ResponseEntity.ok(places);
     }

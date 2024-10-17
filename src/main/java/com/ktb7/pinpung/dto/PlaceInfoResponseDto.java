@@ -6,14 +6,14 @@ import com.ktb7.pinpung.entity.Review;
 import java.util.List;
 
 public class PlaceInfoResponseDto {
-    private String placeId;
+    private Long placeId;
     private String placeName;
     private String address;
     private List<String> tags;
     private List<Review> reviews;
     private Pung representativePung;
 
-    public PlaceInfoResponseDto(String placeId, String placeName, String address, List<String> tags, List<Review> reviews, Pung representativePung) {
+    public PlaceInfoResponseDto(Long placeId, String placeName, String address, List<String> tags, List<Review> reviews, Pung representativePung) {
         this.placeId = placeId;
         this.placeName = placeName;
         this.address = address;
@@ -24,7 +24,7 @@ public class PlaceInfoResponseDto {
 
     // for test
 
-    public String getPlaceId() {
+    public Long getPlaceId() {
         return placeId;
     }
 

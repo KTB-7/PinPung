@@ -9,6 +9,7 @@ import com.ktb7.pinpung.repository.PlaceRepository;
 import com.ktb7.pinpung.repository.PungRepository;
 import com.ktb7.pinpung.repository.ReviewRepository;
 import com.ktb7.pinpung.repository.TagRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -19,6 +20,7 @@ import java.time.Clock;
 import java.util.Collections;
 
 @Service
+@Slf4j
 public class PlaceService {
 
     private final PungRepository pungRepository;
@@ -39,7 +41,7 @@ public class PlaceService {
     GET places/nearby
     place id 리스트를 받아 24시간 내 업로드된 펑이 있는 장소의 id와 대표 펑 이미지 반환
     */
-    public List<PlaceNearbyResponseDto> getPlacesWithRepresentativeImage(List<String> placeIds) {
+    public List<PlaceNearbyResponseDto> getPlacesWithRepresentativeImage(List<Long> placeIds) {
         LocalDateTime yesterday = LocalDateTime.now(clock).minusDays(1);
 
         return placeIds.stream().map(placeId -> {
@@ -48,6 +50,7 @@ public class PlaceService {
                     .map(Pung::getImageUrl)
                     .orElse(null);
 
+            log.info("places/nearby placeId imageUrl: {} {}", placeId, imageUrl);
             return new PlaceNearbyResponseDto(placeId, imageUrl);
         }).collect(Collectors.toList());
     }
@@ -56,12 +59,13 @@ public class PlaceService {
     GET places/{placeId}
     place id를 받아 해당 장소의 정보, 리뷰, 대표 펑 반환
     */
-    public PlaceInfoResponseDto getPlaceInfo(String placeId) {
+    public PlaceInfoResponseDto getPlaceInfo(Long placeId) {
         LocalDateTime yesterday = LocalDateTime.now(clock).minusDays(1);
 
         // place info 조회
         Place place = placeRepository.findById(placeId)
                 .orElseThrow(() -> new IllegalArgumentException("Invalid placeId: " + placeId));
+        log.info("places/{placeId} placeId placeInfo: {} {}", placeId, place);
 
         // tags 조회
         List<Object[]> tagObjects = tagRepository.findTagsByPlaceIds(Collections.singletonList(placeId));
@@ -70,12 +74,15 @@ public class PlaceService {
         List<String> tags = tagObjects.stream()
                 .map(tagObj -> (String) tagObj[1]) // 두 번째 요소(tagName)를 가져옴
                 .collect(Collectors.toList());
+        log.info("places/{placeId} tags {}", tags);
 
         // representative pung 조회
         Optional<Pung> representativePung = pungRepository.findLatestByPlaceIdWithin24Hours(placeId, yesterday);
+        log.info("places/{placeId} representativePung: {}", representativePung);
 
         // reviews 조회
         List<Review> reviews = reviewRepository.findByPlaceId(placeId);
+        log.info("places/{placeId} reviews {}", reviews);
 
         // PlaceInfoResponseDto로 반환
         return new PlaceInfoResponseDto(

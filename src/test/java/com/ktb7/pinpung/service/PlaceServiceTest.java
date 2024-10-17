@@ -66,7 +66,7 @@ class PlaceServiceTest {
     @DisplayName("대표 펑 이미지 가져오기")
     void testGetPlacesWithRepresentativeImage() {
         // 테스트용 장소 ID 목록
-        List<String> placeIds = Arrays.asList("1abc", "2def", "3ghi");
+        List<Long> placeIds = Arrays.asList(1L, 2L, 3L);
         LocalDateTime yesterday = LocalDateTime.now(clock).minusDays(1);
 
         // PungRepository 모킹
@@ -76,13 +76,13 @@ class PlaceServiceTest {
         Pung pung2 = new Pung();
         pung2.setImageUrl("http://example.com/image2.jpg");
 
-        when(pungRepository.findLatestByPlaceIdWithin24Hours("1abc", yesterday))
+        when(pungRepository.findLatestByPlaceIdWithin24Hours(1L, yesterday))
                 .thenReturn(Optional.of(pung1));
 
-        when(pungRepository.findLatestByPlaceIdWithin24Hours("2def", yesterday))
+        when(pungRepository.findLatestByPlaceIdWithin24Hours(2L, yesterday))
                 .thenReturn(Optional.of(pung2));
 
-        when(pungRepository.findLatestByPlaceIdWithin24Hours("3ghi", yesterday))
+        when(pungRepository.findLatestByPlaceIdWithin24Hours(3L, yesterday))
                 .thenReturn(Optional.empty()); // 이미지가 없는 경우
 
         // 테스트 실행
@@ -92,15 +92,15 @@ class PlaceServiceTest {
         assertEquals(3, result.size());
 
         // 첫 번째 장소 검증
-        assertEquals("1abc", result.get(0).getPlaceId());
+        assertEquals(1L, result.get(0).getPlaceId());
         assertEquals("http://example.com/image1.jpg", result.get(0).getImageUrl());
 
         // 두 번째 장소 검증
-        assertEquals("2def", result.get(1).getPlaceId());
+        assertEquals(2L, result.get(1).getPlaceId());
         assertEquals("http://example.com/image2.jpg", result.get(1).getImageUrl());
 
         // 세 번째 장소 검증 (이미지 없음)
-        assertEquals("3ghi", result.get(2).getPlaceId());
+        assertEquals(3L, result.get(2).getPlaceId());
         assertNull(result.get(2).getImageUrl());  // 이미지가 없는 경우 null
     }
 
@@ -111,20 +111,20 @@ class PlaceServiceTest {
 
         // PlaceRepository 모킹
         Place place = new Place();
-        place.setPlaceId("1abc");
+        place.setPlaceId(1L);
         place.setPlaceName("Test Place");
         place.setAddress("123 Test address");
-        when(placeRepository.findById("1abc")).thenReturn(Optional.of(place));
+        when(placeRepository.findById(1L)).thenReturn(Optional.of(place));
 
         // TagRepository 모킹
-        when(tagRepository.findTagsByPlaceIds(Collections.singletonList("1abc")))
-                .thenReturn(Arrays.asList(new Object[] { "1abc", "Coffee" }, new Object[] { "1abc", "Quiet" }));
+        when(tagRepository.findTagsByPlaceIds(Collections.singletonList(1L)))
+                .thenReturn(Arrays.asList(new Object[] { 1L, "Coffee" }, new Object[] { 1L, "Quiet" }));
 
         // PungRepository 모킹
         Pung pung = new Pung();
         pung.setImageUrl("http://example.com/image1.jpg");
         pung.setText("Test Pung");
-        when(pungRepository.findLatestByPlaceIdWithin24Hours("1abc", yesterday))
+        when(pungRepository.findLatestByPlaceIdWithin24Hours(1L, yesterday))
                 .thenReturn(Optional.of(pung));
 
         // ReviewRepository 모킹
@@ -132,13 +132,13 @@ class PlaceServiceTest {
         review.setUserId(1);
         review.setText("Great place!");
         review.setCreatedAt(LocalDateTime.now(clock));
-        when(reviewRepository.findByPlaceId("1abc")).thenReturn(Collections.singletonList(review));
+        when(reviewRepository.findByPlaceId(1L)).thenReturn(Collections.singletonList(review));
 
         // 테스트 실행
-        PlaceInfoResponseDto result = placeService.getPlaceInfo("1abc");
+        PlaceInfoResponseDto result = placeService.getPlaceInfo(1L);
 
         // 결과 검증
-        assertEquals("1abc", result.getPlaceId());
+        assertEquals(1L, result.getPlaceId());
         assertEquals("Test Place", result.getPlaceName());
         assertEquals("123 Test address", result.getAddress());
         assertEquals(2, result.getTags().size());
