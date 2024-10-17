@@ -60,7 +60,6 @@ public class PungServiceTest {
         Pung pung1 = new Pung();
         Pung pung2 = new Pung();
         Pung pung3 = new Pung();
-//        Pung pung4 = new Pung();
         List<Pung> pungs = Arrays.asList(pung1, pung2, pung3);
 
         Page<Pung> pungsPage = new PageImpl<>(pungs, pageable, 3);
@@ -82,9 +81,9 @@ public class PungServiceTest {
         Pung pung1 = new Pung();
         Pung pung2 = new Pung();
         Pung pung3 = new Pung();
-        Pung pung4 = new Pung();  // 4번째 펑
-        List<Pung> firstPagePungs = Arrays.asList(pung1, pung2, pung3);  // 첫 번째 페이지
-        List<Pung> secondPagePungs = Arrays.asList(pung4);  // 두 번째 페이지
+        Pung pung4 = new Pung();
+        List<Pung> firstPagePungs = Arrays.asList(pung1, pung2, pung3);
+        List<Pung> secondPagePungs = Arrays.asList(pung4);
 
         // 첫 번째 페이지
         Page<Pung> firstPage = new PageImpl<>(firstPagePungs, PageRequest.of(0, 3), 4);
@@ -98,15 +97,15 @@ public class PungServiceTest {
 
         // When - 첫 번째 페이지 요청
         PungsResponseDto firstPageResponse = pungService.getPungsByPlaceId("testPlaceId", PageRequest.of(0, 3));
-        // Then - 첫 번째 페이지 결과 검증
-        assertEquals(4, firstPageResponse.getPungCount());  // 전체 펑 개수는 4개
+        // Then
+        assertEquals(4, firstPageResponse.getPungCount());
         assertEquals(0, firstPageResponse.getCurrentPage());  // 첫 번째 페이지
         assertEquals(3, firstPageResponse.getPungs().size());  // 첫 번째 페이지에는 3개의 펑이 있음
 
         // When - 두 번째 페이지 요청
         PungsResponseDto secondPageResponse = pungService.getPungsByPlaceId("testPlaceId", PageRequest.of(1, 3));
-        // Then - 두 번째 페이지 결과 검증
-        assertEquals(4, secondPageResponse.getPungCount());  // 전체 펑 개수는 4개
+        // Then
+        assertEquals(4, secondPageResponse.getPungCount());
         assertEquals(1, secondPageResponse.getCurrentPage());  // 두 번째 페이지
         assertEquals(1, secondPageResponse.getPungs().size());  // 두 번째 페이지에는 1개의 펑이 있음
     }

@@ -22,7 +22,10 @@ public class PungService {
         this.clock = clock;
     }
 
-    // placeId를 받아서 24시간 내의 펑을 페이지네이션을 적용해 가져오기
+    /*
+   GET pungs/{placeId}
+   place id를 받아 해당 장소의 펑 모음 반환
+   */
     public PungsResponseDto getPungsByPlaceId(String placeId, Pageable pageable) {
         LocalDateTime yesterday = LocalDateTime.now(clock).minusDays(1);
         Page<Pung> pungsPage = pungRepository.findByPlaceIdAndCreatedAtAfter(placeId, yesterday, pageable);
