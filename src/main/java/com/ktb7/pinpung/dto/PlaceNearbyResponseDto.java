@@ -1,22 +1,19 @@
 package com.ktb7.pinpung.dto;
 
+import lombok.AllArgsConstructor;
+
 import java.util.List;
 
+@AllArgsConstructor
 public class PlaceNearbyResponseDto {
     private Long placeId;
-    private String imageUrl;
-
-    public PlaceNearbyResponseDto(Long placeId, String imageUrl) {
-        this.placeId = placeId;
-        this.imageUrl = imageUrl;
-    }
+    private Long imageId;
 
     // for test
     public Long getPlaceId() {
         return placeId;
     }
-
-    public String getImageUrl() {
-        return imageUrl;
+    public Long getImageId() {
+        return imageId;
     }
 }

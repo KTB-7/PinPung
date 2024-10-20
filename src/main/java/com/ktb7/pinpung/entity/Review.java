@@ -16,10 +16,10 @@ public class Review {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
-    private Integer id;
+    private Long id;
 
     @Column(name = "userId")
-    private Integer userId;
+    private Long userId;
 
     @Column(name = "placeId")
     private Long placeId;

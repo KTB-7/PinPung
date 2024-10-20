@@ -15,16 +15,16 @@ public class Pung {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
-    private Integer id;
+    private Long id;
 
     @Column(name = "userId", nullable = false)
-    private Integer userId;
+    private Long userId;
 
     @Column(name = "placeId", nullable = false)
     private Long placeId;
 
-    @Column(name = "imageUrl")
-    private String imageUrl;
+    @Column(name = "imageId")
+    private Long imageId;
 
     @Column(name = "text")
     private String text;
