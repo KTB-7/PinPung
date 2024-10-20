@@ -1,22 +1,16 @@
 package com.ktb7.pinpung.dto;
 
 import com.ktb7.pinpung.entity.Pung;
-
+import lombok.AllArgsConstructor;
 import java.util.List;
 
+@AllArgsConstructor
 public class PungsResponseDto {
     private Integer pungCount;
     private Integer currentPage;
     private List<Pung> pungs;
 
-    public PungsResponseDto(Integer pungCount, Integer currentPage, List<Pung> pungs) {
-        this.pungCount = pungCount;
-        this.currentPage = currentPage;
-        this.pungs = pungs;
-    }
-
     // for test
-
     public Integer getPungCount() {
         return pungCount;
     }

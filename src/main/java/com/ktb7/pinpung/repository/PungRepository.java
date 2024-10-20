@@ -12,10 +12,7 @@ import java.util.Optional;
 
 @Repository
 public interface PungRepository extends JpaRepository<Pung, Long> {
-
-    @Query(value = "SELECT p FROM Pung p WHERE p.placeId = :placeId AND p.createdAt >= :yesterday ORDER BY p.createdAt DESC LIMIT 1")
-    Optional<Pung> findLatestByPlaceIdWithin24Hours(Long placeId, LocalDateTime yesterday);
+    Optional<Pung> findFirstByPlaceIdAndCreatedAtAfterOrderByCreatedAtDesc(Long placeId, LocalDateTime yesterday);
     Page<Pung> findByPlaceIdAndCreatedAtAfter(Long placeId, LocalDateTime yesterday, Pageable pageable);
 }
-
 

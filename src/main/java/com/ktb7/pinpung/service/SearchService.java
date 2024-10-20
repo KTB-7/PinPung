@@ -3,6 +3,7 @@ package com.ktb7.pinpung.service;
 import com.ktb7.pinpung.dto.SearchResponseDto;
 import com.ktb7.pinpung.repository.SearchRepository;
 import com.ktb7.pinpung.repository.TagRepository;
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -13,15 +14,11 @@ import java.util.stream.Collectors;
 
 @Slf4j
 @Service
+@AllArgsConstructor
 public class SearchService {
 
     private final SearchRepository searchRepository;
     private final TagRepository tagRepository;
-
-    public SearchService(SearchRepository searchRepository, TagRepository tagRepository) {
-        this.searchRepository = searchRepository;
-        this.tagRepository = tagRepository;
-    }
 
     /*
    GET search/places

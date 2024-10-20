@@ -3,6 +3,7 @@ package com.ktb7.pinpung.service;
 import com.ktb7.pinpung.entity.Pung;
 import com.ktb7.pinpung.dto.PungsResponseDto;
 import com.ktb7.pinpung.repository.PungRepository;
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -13,14 +14,10 @@ import java.time.LocalDateTime;
 
 @Slf4j
 @Service
+@AllArgsConstructor
 public class PungService {
     private final PungRepository pungRepository;
     private final Clock clock;
-
-    public PungService(PungRepository pungRepository, Clock clock) {
-        this.pungRepository = pungRepository;
-        this.clock = clock;
-    }
 
     /*
    GET pungs/{placeId}

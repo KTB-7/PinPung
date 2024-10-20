@@ -9,6 +9,7 @@ import com.ktb7.pinpung.repository.PlaceRepository;
 import com.ktb7.pinpung.repository.PungRepository;
 import com.ktb7.pinpung.repository.ReviewRepository;
 import com.ktb7.pinpung.repository.TagRepository;
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -21,6 +22,7 @@ import java.util.Collections;
 
 @Service
 @Slf4j
+@AllArgsConstructor
 public class PlaceService {
 
     private final PungRepository pungRepository;
@@ -28,14 +30,6 @@ public class PlaceService {
     private final PlaceRepository placeRepository;
     private final TagRepository tagRepository;
     private final ReviewRepository reviewRepository;
-
-    public PlaceService(PungRepository pungRepository, Clock clock, PlaceRepository placeRepository, TagRepository tagRepository, ReviewRepository reviewRepository) {
-        this.pungRepository = pungRepository;
-        this.clock = clock;
-        this.placeRepository = placeRepository;
-        this.tagRepository = tagRepository;
-        this.reviewRepository = reviewRepository;
-    }
 
     /*
     GET places/nearby
@@ -46,7 +40,7 @@ public class PlaceService {
 
         return placeIds.stream().map(placeId -> {
             // PungRepository에서 24시간 내의 이미지 URL을 가져옴. 없으면 null 반환
-            String imageUrl = pungRepository.findLatestByPlaceIdWithin24Hours(placeId, yesterday)
+            String imageUrl = pungRepository.findFirstByPlaceIdAndCreatedAtAfterOrderByCreatedAtDesc(placeId, yesterday)
                     .map(Pung::getImageUrl)
                     .orElse(null);
 
@@ -77,7 +71,7 @@ public class PlaceService {
         log.info("places/{placeId} tags {}", tags);
 
         // representative pung 조회
-        Optional<Pung> representativePung = pungRepository.findLatestByPlaceIdWithin24Hours(placeId, yesterday);
+        Optional<Pung> representativePung = pungRepository.findFirstByPlaceIdAndCreatedAtAfterOrderByCreatedAtDesc(placeId, yesterday);
         log.info("places/{placeId} representativePung: {}", representativePung);
 
         // reviews 조회

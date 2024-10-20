@@ -7,16 +7,15 @@ import lombok.Setter;
 @Entity
 @Table(name = "PlaceTag")
 @Getter
-@Setter
 public class PlaceTag {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
-    private Integer id;
+    private Long placeTagId;
 
     @Column(name = "tagId")
-    private Integer tagId;
+    private Long tagId;
 
     @Column(name = "placeId")
     private Long placeId;
