@@ -93,15 +93,15 @@ class PlaceServiceTest {
 
         // 첫 번째 장소 검증
         assertEquals(1L, result.get(0).getPlaceId());
-        assertEquals("http://example.com/image1.jpg", result.get(0).getImageUrl());
+        assertEquals("http://example.com/image1.jpg", result.get(0).getImageId());
 
         // 두 번째 장소 검증
         assertEquals(2L, result.get(1).getPlaceId());
-        assertEquals("http://example.com/image2.jpg", result.get(1).getImageUrl());
+        assertEquals("http://example.com/image2.jpg", result.get(1).getImageId());
 
         // 세 번째 장소 검증 (이미지 없음)
         assertEquals(3L, result.get(2).getPlaceId());
-        assertNull(result.get(2).getImageUrl());  // 이미지가 없는 경우 null
+        assertNull(result.get(2).getImageId());  // 이미지가 없는 경우 null
     }
 
     @Test

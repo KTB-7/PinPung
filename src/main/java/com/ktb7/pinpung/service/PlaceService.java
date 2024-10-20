@@ -40,12 +40,12 @@ public class PlaceService {
 
         return placeIds.stream().map(placeId -> {
             // PungRepository에서 24시간 내의 이미지 URL을 가져옴. 없으면 null 반환
-            String imageUrl = pungRepository.findFirstByPlaceIdAndCreatedAtAfterOrderByCreatedAtDesc(placeId, yesterday)
-                    .map(Pung::getImageUrl)
+            Long imageId = pungRepository.findFirstByPlaceIdAndCreatedAtAfterOrderByCreatedAtDesc(placeId, yesterday)
+                    .map(Pung::getImageId)
                     .orElse(null);
 
-            log.info("places/nearby placeId imageUrl: {} {}", placeId, imageUrl);
-            return new PlaceNearbyResponseDto(placeId, imageUrl);
+            log.info("places/nearby placeId imageUrl: {} {}", placeId, imageId);
+            return new PlaceNearbyResponseDto(placeId, imageId);
         }).collect(Collectors.toList());
     }
 

@@ -7,6 +7,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping("/pungs")
@@ -26,5 +27,21 @@ public class PungController {
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.ASC, "createdAt"));
         PungsResponseDto pungs = pungService.getPungsByPlaceId(placeId, pageable);
         return ResponseEntity.ok(pungs);
+    }
+
+    @PostMapping("/upload")
+    public ResponseEntity<String> uploadPungs(
+            @RequestParam Long userId,
+            @RequestParam Long placeId,
+            @RequestParam MultipartFile imageWithText,
+            @RequestParam MultipartFile pureImage,
+            @RequestParam String text
+    ) {
+        try {
+            pungService.uploadPung(userId, placeId, imageWithText, pureImage, text);
+            return ResponseEntity.ok("Pung upload success");
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body("Pung upload failed: " + e.getMessage());
+        }
     }
 }

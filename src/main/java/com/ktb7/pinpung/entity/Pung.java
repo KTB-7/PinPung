@@ -9,6 +9,7 @@ import java.time.LocalDateTime;
 @Entity
 @Table(name = "Pung")
 @Getter
+@Setter
 public class Pung {
 
     @Id
@@ -22,8 +23,8 @@ public class Pung {
     @Column(name = "placeId", nullable = false)
     private Long placeId;
 
-    @Column(name = "imageUrl")
-    private String imageUrl;
+    @Column(name = "imageId")
+    private Long imageId;
 
     @Column(name = "text")
     private String text;
