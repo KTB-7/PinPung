@@ -7,6 +7,7 @@ import lombok.Setter;
 @Entity
 @Table(name = "Place")
 @Getter
+@Setter // for test
 public class Place {
 
     @Id
@@ -22,4 +23,5 @@ public class Place {
 
     @Column(name = "address")
     private String address;
+
 }

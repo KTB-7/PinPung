@@ -5,14 +5,13 @@ import lombok.AllArgsConstructor;
 @AllArgsConstructor
 public class PlaceNearbyResponseDto {
     private Long placeId;
-    private String imageUrl;
+    private Long imageId;
 
     // for test
     public Long getPlaceId() {
         return placeId;
     }
-
-    public String getImageUrl() {
-        return imageUrl;
+    public Long getImageId() {
+        return imageId;
     }
 }

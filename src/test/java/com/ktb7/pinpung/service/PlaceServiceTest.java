@@ -71,18 +71,18 @@ class PlaceServiceTest {
 
         // PungRepository 모킹
         Pung pung1 = new Pung();
-        pung1.setImageUrl("http://example.com/image1.jpg");
+        pung1.setImageId(1L);
 
         Pung pung2 = new Pung();
-        pung2.setImageUrl("http://example.com/image2.jpg");
+        pung2.setImageId(2L);
 
-        when(pungRepository.findLatestByPlaceIdWithin24Hours(1L, yesterday))
+        when(pungRepository.findFirstByPlaceIdAndCreatedAtAfterOrderByCreatedAtDesc(1L, yesterday))
                 .thenReturn(Optional.of(pung1));
 
-        when(pungRepository.findLatestByPlaceIdWithin24Hours(2L, yesterday))
+        when(pungRepository.findFirstByPlaceIdAndCreatedAtAfterOrderByCreatedAtDesc(2L, yesterday))
                 .thenReturn(Optional.of(pung2));
 
-        when(pungRepository.findLatestByPlaceIdWithin24Hours(3L, yesterday))
+        when(pungRepository.findFirstByPlaceIdAndCreatedAtAfterOrderByCreatedAtDesc(3L, yesterday))
                 .thenReturn(Optional.empty()); // 이미지가 없는 경우
 
         // 테스트 실행
@@ -93,15 +93,15 @@ class PlaceServiceTest {
 
         // 첫 번째 장소 검증
         assertEquals(1L, result.get(0).getPlaceId());
-        assertEquals("http://example.com/image1.jpg", result.get(0).getImageUrl());
+        assertEquals(1L, result.get(0).getImageId());
 
         // 두 번째 장소 검증
         assertEquals(2L, result.get(1).getPlaceId());
-        assertEquals("http://example.com/image2.jpg", result.get(1).getImageUrl());
+        assertEquals(2L, result.get(1).getImageId());
 
         // 세 번째 장소 검증 (이미지 없음)
         assertEquals(3L, result.get(2).getPlaceId());
-        assertNull(result.get(2).getImageUrl());  // 이미지가 없는 경우 null
+        assertNull(result.get(2).getImageId());  // 이미지가 없는 경우 null
     }
 
     @Test
@@ -122,14 +122,14 @@ class PlaceServiceTest {
 
         // PungRepository 모킹
         Pung pung = new Pung();
-        pung.setImageUrl("http://example.com/image1.jpg");
+        pung.setImageId(1L);
         pung.setText("Test Pung");
-        when(pungRepository.findLatestByPlaceIdWithin24Hours(1L, yesterday))
+        when(pungRepository.findFirstByPlaceIdAndCreatedAtAfterOrderByCreatedAtDesc(1L, yesterday))
                 .thenReturn(Optional.of(pung));
 
         // ReviewRepository 모킹
         Review review = new Review();
-        review.setUserId(1);
+        review.setUserId(1L);
         review.setText("Great place!");
         review.setCreatedAt(LocalDateTime.now(clock));
         when(reviewRepository.findByPlaceId(1L)).thenReturn(Collections.singletonList(review));
@@ -146,7 +146,7 @@ class PlaceServiceTest {
         assertEquals("Quiet", result.getTags().get(1));
         assertEquals(1, result.getReviews().size());
         assertEquals("Great place!", result.getReviews().get(0).getText());
-        assertEquals("http://example.com/image1.jpg", result.getRepresentativePung().getImageUrl());
+        assertEquals(1L, result.getRepresentativePung().getImageId());
         assertEquals("Test Pung", result.getRepresentativePung().getText());
     }
 }

@@ -36,10 +36,11 @@ dependencies {
 	// for login html
 //	implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
 
-	// aws sdk
+	// aws sdk v2
 	implementation(platform("software.amazon.awssdk:bom:2.27.21"))
-	implementation("software.amazon.awssdk:s3")
-	implementation 'org.springframework.cloud:spring-cloud-starter-aws:2.2.6.RELEASE'
+	implementation 'software.amazon.awssdk:s3'
+
+	// spring-cloud-aws
 	implementation 'io.awspring.cloud:spring-cloud-aws-s3:3.0.2'
 
 }
