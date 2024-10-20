@@ -10,7 +10,7 @@ import java.util.List;
 
 @Repository
 public interface SearchRepository extends JpaRepository<Place, Long> {
-    @Query("SELECT p.placeId, COUNT(r.id) as reviewCount " +
+    @Query("SELECT p.placeId, COUNT(r.reviewId) as reviewCount " +
             "FROM Place p LEFT JOIN Review r ON p.placeId = r.placeId " +
             "WHERE p.placeId IN :placeIds " +
             "GROUP BY p.placeId")
