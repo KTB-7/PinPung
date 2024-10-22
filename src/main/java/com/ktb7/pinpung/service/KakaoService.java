@@ -2,6 +2,10 @@ package com.ktb7.pinpung.service;
 
 import com.ktb7.pinpung.dto.KakaoInfoResponseDto;
 import com.ktb7.pinpung.dto.KakaoTokenResponseDto;
+import com.ktb7.pinpung.dto.KakaoUserInfoResponseDto;
+import com.ktb7.pinpung.dto.LoginResponseDto;
+import com.ktb7.pinpung.entity.User;
+import com.ktb7.pinpung.repository.UserRepository;
 import io.netty.handler.codec.http.HttpHeaderValues;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -21,15 +25,17 @@ public class KakaoService {
     private String clientId;
     private final String KAUTH_TOKEN_URL_HOST;
     private final String KAUTH_USER_URL_HOST;
+    private final UserRepository userRepository;
 
     @Autowired
-    public KakaoService(@Value("${kakao.client_id}") String clientId) {
+    public KakaoService(@Value("${kakao.client_id}") String clientId, UserRepository userRepository) {
         this.clientId = clientId;
+        this.userRepository = userRepository;
         KAUTH_TOKEN_URL_HOST ="https://kauth.kakao.com";
         KAUTH_USER_URL_HOST = "https://kapi.kakao.com";
     }
 
-    public String getAccessTokenFromKakao(String code) {
+    public String getAccessToken(String code) {
         KakaoTokenResponseDto kakaoTokenResponseDto = WebClient.create(KAUTH_TOKEN_URL_HOST).post()
                 .uri(uriBuilder -> uriBuilder
                         .scheme("https")
@@ -43,9 +49,59 @@ public class KakaoService {
                 .bodyToMono(KakaoTokenResponseDto.class)
                 .block();  // 동기적으로 값을 가져오려면 block() 사용
 
-        log.info(" [Kakao Service] Access Token ------> {}", kakaoTokenResponseDto.getAccessToken());
-        log.info(" [Kakao Service] Refresh Token ------> {}", kakaoTokenResponseDto.getRefreshToken());
+//        log.info(" [Kakao Service] Access Token ------> {}", kakaoTokenResponseDto.getAccessToken());
+//        log.info(" [Kakao Service] Refresh Token ------> {}", kakaoTokenResponseDto.getRefreshToken());
         return kakaoTokenResponseDto.getAccessToken();
     }
+
+    public KakaoUserInfoResponseDto getUserInfo(String accessToken) {
+        KakaoUserInfoResponseDto userInfo = WebClient.create(KAUTH_USER_URL_HOST).get()
+                .uri(uriBuilder -> uriBuilder
+                        .scheme("https")
+                        .path("/v2/user/me")
+                        .build(true))
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken) // access token 인가
+                .header(HttpHeaders.CONTENT_TYPE, HttpHeaderValues.APPLICATION_X_WWW_FORM_URLENCODED.toString())
+                .retrieve()
+                .bodyToMono(KakaoUserInfoResponseDto.class)
+                .block();
+
+//        log.info("[ Kakao Service ] Auth ID ---> {} ", userInfo.getId());
+//        log.info("[ Kakao Service ] NickName ---> {} ", userInfo.getKakaoAccount().getProfile().getNickName());
+//        log.info("[ Kakao Service ] ProfileImageUrl ---> {} ", userInfo.getKakaoAccount().getProfile().getProfileImageUrl());
+
+        return userInfo;
+    }
+
+
+    public LoginResponseDto kakaoLogin(KakaoUserInfoResponseDto userInfo) {
+        Long socialId = userInfo.getId();
+        User user = userRepository.findBySocialId(socialId).orElse(null);  // 소셜 ID로 사용자 확인
+
+        LoginResponseDto loginResponse = new LoginResponseDto();
+
+        if (user == null) {
+            // 회원가입 처리
+            user = new User();
+            user.setSocialId(socialId);
+            user.setUserEmail(userInfo.getKakaoAccount().getEmail());
+            user.setUserName(userInfo.getKakaoAccount().getProfile().getNickName());
+            // S3에 이미지 저장
+//            user.setProfileImageId(userInfo.getKakaoAccount().getProfile().getProfileImageUrl());
+
+            // 새 유저 저장
+            userRepository.save(user);
+
+            loginResponse.setLoginSuccess(true);  // 새 회원가입 성공 시 로그인으로 간주
+            loginResponse.setUser(user);  // 유저 정보 반환
+        } else {
+            // 기존 사용자 로그인 처리
+            loginResponse.setLoginSuccess(true);  // 로그인 성공
+            loginResponse.setUser(user);  // 유저 정보 반환
+        }
+
+        return loginResponse;
+    }
+
 
 }

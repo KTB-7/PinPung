@@ -7,6 +7,8 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+
+// react에서 구현할 내용
 @Slf4j
 @Controller
 @RequestMapping("/login")

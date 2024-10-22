@@ -20,4 +20,11 @@ public class User {
 
     @Column(name = "userName")
     private String userName;
+
+    @Column(name = "socialId")
+    private Long socialId;
+
+    @Column(name = "profileImageId")
+    private Long profileImageId;
+
 }
