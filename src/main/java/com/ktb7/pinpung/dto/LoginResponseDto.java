@@ -7,6 +7,8 @@ import lombok.Setter;
 @Getter
 @Setter
 public class LoginResponseDto {
-    public boolean loginSuccess;
-    public User user;
+    private boolean loginSuccess;
+    private User user;
+    private String accessToken;
+    private Integer expiresIn;
 }

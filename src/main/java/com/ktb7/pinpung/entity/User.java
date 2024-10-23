@@ -26,5 +26,4 @@ public class User {
 
     @Column(name = "profileImageId")
     private Long profileImageId;
-
 }

@@ -1,10 +1,9 @@
 package com.ktb7.pinpung.service;
 
-import com.ktb7.pinpung.dto.KakaoInfoResponseDto;
-import com.ktb7.pinpung.dto.KakaoTokenResponseDto;
-import com.ktb7.pinpung.dto.KakaoUserInfoResponseDto;
-import com.ktb7.pinpung.dto.LoginResponseDto;
+import com.ktb7.pinpung.dto.*;
+import com.ktb7.pinpung.entity.Token;
 import com.ktb7.pinpung.entity.User;
+import com.ktb7.pinpung.repository.TokenRepository;
 import com.ktb7.pinpung.repository.UserRepository;
 import io.netty.handler.codec.http.HttpHeaderValues;
 import lombok.RequiredArgsConstructor;
@@ -13,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatusCode;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 
@@ -26,16 +26,18 @@ public class KakaoService {
     private final String KAUTH_TOKEN_URL_HOST;
     private final String KAUTH_USER_URL_HOST;
     private final UserRepository userRepository;
+    private final TokenRepository tokenRepository;
 
     @Autowired
-    public KakaoService(@Value("${kakao.client_id}") String clientId, UserRepository userRepository) {
+    public KakaoService(@Value("${kakao.client_id}") String clientId, UserRepository userRepository, TokenRepository tokenRepository) {
         this.clientId = clientId;
         this.userRepository = userRepository;
+        this.tokenRepository = tokenRepository;
         KAUTH_TOKEN_URL_HOST ="https://kauth.kakao.com";
         KAUTH_USER_URL_HOST = "https://kapi.kakao.com";
     }
 
-    public String getAccessToken(String code) {
+    public LoginResponseDto getAccessToken(String code) {
         KakaoTokenResponseDto kakaoTokenResponseDto = WebClient.create(KAUTH_TOKEN_URL_HOST).post()
                 .uri(uriBuilder -> uriBuilder
                         .scheme("https")
@@ -51,7 +53,17 @@ public class KakaoService {
 
 //        log.info(" [Kakao Service] Access Token ------> {}", kakaoTokenResponseDto.getAccessToken());
 //        log.info(" [Kakao Service] Refresh Token ------> {}", kakaoTokenResponseDto.getRefreshToken());
-        return kakaoTokenResponseDto.getAccessToken();
+
+        KakaoUserInfoResponseDto userInfo = getUserInfo(kakaoTokenResponseDto.getAccessToken());
+        LoginResponseDto loginResponseDto = kakaoLogin(userInfo);
+
+        String accessToken = kakaoTokenResponseDto.getAccessToken();
+        Integer expiresIn = kakaoTokenResponseDto.getExpiresIn();
+        loginResponseDto.setExpiresIn(expiresIn);
+        loginResponseDto.setAccessToken(accessToken);
+
+        storeToken(kakaoTokenResponseDto, userInfo.getId());
+        return loginResponseDto;
     }
 
     public KakaoUserInfoResponseDto getUserInfo(String accessToken) {
@@ -71,6 +83,15 @@ public class KakaoService {
 //        log.info("[ Kakao Service ] ProfileImageUrl ---> {} ", userInfo.getKakaoAccount().getProfile().getProfileImageUrl());
 
         return userInfo;
+    }
+
+    private void storeToken(KakaoTokenResponseDto kakaoTokenResponseDto, Long userId) {
+        // 리프레시 토큰 저장
+        Token token = new Token();
+        token.setUserId(userId);
+        token.setRefreshToken(kakaoTokenResponseDto.getRefreshToken());
+        token.setExpiresIn(kakaoTokenResponseDto.getRefreshTokenExpiresIn());
+        tokenRepository.save(token);
     }
 
 
@@ -102,6 +123,4 @@ public class KakaoService {
 
         return loginResponse;
     }
-
-
 }
