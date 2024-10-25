@@ -6,11 +6,12 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 
 // react에서 구현할 내용
 @Slf4j
-@Controller
+@RestController
 @RequestMapping("/login")
 public class PageController {
 
@@ -25,7 +26,6 @@ public class PageController {
 
         String location = "https://kauth.kakao.com/oauth/authorize?response_type=code&client_id="+client_id+"&redirect_uri="+redirect_uri;
         model.addAttribute("location", location);
-
         return "login";
     }
 }

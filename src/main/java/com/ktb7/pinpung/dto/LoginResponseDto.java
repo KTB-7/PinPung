@@ -9,6 +9,6 @@ import lombok.Setter;
 public class LoginResponseDto {
     private boolean loginSuccess;
     private User user;
-    private String accessToken;
-    private Integer expiresIn;
+//    private String accessToken;
+//    private Integer expiresIn;
 }

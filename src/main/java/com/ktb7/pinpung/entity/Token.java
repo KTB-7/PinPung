@@ -1,10 +1,12 @@
 package com.ktb7.pinpung.entity;
 
 import jakarta.persistence.*;
+import lombok.Getter;
 import lombok.Setter;
 
 @Entity
 @Setter
+@Getter
 public class Token {
 
     @Id
@@ -17,6 +19,9 @@ public class Token {
 
     @Column(name="refreshToken")
     private String refreshToken;
+
+    @Column(name="accessToken")
+    private String accessToken;
 
     @Column(name="expiresIn")
     private Integer expiresIn;
