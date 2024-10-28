@@ -1,16 +1,13 @@
 package com.ktb7.pinpung.dto;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
 @Setter
+@AllArgsConstructor
 public class TokenResponseDto {
+    private Long userId;
     private String accessToken;
-    private Integer expiresIn;
-
-    public TokenResponseDto(String accessToken, Integer expiresIn) {
-        this.accessToken = accessToken;
-        this.expiresIn = expiresIn;
-    }
 }
