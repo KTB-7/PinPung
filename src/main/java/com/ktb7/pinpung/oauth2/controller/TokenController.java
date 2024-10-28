@@ -1,7 +1,6 @@
-package com.ktb7.pinpung.controller;
+package com.ktb7.pinpung.oauth2.controller;
 
-import com.ktb7.pinpung.dto.TokenResponseDto;
-import com.ktb7.pinpung.service.TokenService;
+import com.ktb7.pinpung.oauth2.service.TokenService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -9,8 +8,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.Optional;
 
 @RestController
 @Slf4j

@@ -1,8 +1,8 @@
-package com.ktb7.pinpung.service;
+package com.ktb7.pinpung.oauth2.service;
 
-import com.ktb7.pinpung.dto.KakaoTokenResponseDto;
-import com.ktb7.pinpung.dto.KakaoTokenInfoResponseDto;
-import com.ktb7.pinpung.dto.TokenResponseDto;
+import com.ktb7.pinpung.oauth2.dto.KakaoTokenResponseDto;
+import com.ktb7.pinpung.oauth2.dto.KakaoTokenInfoResponseDto;
+import com.ktb7.pinpung.oauth2.dto.TokenResponseDto;
 import com.ktb7.pinpung.entity.Token;
 import com.ktb7.pinpung.entity.User;
 import com.ktb7.pinpung.repository.TokenRepository;
@@ -13,8 +13,6 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
-
-import java.util.Map;
 
 @Service
 @RequiredArgsConstructor

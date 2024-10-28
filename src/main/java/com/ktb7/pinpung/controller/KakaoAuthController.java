@@ -1,8 +1,8 @@
 //package com.ktb7.pinpung.controller;
 //
-//import com.ktb7.pinpung.dto.KakaoTokenResponseDto;
-//import com.ktb7.pinpung.dto.LoginResponseDto;
-//import com.ktb7.pinpung.dto.TokenResponseDto;
+//import com.ktb7.pinpung.oauth2.dto.KakaoTokenResponseDto;
+//import com.ktb7.pinpung.oauth2.dto.LoginResponseDto;
+//import com.ktb7.pinpung.oauth2.dto.TokenResponseDto;
 //import com.ktb7.pinpung.entity.Token;
 //import com.ktb7.pinpung.repository.TokenRepository;
 //import com.ktb7.pinpung.service.KakaoService;

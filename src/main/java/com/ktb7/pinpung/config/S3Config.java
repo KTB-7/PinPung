@@ -10,11 +10,6 @@ import software.amazon.awssdk.services.s3.S3Client;
 
 @Configuration
 public class S3Config {
-    @Value("${spring.cloud.aws.credentials.accessKey}")
-    private String accessKey;
-
-    @Value("${spring.cloud.aws.credentials.secretKey}")
-    private String secretKey;
 
     @Value("${spring.cloud.aws.region.static}")
     private String region;
@@ -23,7 +18,6 @@ public class S3Config {
     public S3Client s3Client() {
         return S3Client.builder()
                 .region(Region.of(region))
-                .credentialsProvider(StaticCredentialsProvider.create(AwsBasicCredentials.create(accessKey, secretKey)))
                 .build();
     }
 }

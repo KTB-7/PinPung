@@ -1,4 +1,4 @@
-package com.ktb7.pinpung.config;
+package com.ktb7.pinpung.oauth2;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;

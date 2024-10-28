@@ -1,4 +1,4 @@
-package com.ktb7.pinpung.dto;
+package com.ktb7.pinpung.oauth2.dto;
 
 import com.ktb7.pinpung.entity.User;
 import lombok.Getter;
