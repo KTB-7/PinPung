@@ -34,14 +34,14 @@ dependencies {
 	implementation 'com.mysql:mysql-connector-j'
 
 //	 for login html
-	implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
+//	implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
 
 	// aws sdk v2
 	implementation(platform("software.amazon.awssdk:bom:2.27.21"))
 	implementation 'software.amazon.awssdk:s3'
 
 	// spring-cloud-aws
-	implementation 'io.awspring.cloud:spring-cloud-aws-s3:3.0.2'
+//	implementation 'io.awspring.cloud:spring-cloud-aws-s3:3.0.2'
 
 	//Webflux
 	implementation 'org.springframework.boot:spring-boot-starter-webflux'
