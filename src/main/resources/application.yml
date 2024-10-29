@@ -1,4 +1,21 @@
 spring:
+  security:
+    oauth2:
+      client:
+        registration:
+          kakao:
+            client-id: ${KAKAO_CLIENT_ID}  # Kakao 개발자 콘솔에서 발급받은 클라이언트 ID 입력
+            authorization-grant-type: authorization_code
+            redirect-uri: ${REDIRECT_URI}
+            scope: profile_nickname, profile_image, account_email
+        provider:
+          kakao:
+            authorization-uri: https://kauth.kakao.com/oauth/authorize
+            token-uri: https://kauth.kakao.com/oauth/token
+            user-info-uri: https://kapi.kakao.com/v2/user/me
+            user-name-attribute: id  # 사용자 정보를 받을 때 사용할 식별자
+  config:
+    import: optional:file:dev.env[.properties]
   cloud:
     aws:
       s3:
@@ -7,11 +24,10 @@ spring:
         static: ${AWS_REGION}
       stack:
         auto: false
-
   datasource:
     username: ${DB_USERNAME}
     url: jdbc:mysql://${DB_HOST}:${DB_PORT}/${DB_NAME}
-    password: ${DB_PASSWORD}
+    password: dala0118
   application:
     name: pinpung
   main:
@@ -22,6 +38,7 @@ spring:
       naming:
         physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
       ddl-auto: update
+
 
 kakao:
   client_id: ${KAKAO_CLIENT_ID}

@@ -3,7 +3,7 @@ package com.ktb7.pinpung.oauth2.config;
 import com.ktb7.pinpung.oauth2.OAuth2LoginFailureHandler;
 import com.ktb7.pinpung.oauth2.OAuth2LoginSuccessHandler;
 import com.ktb7.pinpung.oauth2.OAuth2LogoutCustomHandler;
-import com.ktb7.pinpung.service.CustomOAuth2UserService;
+import com.ktb7.pinpung.oauth2.service.CustomOAuth2UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

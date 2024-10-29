@@ -1,5 +1,4 @@
-package com.ktb7.pinpung.service;
-import com.ktb7.pinpung.entity.User;
+package com.ktb7.pinpung.oauth2.service;
 import com.ktb7.pinpung.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
