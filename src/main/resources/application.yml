@@ -1,0 +1,32 @@
+spring:
+  cloud:
+    aws:
+      credentials:
+        accessKey: ${AWS_ACCESS_KEY_ID}
+        secretKey: ${AWS_SECRET_ACCESS_KEY}
+      s3:
+        bucket: ${S3_BUCKET_NAME}
+      region:
+        static: ${AWS_REGION}
+      stack:
+        auto: false
+
+  datasource:
+    username: ${DB_USERNAME}
+    url: jdbc:mysql://${DB_HOST}:${DB_PORT}/${DB_NAME}
+    password: ${DB_PASSWORD}
+  application:
+    name: pinpung
+  main:
+    web-application-type: servlet
+  jpa:
+    hibernate:
+      naming:
+        physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
+      ddl-auto: update
+
+kakao:
+  client_id: ${KAKAO_CLIENT_ID}
+  redirect_uri: ${REDIRECT_URI}
+
+
