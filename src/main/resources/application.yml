@@ -21,6 +21,7 @@ spring:
     web-application-type: servlet
   jpa:
     hibernate:
+      dialect: org.hibernate.dialect.MySQLDialect
       naming:
         physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
       ddl-auto: update
