@@ -6,13 +6,13 @@ import java.util.List;
 
 @AllArgsConstructor
 public class PungsResponseDto {
-    private Integer pungCount;
+    private Integer count;
     private Integer currentPage;
     private List<Pung> pungs;
 
     // for test
     public Integer getPungCount() {
-        return pungCount;
+        return count;
     }
 
     public Integer getCurrentPage() {

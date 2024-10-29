@@ -9,7 +9,7 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface TagRepository extends JpaRepository<Tag, String> {
+public interface TagRepository extends JpaRepository<Tag, Long> {
     @Query("SELECT p.placeId, t.tagName " +
             "FROM PlaceTag pt JOIN Tag t ON pt.tagId = t.tagId " +
             "JOIN Place p ON pt.placeId = p.placeId " +

@@ -33,7 +33,7 @@ dependencies {
 	runtimeOnly 'com.mysql:mysql-connector-j'
 	implementation 'com.mysql:mysql-connector-j'
 
-	// for login html
+//	 for login html
 //	implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
 
 	// aws sdk v2
@@ -41,8 +41,16 @@ dependencies {
 	implementation 'software.amazon.awssdk:s3'
 
 	// spring-cloud-aws
-	implementation 'io.awspring.cloud:spring-cloud-aws-s3:3.0.2'
+//	implementation 'io.awspring.cloud:spring-cloud-aws-s3:3.0.2'
 
+	//Webflux
+	implementation 'org.springframework.boot:spring-boot-starter-webflux'
+
+	// spring security
+	implementation 'org.springframework.boot:spring-boot-starter-security'
+
+	// OAuth2 클라이언트
+	implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
 }
 
 tasks.named('test') {

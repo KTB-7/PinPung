@@ -1,8 +1,6 @@
 package com.ktb7.pinpung.service;
 
-import com.ktb7.pinpung.dto.PlaceInfoResponseDto;
-import com.ktb7.pinpung.dto.PlaceNearbyResponseDto;
-import com.ktb7.pinpung.dto.SearchResponseDto;
+import com.ktb7.pinpung.dto.*;
 import com.ktb7.pinpung.entity.Place;
 import com.ktb7.pinpung.entity.Pung;
 import com.ktb7.pinpung.entity.Review;
@@ -37,7 +35,7 @@ public class PlaceService {
     GET places/nearby
     place id 리스트를 받아 24시간 내 업로드된 펑이 있는 장소의 id와 대표 펑 이미지 반환
     */
-    public List<PlaceNearbyResponseDto> getPlacesWithRepresentativeImage(List<Long> placeIds) {
+    public List<PlaceNearbyDto> getPlacesWithRepresentativeImage(List<Long> placeIds) {
         LocalDateTime yesterday = LocalDateTime.now(clock).minusDays(1);
 
         return placeIds.stream().map(placeId -> {
@@ -47,7 +45,7 @@ public class PlaceService {
                     .orElse(null);
 
             log.info("places/nearby placeId imageUrl: {} {}", placeId, imageId);
-            return new PlaceNearbyResponseDto(placeId, imageId);
+            return new PlaceNearbyDto(placeId, imageId);
         }).collect(Collectors.toList());
     }
 
@@ -77,8 +75,9 @@ public class PlaceService {
         log.info("places/{placeId} representativePung: {}", representativePung);
 
         // reviews 조회
-        List<Review> reviews = reviewRepository.findByPlaceId(placeId);
-        log.info("places/{placeId} reviews {}", reviews);
+        List<Review> reviewList = reviewRepository.findByPlaceId(placeId);
+        log.info("places/{placeId} reviews {}", reviewList);
+        ReviewsDto reviews = new ReviewsDto(reviewList.size(), reviewList);
 
         // PlaceInfoResponseDto로 반환
         return new PlaceInfoResponseDto(

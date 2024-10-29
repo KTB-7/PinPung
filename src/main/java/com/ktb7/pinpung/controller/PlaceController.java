@@ -1,6 +1,7 @@
 package com.ktb7.pinpung.controller;
 
 import com.ktb7.pinpung.dto.PlaceInfoResponseDto;
+import com.ktb7.pinpung.dto.PlaceNearbyDto;
 import com.ktb7.pinpung.dto.PlaceNearbyResponseDto;
 import com.ktb7.pinpung.dto.SearchResponseDto;
 import com.ktb7.pinpung.exception.common.CustomException;
@@ -24,15 +25,19 @@ public class PlaceController {
     }
 
     @GetMapping("/nearby")
-    public ResponseEntity<List<PlaceNearbyResponseDto>> getPlacesWithRepresentativeImage(
+    public ResponseEntity<PlaceNearbyResponseDto> getPlacesWithRepresentativeImage(
             @RequestParam List<Long> placeIds) {
         // 유효성 검증: placeIds가 비어 있는지 확인
         if (placeIds == null || placeIds.isEmpty()) {
             throw new CustomException(HttpStatus.BAD_REQUEST, ErrorCode.MISSING_PARAMETER, ErrorCode.MISSING_PARAMETER.getMsg());
         }
 
-        List<PlaceNearbyResponseDto> places = placeService.getPlacesWithRepresentativeImage(placeIds);
-        return ResponseEntity.ok(places);
+        List<PlaceNearbyDto> places = placeService.getPlacesWithRepresentativeImage(placeIds);
+
+//        log.info("{}", places.size());
+//        log.info("{}", places);
+        PlaceNearbyResponseDto response = new PlaceNearbyResponseDto(places.size(), places);
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/{placeId}")
