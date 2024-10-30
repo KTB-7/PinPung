@@ -24,4 +24,9 @@ public class Place {
     @Column(name = "address")
     private String address;
 
+    @Column(name = "x")
+    private String x;
+
+    @Column(name = "y")
+    private String y;
 }

@@ -8,21 +8,27 @@ import com.ktb7.pinpung.repository.PlaceRepository;
 import com.ktb7.pinpung.repository.PungRepository;
 import com.ktb7.pinpung.repository.ReviewRepository;
 import com.ktb7.pinpung.repository.TagRepository;
+import io.github.cdimascio.dotenv.Dotenv;
 import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Repository;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.time.Clock;
-import java.util.Collections;
 
 @Service
 @Slf4j
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class PlaceService {
 
     private final PungRepository pungRepository;
@@ -30,6 +36,59 @@ public class PlaceService {
     private final PlaceRepository placeRepository;
     private final TagRepository tagRepository;
     private final ReviewRepository reviewRepository;
+
+    private static final String KAKAO_LOCAL_API_URL = "https://dapi.kakao.com/v2/local/search/category.json";
+
+    @Value("${kakao.client_id}")
+    private String client_id;
+
+    public List<Long> categorySearch(String x, String y, Integer radius) {
+        RestTemplate restTemplate = new RestTemplate();
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("Authorization", "KakaoAK " + client_id);
+        String requestUrl = KAKAO_LOCAL_API_URL + "?category_group_code=CE7&x=" + x + "&y=" + y + "&radius=" + radius;
+
+        HttpEntity<String> entity = new HttpEntity<>(headers);
+        ResponseEntity<Map> response = restTemplate.exchange(requestUrl, HttpMethod.GET, entity, Map.class);
+
+        List<Long> placeIds = new ArrayList<>();
+
+        if (response.getStatusCode().is2xxSuccessful()) {
+            List<Map<String, Object>> documents = (List<Map<String, Object>>) response.getBody().get("documents");
+
+            for (Map<String, Object> document : documents) {
+                String kakaoPlaceId = (String) document.get("id");
+
+                // 이미 존재하는지 확인
+                Optional<Place> existingPlace = placeRepository.findByKakaoPlaceId(kakaoPlaceId);
+
+                if (existingPlace.isPresent()) {
+                    // 이미 존재하는 경우, 저장하지 않고 기존 ID 추가
+                    placeIds.add(existingPlace.get().getPlaceId());
+                } else {
+                    // 존재하지 않는 경우 새로 저장
+                    String placeName = (String) document.get("place_name");
+                    String address = (String) document.get("road_address_name");
+                    String longitude = (String) document.get("x");
+                    String latitude = (String) document.get("y");
+
+                    Place place = new Place();
+                    place.setKakaoPlaceId(kakaoPlaceId);
+                    place.setPlaceName(placeName);
+                    place.setAddress(address);
+                    place.setX(longitude);
+                    place.setY(latitude);
+
+                    Place savedPlace = placeRepository.save(place);
+                    placeIds.add(savedPlace.getPlaceId());
+                }
+            }
+        } else {
+            log.error("카테고리 검색 API 호출 실패: {}", response.getStatusCode());
+        }
+        return placeIds;
+    }
+
 
     /*
     GET places/nearby
@@ -40,14 +99,28 @@ public class PlaceService {
 
         return placeIds.stream().map(placeId -> {
             // PungRepository에서 24시간 내의 이미지 URL을 가져옴. 없으면 null 반환
-            Long imageId = pungRepository.findFirstByPlaceIdAndCreatedAtAfterOrderByCreatedAtDesc(placeId, yesterday)
-                    .map(Pung::getImageId)
+            Long imageWithText = pungRepository.findFirstByPlaceIdAndCreatedAtAfterOrderByCreatedAtDesc(placeId, yesterday)
+                    .map(Pung::getImageWithText)
                     .orElse(null);
+            boolean hasPung = imageWithText != null;
 
-            log.info("places/nearby placeId imageUrl: {} {}", placeId, imageId);
-            return new PlaceNearbyDto(placeId, imageId);
-        }).collect(Collectors.toList());
+            Place place = placeRepository.findById(placeId).orElse(null);
+            if (place == null) {
+                log.error("Place not found for placeId: {}", placeId);
+                return null;
+            }
+
+            log.info("places/nearby placeId imageUrl: {} {}", placeId, imageWithText);
+            return new PlaceNearbyDto(
+                    placeId,
+                    hasPung,
+                    imageWithText,
+                    place.getX(),
+                    place.getY()
+            );
+        }).filter(Objects::nonNull).collect(Collectors.toList());
     }
+
 
     /*
     GET places/{placeId}
