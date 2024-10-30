@@ -37,11 +37,6 @@ pipeline {
                 }
             }
         }
-        stage('Build & Test') {
-            steps {
-                sh './gradlew clean build -x test'
-            }
-        }
         stage('Build Docker Image') {
             steps {
                 script {
