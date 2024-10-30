@@ -26,16 +26,22 @@ public class PlaceController {
 
     @GetMapping("/nearby")
     public ResponseEntity<PlaceNearbyResponseDto> getPlacesWithRepresentativeImage(
-            @RequestParam List<Long> placeIds) {
-        // 유효성 검증: placeIds가 비어 있는지 확인
-        if (placeIds == null || placeIds.isEmpty()) {
-            throw new CustomException(HttpStatus.BAD_REQUEST, ErrorCode.MISSING_PARAMETER, ErrorCode.MISSING_PARAMETER.getMsg());
-        }
+            @RequestParam String x, @RequestParam String y, @RequestParam Integer radius) {
+        // 유효성 검증: 각 값이 비어있지 않은지 확인?
+        // 코드 추가
 
+
+        // service.categotySearch
+        // place service에서 카카오 로컬 api 써서 현재 위치로 검색 결과 얻어내기
+        // 검색 결과에서 placeid만 추출하기
+
+        // service.getPlacesWithRepresentativeImage
+        // 추출한 placeid list로 펑 있나없나 확인(기존코드)
+        // 펑 있으면 haspung true로 해두는 코드만 추가하면 됨, 그리고 각 장소의 xy값도 추가하기
+        // 최종은 placenearbyresponsedto, 그 안에 pndto 들어가도록
+
+        List<Long> placeIds = placeService.categorySearch(x, y, radius);
         List<PlaceNearbyDto> places = placeService.getPlacesWithRepresentativeImage(placeIds);
-
-//        log.info("{}", places.size());
-//        log.info("{}", places);
         PlaceNearbyResponseDto response = new PlaceNearbyResponseDto(places.size(), places);
         return ResponseEntity.ok(response);
     }

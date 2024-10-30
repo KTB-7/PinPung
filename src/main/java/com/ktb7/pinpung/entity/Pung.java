@@ -24,7 +24,7 @@ public class Pung {
     private Long placeId;
 
     @Column(name = "imageId")
-    private Long imageId;
+    private Long imageWithText;
 
     @Column(name = "text")
     private String text;
