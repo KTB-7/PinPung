@@ -20,7 +20,8 @@ public class TokenController {
 
     @PostMapping("/refresh")
     public ResponseEntity<?> refreshToken(@RequestParam Long userId, @RequestParam String expiredAccessToken) {
-        ValidationUtils.validateUserRequest(userId); // 현재 로그인된 사용자와 요청된 userId가 일치하는지 확인
+        // 유효성 검증: 현재 로그인된 사용자와 요청된 userId가 일치하는지 확인
+        ValidationUtils.validateUserRequest(userId);
         return tokenService.validateToken(userId, expiredAccessToken);
     }
 }

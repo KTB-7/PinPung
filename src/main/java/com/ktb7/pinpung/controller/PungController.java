@@ -1,10 +1,12 @@
 package com.ktb7.pinpung.controller;
 
 import com.ktb7.pinpung.dto.PungsResponseDto;
+import com.ktb7.pinpung.dto.UploadPungRequest;
 import com.ktb7.pinpung.exception.common.CustomException;
 import com.ktb7.pinpung.exception.common.ErrorCode;
 import com.ktb7.pinpung.service.PungService;
 import com.ktb7.pinpung.util.ValidationUtils;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -14,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 @RestController
+@Slf4j
 @RequestMapping("/pungs")
 public class PungController {
     private final PungService pungService;
@@ -37,21 +40,22 @@ public class PungController {
         return ResponseEntity.ok(pungs);
     }
 
-    @PostMapping("/upload")
+    @PostMapping
     public ResponseEntity<String> uploadPungs(
-            @RequestParam Long userId,
-            @RequestParam Long placeId,
+            @ModelAttribute UploadPungRequest request,
             @RequestParam MultipartFile imageWithText,
-            @RequestParam MultipartFile pureImage,
-            @RequestParam String text
+            @RequestParam MultipartFile pureImage
     ) {
+        // 로그 출력
+        log.info("uploadPungs: {} {} {}", request.getUserId(), request.getPlaceId(), request.getText());
+
         // 유효성 검증
-        ValidationUtils.validateUserAndPlaceId(userId, placeId);
+        ValidationUtils.validateUserAndPlaceId(request.getUserId(), request.getPlaceId());
         ValidationUtils.validateFile(imageWithText, "imageWithText");
         ValidationUtils.validateFile(pureImage, "pureImage");
 
         try {
-            pungService.uploadPung(userId, placeId, imageWithText, pureImage, text);
+            pungService.uploadPung(request.getUserId(), request.getPlaceId(), imageWithText, pureImage, request.getText());
             return ResponseEntity.ok("Pung upload success");
         } catch (Exception e) {
             throw new CustomException(HttpStatus.INTERNAL_SERVER_ERROR, ErrorCode.FILE_UPLOAD_FAILED, ErrorCode.FILE_UPLOAD_FAILED.getMsg());

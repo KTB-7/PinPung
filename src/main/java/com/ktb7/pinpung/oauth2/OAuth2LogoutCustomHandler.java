@@ -2,6 +2,7 @@ package com.ktb7.pinpung.oauth2;
 
 import com.ktb7.pinpung.exception.common.CustomException;
 import com.ktb7.pinpung.exception.common.ErrorCode;
+import com.ktb7.pinpung.exception.common.LogoutFailureException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
@@ -33,8 +34,8 @@ public class OAuth2LogoutCustomHandler implements LogoutHandler {
 
         try {
             response.sendRedirect(kakaoLogoutUrl);
-        } catch (IOException ex) {
-            throw new CustomException(ErrorCode.INTERNAL_SERVER_ERROR, "카카오 로그아웃 중 오류가 발생했습니다.");
+        } catch (Exception ex) {
+            throw new LogoutFailureException();
         }
     }
 }

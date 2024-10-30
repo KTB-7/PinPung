@@ -4,6 +4,7 @@ import com.ktb7.pinpung.exception.common.CustomException;
 import com.ktb7.pinpung.exception.common.ErrorCode;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationFailureHandler;
@@ -17,21 +18,33 @@ public class OAuth2LoginFailureHandler extends SimpleUrlAuthenticationFailureHan
     @Override
     public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response,
                                         AuthenticationException exception) throws IOException {
-        if (exception instanceof OAuth2AuthenticationException) {
-            OAuth2AuthenticationException oauthException = (OAuth2AuthenticationException) exception;
-            String errorCode = oauthException.getError().getErrorCode();
+        try {
+            if (exception instanceof OAuth2AuthenticationException) {
+                OAuth2AuthenticationException oauthException = (OAuth2AuthenticationException) exception;
+                String errorCode = oauthException.getError().getErrorCode();
 
-            if ("unauthorized_client".equals(errorCode)) {
-                throw new CustomException(ErrorCode.UNAUTHORIZED_CLIENT);
-            } else if ("invalid_token".equals(errorCode)) {
-                throw new CustomException(ErrorCode.INVALID_TOKEN);
-            } else if ("expired_token".equals(errorCode)) {
-                throw new CustomException(ErrorCode.EXPIRED_TOKEN);
+                if ("unauthorized_client".equals(errorCode)) {
+                    throw new CustomException(HttpStatus.UNAUTHORIZED, ErrorCode.UNAUTHORIZED_CLIENT);
+                } else if ("invalid_token".equals(errorCode)) {
+                    throw new CustomException(HttpStatus.BAD_REQUEST, ErrorCode.INVALID_TOKEN_OR_SOCIAL_ID);
+                } else if ("expired_token".equals(errorCode)) {
+                    throw new CustomException(HttpStatus.UNAUTHORIZED, ErrorCode.EXPIRED_TOKEN);
+                } else {
+                    throw new CustomException(HttpStatus.BAD_REQUEST, ErrorCode.AUTHENTICATION_FAILED);
+                }
             } else {
-                throw new CustomException(ErrorCode.AUTHENTICATION_FAILED);
+                throw new CustomException(HttpStatus.BAD_REQUEST, ErrorCode.AUTHENTICATION_FAILED);
             }
-        } else {
-            throw new CustomException(ErrorCode.AUTHENTICATION_FAILED);
+        } catch (CustomException e) {
+            response.setStatus(e.getStatus().value());
+            response.setContentType("application/json");
+            response.setCharacterEncoding("UTF-8");
+            response.getWriter().write(String.format(
+                    "{\"status\": %d, \"errorCode\": \"%s\", \"msg\": \"%s\"}",
+                    e.getStatus().value(),
+                    e.getErrorCode().getCode(),
+                    e.getErrorCode().getMsg()
+            ));
         }
     }
 }

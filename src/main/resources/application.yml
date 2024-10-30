@@ -1,4 +1,7 @@
 spring:
+  mvc:
+    favicon:
+      enabled: false
   security:
     oauth2:
       client:
