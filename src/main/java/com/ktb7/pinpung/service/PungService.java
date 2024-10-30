@@ -61,7 +61,7 @@ public class PungService {
         Pung pung = new Pung();
         pung.setUserId(userId);
         pung.setPlaceId(placeId);
-        pung.setImageId(imageId);
+        pung.setImageWithText(imageId);
         pung.setText(text);
         pungRepository.save(pung);
     }
