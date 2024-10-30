@@ -25,9 +25,8 @@ pipeline {
                         '/pinpung/S3_BUCKET_NAME'
                     ]
                     def params = parameterNames.join(',')
-
-                    def result = sh(script: "aws ssm get-parameters --names ${params} --with-decryption --query 'Parameters[*].{Name:Name,Value:Value}' --region ${AWS_REGION}", returnStdout: true)
-                    def paramConfig = readJSON text: result
+                    def result = sh(script: "aws ssm get-parameters --names ${params} --with-decryption --query 'Parameters[*].{Name:Name,Value:Value}' --region ${AWS_REGION} --output json", returnStdout: true).trim()
+                    def paramConfig = new groovy.json.JsonSlurper().parseText(result)
 
                     paramConfig.each { item ->
                         def key = item.Name.tokenize('/').last()
