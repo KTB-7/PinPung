@@ -90,7 +90,6 @@ public class PlaceService {
     }
 
 
-
     /*
     GET places/nearby
     place id 리스트를 받아 24시간 내 업로드된 펑이 있는 장소의 id와 대표 펑 이미지 반환
