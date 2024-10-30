@@ -27,7 +27,7 @@ spring:
   datasource:
     username: ${DB_USERNAME}
     url: jdbc:mysql://${DB_HOST}:${DB_PORT}/${DB_NAME}
-    password: dala0118
+    password: ${DB_PASSWORD}
   application:
     name: pinpung
   main:
