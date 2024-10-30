@@ -4,6 +4,8 @@ pipeline {
         AWS_REGION = 'ap-northeast-2'
         AWS_ACCOUNT_ID = '528938155874'
         ECR_REPO = "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/pinpung/develop/backend"
+        JAVA_HOME = '/usr/lib/jvm/java-17-amazon-corretto'
+        PATH = "${JAVA_HOME}/bin:${env.PATH}"
     }
     stages {
         stage('Checkout') {
