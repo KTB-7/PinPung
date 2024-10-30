@@ -17,7 +17,7 @@ pipeline {
             steps {
                 script {
                     def parameterNames = [
-                        '/pinpung/DB_ENDPOINT',
+                        '/pinpung/DB_HOST',
                         '/pinpung/DB_NAME',
                         '/pinpung/DB_PASSWORD',
                         '/pinpung/DB_PORT',
@@ -66,7 +66,7 @@ pipeline {
                     sh """
                     docker stop pinpung-develop-backend || true && docker rm pinpung-develop-backend || true
                     docker run -d --name pinpung-develop-backend \
-                    -e DB_HOST=${DB_ENDPOINT} \
+                    -e DB_HOST=${DB_HOST} \
                     -e DB_NAME=${DB_NAME} \
                     -e DB_PASSWORD=${DB_PASSWORD} \
                     -e DB_PORT=${DB_PORT} \
