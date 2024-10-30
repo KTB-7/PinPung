@@ -57,29 +57,38 @@ public class PlaceService {
             List<Map<String, Object>> documents = (List<Map<String, Object>>) response.getBody().get("documents");
 
             for (Map<String, Object> document : documents) {
-                String placeId = (String) document.get("id");
-                String placeName = (String) document.get("place_name");
-                String address = (String) document.get("road_address_name");
-                String longitude = (String) document.get("x");
-                String latitude = (String) document.get("y");
+                String kakaoPlaceId = (String) document.get("id");
 
+                // 이미 존재하는지 확인
+                Optional<Place> existingPlace = placeRepository.findByKakaoPlaceId(kakaoPlaceId);
 
-                Place place = new Place();
-                place.setKakaoPlaceId(placeId);
-                place.setPlaceName(placeName);
-                place.setAddress(address);
-                place.setX(longitude);
-                place.setY(latitude);
-                Place savedPlace = placeRepository.save(place);
+                if (existingPlace.isPresent()) {
+                    // 이미 존재하는 경우, 저장하지 않고 기존 ID 추가
+                    placeIds.add(existingPlace.get().getPlaceId());
+                } else {
+                    // 존재하지 않는 경우 새로 저장
+                    String placeName = (String) document.get("place_name");
+                    String address = (String) document.get("road_address_name");
+                    String longitude = (String) document.get("x");
+                    String latitude = (String) document.get("y");
 
-                // 자동 생성된 Place의 id 추가
-                placeIds.add(savedPlace.getPlaceId());
+                    Place place = new Place();
+                    place.setKakaoPlaceId(kakaoPlaceId);
+                    place.setPlaceName(placeName);
+                    place.setAddress(address);
+                    place.setX(longitude);
+                    place.setY(latitude);
+
+                    Place savedPlace = placeRepository.save(place);
+                    placeIds.add(savedPlace.getPlaceId());
+                }
             }
         } else {
             log.error("카테고리 검색 API 호출 실패: {}", response.getStatusCode());
         }
         return placeIds;
     }
+
 
 
     /*
