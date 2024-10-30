@@ -2,6 +2,7 @@ package com.ktb7.pinpung.exception.common;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
@@ -15,35 +16,25 @@ public class CustomExceptionHandler {
         return ErrorDto.toResponseEntity(ex);
     }
 
-    // 잘못된 경로 변수로 인한 타입 변환 실패 처리 (400 Bad Request)
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
     protected ResponseEntity<ErrorDto> handleTypeMismatchException(MethodArgumentTypeMismatchException ex) {
-        CustomException customException = new CustomException(HttpStatus.BAD_REQUEST, ErrorCode.BAD_REQUEST, ErrorCode.BAD_REQUEST.getMsg());
-        return ErrorDto.toResponseEntity(customException);
+        return ErrorDto.toResponseEntity(new CustomException(ErrorCode.BAD_REQUEST));
     }
 
-    // NoHandlerFoundException 처리 (404 Not Found)
     @ExceptionHandler(NoHandlerFoundException.class)
     public ResponseEntity<ErrorDto> handleNoHandlerFoundException(NoHandlerFoundException ex) {
-        ErrorDto errorDto = ErrorDto.builder()
-                .status(HttpStatus.NOT_FOUND.value())
-                .errorCode("404_NOT_FOUND")
-                .msg("잘못된 요청입니다. 경로를 확인하세요.")
-//                .detail("요청한 URL을 찾을 수 없습니다: " + ex.getRequestURL())
-                .build();
-
-        return new ResponseEntity<>(errorDto, HttpStatus.NOT_FOUND);
+        return ErrorDto.toResponseEntity(new CustomException(ErrorCode.PLACE_NOT_FOUND));
     }
 
-    // 추가적인 예외 처리
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorDto> handleGenericException(Exception ex) {
-        ErrorDto errorDto = ErrorDto.builder()
-                .status(HttpStatus.INTERNAL_SERVER_ERROR.value())
-                .errorCode("500_INTERNAL_SERVER_ERROR")
-                .msg("서버 내부 오류가 발생했습니다.")
-                .build();
+        return ErrorDto.toResponseEntity(new CustomException(ErrorCode.INTERNAL_SERVER_ERROR));
+    }
 
-        return new ResponseEntity<>(errorDto, HttpStatus.INTERNAL_SERVER_ERROR);
+    // OAuth2 인증 관련 예외 처리
+    @ExceptionHandler(OAuth2AuthenticationException.class)
+    public ResponseEntity<ErrorDto> handleOAuth2AuthenticationException(OAuth2AuthenticationException ex) {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                .body(new ErrorDto(HttpStatus.UNAUTHORIZED.value(), ErrorCode.AUTHENTICATION_FAILED.getCode(), "OAuth2 인증에 실패했습니다."));
     }
 }

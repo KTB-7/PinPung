@@ -1,6 +1,7 @@
 package com.ktb7.pinpung.oauth2.controller;
 
 import com.ktb7.pinpung.oauth2.service.TokenService;
+import com.ktb7.pinpung.util.ValidationUtils;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -19,8 +20,7 @@ public class TokenController {
 
     @PostMapping("/refresh")
     public ResponseEntity<?> refreshToken(@RequestParam Long userId, @RequestParam String expiredAccessToken) {
-        ResponseEntity<?> response = tokenService.validateToken(userId, expiredAccessToken);
-
-        return response;
+        ValidationUtils.validateUserRequest(userId); // 현재 로그인된 사용자와 요청된 userId가 일치하는지 확인
+        return tokenService.validateToken(userId, expiredAccessToken);
     }
 }
