@@ -11,5 +11,5 @@ hooks:
       runas: ec2-user
   AfterInstall:
     - location: scripts/health_check.sh
-      timeout: 60
+      timeout: 1000
       runas: ec2-user
