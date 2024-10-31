@@ -30,52 +30,57 @@ pipeline {
                     def result = sh(script: "aws ssm get-parameters --names ${params} --with-decryption --query 'Parameters[*].{Name:Name,Value:Value}' --region ${AWS_REGION} --output json", returnStdout: true).trim()
                     def paramConfig = new groovy.json.JsonSlurper().parseText(result)
 
-                    paramConfig.each { item ->
+                    // withEnv에서 사용할 key=value 형태로 설정
+                    envVars = paramConfig.collect { item ->
                         def key = item.Name.tokenize('/').last()
-                        env[key] = item.Value
+                        return "${key}=${item.Value}"
                     }
+                    echo "Fetched environment variables"
                 }
             }
         }
         stage('Build Docker Image') {
             steps {
-                script {
-                    // Docker 이미지를 ECR 태그로 빌드
-                    sh """
-                    docker build -t pinpung-develop-backend:latest .
-                    docker tag pinpung-develop-backend:latest ${ECR_REPO}:latest
-                    """
+                withEnv(envVars) {
+                    script {
+                        sh """
+                        docker build -t pinpung-develop-backend:latest .
+                        docker tag pinpung-develop-backend:latest ${ECR_REPO}:latest
+                        """
+                    }
                 }
             }
         }
         stage('Push to ECR') {
             steps {
-                script {
-                    // ECR에 로그인 및 이미지 푸시
-                    sh """
-                    aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${ECR_REPO}
-                    docker push ${ECR_REPO}:latest
-                    """
+                withEnv(envVars) {
+                    script {
+                        sh """
+                        aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${ECR_REPO}
+                        docker push ${ECR_REPO}:latest
+                        """
+                    }
                 }
             }
         }
         stage('Deploy to EC2 with Docker Run') {
             steps {
-                script {
-                    // EC2에서 Docker 컨테이너 실행 시 환경 변수 전달
-                    sh """
-                    docker stop pinpung-develop-backend || true && docker rm pinpung-develop-backend || true
-                    docker run -d --name pinpung-develop-backend \
-                    -e DB_HOST=${DB_HOST} \
-                    -e DB_NAME=${DB_NAME} \
-                    -e DB_PASSWORD=${DB_PASSWORD} \
-                    -e DB_PORT=${DB_PORT} \
-                    -e DB_USERNAME=${DB_USERNAME} \
-                    -e KAKAO_CLIENT_ID=${KAKAO_CLIENT_ID} \
-                    -e REDIRECT_URI=${REDIRECT_URI} \
-                    -e S3_BUCKET_NAME=${S3_BUCKET_NAME} \
-                    -p 8080:8080 ${ECR_REPO}:latest
-                    """
+                withEnv(envVars) {
+                    script {
+                        sh """
+                        docker stop pinpung-develop-backend || true && docker rm pinpung-develop-backend || true
+                        docker run -d --name pinpung-develop-backend \
+                        -e DB_HOST=${env.DB_HOST} \
+                        -e DB_NAME=${env.DB_NAME} \
+                        -e DB_PASSWORD=${env.DB_PASSWORD} \
+                        -e DB_PORT=${env.DB_PORT} \
+                        -e DB_USERNAME=${env.DB_USERNAME} \
+                        -e KAKAO_CLIENT_ID=${env.KAKAO_CLIENT_ID} \
+                        -e REDIRECT_URI=${env.REDIRECT_URI} \
+                        -e S3_BUCKET_NAME=${env.S3_BUCKET_NAME} \
+                        -p 8080:8080 ${ECR_REPO}:latest
+                        """
+                    }
                 }
             }
         }
