@@ -1,5 +1,5 @@
 #!/bin/bash
-
+ECR_REPO = "528938155874.dkr.ecr.ap-northeast-2.amazonaws.com/pinpung/develop/backend"
 # Parameter Store에서 환경 변수 가져오기
 DB_HOST=$(aws ssm get-parameter --name "/pinpung/DB_HOST" --query "Parameter.Value" --output text --region ap-northeast-2)
 DB_NAME=$(aws ssm get-parameter --name "/pinpung/DB_NAME" --query "Parameter.Value" --output text --region ap-northeast-2)
