@@ -1,15 +1,19 @@
 package com.ktb7.pinpung.oauth2.service;
 
-import com.ktb7.pinpung.oauth2.dto.KakaoTokenResponseDto;
-import com.ktb7.pinpung.oauth2.dto.KakaoTokenInfoResponseDto;
-import com.ktb7.pinpung.oauth2.dto.TokenResponseDto;
 import com.ktb7.pinpung.entity.Token;
 import com.ktb7.pinpung.entity.User;
+import com.ktb7.pinpung.exception.common.CustomException;
+import com.ktb7.pinpung.exception.common.ErrorCode;
+import com.ktb7.pinpung.oauth2.dto.KakaoTokenInfoResponseDto;
+import com.ktb7.pinpung.oauth2.dto.KakaoTokenResponseDto;
+import com.ktb7.pinpung.oauth2.dto.TokenResponseDto;
 import com.ktb7.pinpung.repository.TokenRepository;
 import com.ktb7.pinpung.repository.UserRepository;
+import com.ktb7.pinpung.util.ValidationUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -17,6 +21,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 @Service
 @RequiredArgsConstructor
 public class TokenService {
+
     @Value("${kakao.client_id}")
     private String clientId;
 
@@ -27,11 +32,17 @@ public class TokenService {
     private final String KAUTH_USER_URL_HOST = "https://kapi.kakao.com";
 
     public ResponseEntity<?> validateToken(Long userId, String token) {
+        // 유효성 검증
+        ValidationUtils.validateUserId(userId);
+        ValidationUtils.validateAccessToken(token);
+
+        // 사용자 확인
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+                .orElseThrow(() -> new CustomException(HttpStatus.NOT_FOUND, ErrorCode.USER_NOT_FOUND));
 
         Long socialId = user.getSocialId();
 
+        // 카카오 API를 통한 토큰 유효성 검증
         KakaoTokenInfoResponseDto kakaoTokenInfoResponseDto = WebClient.create(KAUTH_USER_URL_HOST).get()
                 .uri(uriBuilder -> uriBuilder
                         .path("/v1/user/access_token_info")
@@ -41,21 +52,18 @@ public class TokenService {
                 .bodyToMono(KakaoTokenInfoResponseDto.class)
                 .block();
 
-
-        // socialId와 토큰 정보의 ID 검증
         if (kakaoTokenInfoResponseDto == null || !socialId.equals(kakaoTokenInfoResponseDto.getId())) {
-            return ResponseEntity.badRequest().body("Invalid token or social ID");
+            throw new CustomException(HttpStatus.UNAUTHORIZED, ErrorCode.INVALID_TOKEN_OR_SOCIAL_ID);
         }
 
-        // 리프레시 토큰으로 새로운 액세스 토큰 발급 요청
         return refreshToken(userId);
     }
 
-    // 리프레시 토큰을 사용해 액세스 토큰 갱신
     private ResponseEntity<?> refreshToken(Long userId) {
-        // 해당 유저의 리프레시 토큰 가져오기
+        ValidationUtils.validateUserId(userId);
+
         Token token = tokenRepository.findByUserId(userId)
-                .orElseThrow(() -> new IllegalArgumentException("User's refresh token not found"));
+                .orElseThrow(() -> new CustomException(HttpStatus.NOT_FOUND, ErrorCode.REFRESH_TOKEN_NOT_FOUND));
 
         KakaoTokenResponseDto kakaoTokenResponseDto = WebClient.create(KAUTH_TOKEN_URL_HOST)
                 .post()
@@ -71,12 +79,10 @@ public class TokenService {
 
         if (kakaoTokenResponseDto != null && kakaoTokenResponseDto.getAccessToken() != null) {
             String newAccessToken = kakaoTokenResponseDto.getAccessToken();
-
-            // 새로 발급된 액세스 토큰을 TokenResponseDto에 담아서 반환
             TokenResponseDto tokenResponseDto = new TokenResponseDto(userId, newAccessToken);
             return ResponseEntity.ok(tokenResponseDto);
         } else {
-            return ResponseEntity.status(500).body("Failed to refresh access token");
+            throw new CustomException(HttpStatus.INTERNAL_SERVER_ERROR, ErrorCode.TOKEN_REFRESH_FAILED);
         }
     }
 }

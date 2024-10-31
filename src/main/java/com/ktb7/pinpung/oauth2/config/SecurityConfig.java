@@ -26,20 +26,24 @@ public class SecurityConfig {
         http
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/login", "/oauth/**").permitAll()
-                        .anyRequest().authenticated()
+                        // 로그인 필요 없음 (permitAll)
+                        .requestMatchers("/login", "/logout-success", "/places/nearby", "/places/{placeId}", "/pungs/{placeId}", "/places/tag-reviews").permitAll()
+
+                        // 로그인 필요 (authenticated)
+                        .requestMatchers("/pungs", "/reviews", "/logout").authenticated()
+
+                        .anyRequest().authenticated()  // 나머지 요청도 인증 필요
                 )
                 .oauth2Login(oauth2 -> oauth2
-                                .successHandler(oAuth2LoginSuccessHandler)
-//                        .failureHandler(oAuth2LoginFailureHandler)
-                                .userInfoEndpoint(userInfo -> userInfo
-                                        .userService(customOAuth2UserService)
-                                )
+                        .successHandler(oAuth2LoginSuccessHandler)
+                        .failureHandler(oAuth2LoginFailureHandler)
+                        .userInfoEndpoint(userInfo -> userInfo
+                                .userService(customOAuth2UserService)
+                        )
                 )
                 .logout(logout -> logout
                         .logoutUrl("/logout")
                         .addLogoutHandler(oAuth2LogoutCustomHandler)
-                        .logoutSuccessUrl("/login") // 카카오 로그아웃 후 로그인 페이지로 리다이렉트
                 );
         return http.build();
     }

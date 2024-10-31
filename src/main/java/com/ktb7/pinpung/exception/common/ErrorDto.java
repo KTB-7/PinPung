@@ -17,9 +17,9 @@ public class ErrorDto {
         return ResponseEntity
                 .status(ex.getStatus())
                 .body(ErrorDto.builder()
-                        .status(ex.getStatus().value())  // 상태 코드 400
-                        .errorCode(ex.getErrorCode().getCode())  // 에러 코드 MISSING_PARAMETER
-                        .msg(ex.getErrorCode().getMsg())  // 에러 메시지 "필수 파라미터가 누락되었습니다"
+                        .status(ex.getStatus().value())
+                        .errorCode(ex.getErrorCode().getCode())
+                        .msg(ex.getMessage())
                         .build());
     }
 }

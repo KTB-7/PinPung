@@ -1,20 +1,25 @@
 package com.ktb7.pinpung.exception.common;
 
-import lombok.Getter;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import lombok.Getter;
 
-@Slf4j
 @Getter
 public class CustomException extends RuntimeException {
 
     private final HttpStatus status;
     private final ErrorCode errorCode;
-    private final String detail;
 
-    public CustomException(HttpStatus status, ErrorCode errorCode, String detail) {
+    // ErrorCode와 HttpStatus를 받는 생성자
+    public CustomException(HttpStatus status, ErrorCode errorCode) {
+        super(errorCode.getMsg());
         this.status = status;
         this.errorCode = errorCode;
-        this.detail = detail;
+    }
+
+    // ErrorCode와 HttpStatus, 추가 메시지를 받는 생성자
+    public CustomException(HttpStatus status, ErrorCode errorCode, String message) {
+        super(message);
+        this.status = status;
+        this.errorCode = errorCode;
     }
 }

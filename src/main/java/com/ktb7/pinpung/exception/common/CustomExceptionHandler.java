@@ -1,49 +1,48 @@
 package com.ktb7.pinpung.exception.common;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.servlet.NoHandlerFoundException;
 
 @ControllerAdvice
+@Slf4j
 public class CustomExceptionHandler {
 
     @ExceptionHandler(CustomException.class)
     protected ResponseEntity<ErrorDto> handleCustomException(CustomException ex) {
+        log.error("CustomException 발생: 상태 코드={}, 에러 메시지={}", ex.getStatus(), ex.getMessage());
         return ErrorDto.toResponseEntity(ex);
     }
 
-    // 잘못된 경로 변수로 인한 타입 변환 실패 처리 (400 Bad Request)
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
     protected ResponseEntity<ErrorDto> handleTypeMismatchException(MethodArgumentTypeMismatchException ex) {
-        CustomException customException = new CustomException(HttpStatus.BAD_REQUEST, ErrorCode.BAD_REQUEST, ErrorCode.BAD_REQUEST.getMsg());
-        return ErrorDto.toResponseEntity(customException);
+        log.error("MethodArgumentTypeMismatchException 발생: {}", ex.getMessage());
+        return ErrorDto.toResponseEntity(new CustomException(HttpStatus.BAD_REQUEST, ErrorCode.BAD_REQUEST));
     }
 
-    // NoHandlerFoundException 처리 (404 Not Found)
+    // 존재하지 않는 URL로 요청이 들어왔을 때 발생하는 예외 처리
     @ExceptionHandler(NoHandlerFoundException.class)
     public ResponseEntity<ErrorDto> handleNoHandlerFoundException(NoHandlerFoundException ex) {
-        ErrorDto errorDto = ErrorDto.builder()
-                .status(HttpStatus.NOT_FOUND.value())
-                .errorCode("404_NOT_FOUND")
-                .msg("잘못된 요청입니다. 경로를 확인하세요.")
-//                .detail("요청한 URL을 찾을 수 없습니다: " + ex.getRequestURL())
-                .build();
-
-        return new ResponseEntity<>(errorDto, HttpStatus.NOT_FOUND);
+        log.error("NoHandlerFoundException 발생: {}", ex.getMessage());
+        return ErrorDto.toResponseEntity(new CustomException(HttpStatus.NOT_FOUND, ErrorCode.PLACE_NOT_FOUND));
     }
 
-    // 추가적인 예외 처리
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorDto> handleGenericException(Exception ex) {
-        ErrorDto errorDto = ErrorDto.builder()
-                .status(HttpStatus.INTERNAL_SERVER_ERROR.value())
-                .errorCode("500_INTERNAL_SERVER_ERROR")
-                .msg("서버 내부 오류가 발생했습니다.")
-                .build();
+        log.error("Exception 발생: {}", ex.getMessage(), ex);
+        return ErrorDto.toResponseEntity(new CustomException(HttpStatus.INTERNAL_SERVER_ERROR, ErrorCode.INTERNAL_SERVER_ERROR));
+    }
 
-        return new ResponseEntity<>(errorDto, HttpStatus.INTERNAL_SERVER_ERROR);
+    // OAuth2 인증 관련 예외 처리
+    @ExceptionHandler(OAuth2AuthenticationException.class)
+    public ResponseEntity<ErrorDto> handleOAuth2AuthenticationException(OAuth2AuthenticationException ex) {
+        log.error("OAuth2AuthenticationException 발생: {}", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                .body(new ErrorDto(HttpStatus.UNAUTHORIZED.value(), ErrorCode.AUTHENTICATION_FAILED.getCode(), "OAuth2 인증에 실패했습니다."));
     }
 }
