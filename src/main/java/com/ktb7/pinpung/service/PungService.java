@@ -42,9 +42,11 @@ public class PungService {
     }
 
 
+    @Transactional
     public void uploadPung(Long userId, Long placeId, MultipartFile imageWithText, MultipartFile pureImage, String text) {
         log.info("uploadPung 호출됨: userId={}, placeId={}, text={}", userId, placeId, text);
         try {
+
             // 1. Image 엔티티 생성 후 저장하여 imageId 얻기
             Image image = new Image();
             imageRepository.save(image);
@@ -52,6 +54,7 @@ public class PungService {
 
             // 2. S3에 이미지 업로드
             Map<String, String> imageKeys = s3Service.uploadFile(imageWithText, pureImage, imageId);
+            System.out.println(imageKeys);
 
             // 3. Image 엔티티에 S3 키값 업데이트 후 저장
             image.setImageTextKey(imageKeys.get("imageTextKey"));

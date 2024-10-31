@@ -40,22 +40,24 @@ public class PungController {
         return ResponseEntity.ok(pungs);
     }
 
-    @PostMapping
+    @PostMapping("/upload")
     public ResponseEntity<String> uploadPungs(
-            @ModelAttribute UploadPungRequest request,
+            @RequestParam Long userId,
+            @RequestParam Long placeId,
             @RequestParam MultipartFile imageWithText,
-            @RequestParam MultipartFile pureImage
+            @RequestParam MultipartFile pureImage,
+            @RequestParam String text
     ) {
         // 로그 출력
-        log.info("uploadPungs: {} {} {}", request.getUserId(), request.getPlaceId(), request.getText());
+        log.info("uploadPungs: {} {} {}", userId, placeId, text);
 
         // 유효성 검증
-        ValidationUtils.validateUserAndPlaceId(request.getUserId(), request.getPlaceId());
+        ValidationUtils.validateUserAndPlaceId(userId, placeId);
         ValidationUtils.validateFile(imageWithText, "imageWithText");
         ValidationUtils.validateFile(pureImage, "pureImage");
 
         try {
-            pungService.uploadPung(request.getUserId(), request.getPlaceId(), imageWithText, pureImage, request.getText());
+            pungService.uploadPung(userId, placeId, imageWithText, pureImage, text);
             return ResponseEntity.ok("Pung upload success");
         } catch (Exception e) {
             throw new CustomException(HttpStatus.INTERNAL_SERVER_ERROR, ErrorCode.FILE_UPLOAD_FAILED, ErrorCode.FILE_UPLOAD_FAILED.getMsg());
