@@ -9,3 +9,7 @@ hooks:
     - location: scripts/start_docker.sh
       timeout: 300
       runas: ec2-user
+  AfterInstall:
+    - location: scripts/health_check.sh
+      timeout: 60
+      runas: ec2-user
