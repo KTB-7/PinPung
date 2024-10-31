@@ -60,7 +60,7 @@ pipeline {
                     aws deploy create-deployment \
                         --application-name ${CODE_DEPLOY_APP_NAME} \
                         --deployment-group-name ${CODE_DEPLOY_GROUP} \
-                        --s3-location bucket=${S3_BUCKET},key=appspec.yml,bundleType=YAML \
+                        --s3-location bucket=${S3_BUCKET},key=deploy_bundle.zip,bundleType=zip \
                         --region ${AWS_REGION}
                     """
                 }
