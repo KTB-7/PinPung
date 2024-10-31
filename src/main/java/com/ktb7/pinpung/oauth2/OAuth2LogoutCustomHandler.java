@@ -19,7 +19,8 @@ public class OAuth2LogoutCustomHandler implements LogoutHandler {
     @Value("${kakao.client_id}")
     private String clientId;
 
-    private String logoutRedirectUri = "http://localhost:8080/logout-success";
+    @Value("${LOGOUT_REDIRECT_URI}")
+    private String logoutRedirectUri;
 
     @Override
     public void logout(HttpServletRequest request, HttpServletResponse response, Authentication authentication) {

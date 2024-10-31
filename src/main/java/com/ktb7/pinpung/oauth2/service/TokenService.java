@@ -25,11 +25,14 @@ public class TokenService {
     @Value("${kakao.client_id}")
     private String clientId;
 
+    @Value("${spring.security.oauth2.client.provider.kakao.token-uri}")
+    private String kakaoTokenUrl;
+
+    @Value("${spring.security.oauth2.client.provider.kakao.user-info-uri}")
+    private String kakaoUserInfoUrl;
+
     private final TokenRepository tokenRepository;
     private final UserRepository userRepository;
-
-    private final String KAUTH_TOKEN_URL_HOST = "https://kauth.kakao.com";
-    private final String KAUTH_USER_URL_HOST = "https://kapi.kakao.com";
 
     public ResponseEntity<?> validateToken(Long userId, String token) {
         // 유효성 검증
@@ -43,10 +46,7 @@ public class TokenService {
         Long socialId = user.getSocialId();
 
         // 카카오 API를 통한 토큰 유효성 검증
-        KakaoTokenInfoResponseDto kakaoTokenInfoResponseDto = WebClient.create(KAUTH_USER_URL_HOST).get()
-                .uri(uriBuilder -> uriBuilder
-                        .path("/v1/user/access_token_info")
-                        .build(true))
+        KakaoTokenInfoResponseDto kakaoTokenInfoResponseDto = WebClient.create(kakaoUserInfoUrl).get()
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + token)
                 .retrieve()
                 .bodyToMono(KakaoTokenInfoResponseDto.class)
@@ -65,10 +65,9 @@ public class TokenService {
         Token token = tokenRepository.findByUserId(userId)
                 .orElseThrow(() -> new CustomException(HttpStatus.NOT_FOUND, ErrorCode.REFRESH_TOKEN_NOT_FOUND));
 
-        KakaoTokenResponseDto kakaoTokenResponseDto = WebClient.create(KAUTH_TOKEN_URL_HOST)
+        KakaoTokenResponseDto kakaoTokenResponseDto = WebClient.create(kakaoTokenUrl)
                 .post()
                 .uri(uriBuilder -> uriBuilder
-                        .path("/oauth/token")
                         .queryParam("grant_type", "refresh_token")
                         .queryParam("client_id", clientId)
                         .queryParam("refresh_token", token.getRefreshToken())
