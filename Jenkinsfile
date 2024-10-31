@@ -34,29 +34,20 @@ pipeline {
                 }
             }
         }
-        stage('Generate and Upload AppSpec.yml to S3') {
+        stage('Prepare Deployment Bundle') {
             steps {
                 script {
-                    // appspec.yml 및 start_docker.sh 파일 생성 및 S3 업로드
-                    writeFile file: 'appspec.yml', text: """
-                    version: 0.0
-                    os: linux
-                    files:
-                      - source: /
-                        destination: /home/ec2-user/deploy
-                    hooks:
-                      ApplicationStart:
-                        - location: scripts/start_docker.sh
-                          timeout: 300
-                          runas: ec2-user
-                    """
-                    writeFile file: 'scripts/start_docker.sh', text: '''
-                    #!/bin/bash
-                    # 데이터베이스 환경 변수 설정 및 Docker 실행
-                    '''
                     sh """
-                    aws s3 cp appspec.yml s3://${S3_BUCKET}/appspec.yml --region ${AWS_REGION}
-                    aws s3 cp scripts/start_docker.sh s3://${S3_BUCKET}/scripts/start_docker.sh --region ${AWS_REGION}
+                    zip -r deploy_bundle.zip appspec.yml scripts/
+                    """
+                }
+            }
+        }
+        stage('Upload Deployment Bundle to S3') {
+            steps {
+                script {
+                    sh """
+                    aws s3 cp deploy_bundle.zip s3://${S3_BUCKET}/deploy_bundle.zip --region ${AWS_REGION}
                     """
                 }
             }
