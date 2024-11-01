@@ -3,6 +3,8 @@ package com.ktb7.pinpung.entity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import java.text.DateFormat;
 import java.time.LocalDateTime;
@@ -27,9 +29,10 @@ public class Review {
     @Column(name = "text")
     private String text;
 
-    @Column(name = "createdAt", nullable = false)
+    @CreationTimestamp
+    @Column(updatable = false)
     private LocalDateTime createdAt;
 
-    @Column(name = "updatedAt", nullable = false)
+    @UpdateTimestamp
     private LocalDateTime updatedAt;
 }

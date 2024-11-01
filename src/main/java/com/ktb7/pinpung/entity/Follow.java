@@ -1,7 +1,6 @@
 package com.ktb7.pinpung.entity;
 
 import jakarta.persistence.*;
-import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
@@ -10,22 +9,18 @@ import java.time.LocalDateTime;
 
 @Entity
 @Setter
-@Getter
-public class Token {
-
+public class Follow {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name="id")
-    private Long tokenId;
+    private Long id;
 
-    @Column(name="userId")
-    private Long userId;
+    @ManyToOne
+    @JoinColumn(name = "follower_id", referencedColumnName = "id")
+    private User follower;
 
-    @Column(name="refreshToken")
-    private String refreshToken;
-
-    @Column(name="expiresIn")
-    private Integer expiresIn;
+    @ManyToOne
+    @JoinColumn(name = "following_id", referencedColumnName = "id")
+    private User following;
 
     @CreationTimestamp
     @Column(updatable = false)

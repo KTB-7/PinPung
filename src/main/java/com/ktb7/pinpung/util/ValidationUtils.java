@@ -100,7 +100,7 @@ public class ValidationUtils {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication != null && authentication.getPrincipal() instanceof OAuth2User) {
             OAuth2User user = (OAuth2User) authentication.getPrincipal();
-            return Long.parseLong(user.getAttribute("id")); // OAuth2 사용자 ID 가져오기
+            return Long.parseLong(user.getAttribute("id"));
         }
         throw new CustomException(HttpStatus.UNAUTHORIZED, ErrorCode.AUTHENTICATION_FAILED);
     }
