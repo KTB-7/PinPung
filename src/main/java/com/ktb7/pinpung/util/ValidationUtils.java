@@ -1,16 +1,24 @@
 package com.ktb7.pinpung.util;
 
+import com.ktb7.pinpung.entity.User;
 import com.ktb7.pinpung.exception.common.CustomException;
 import com.ktb7.pinpung.exception.common.ErrorCode;
+import com.ktb7.pinpung.repository.UserRepository;
+import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.core.user.OAuth2User;
+import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
+@Component
+@AllArgsConstructor
 public class ValidationUtils {
+
+    private final UserRepository userRepository;
 
     // x, y 좌표 값의 유효성을 검사하는 메서드
     public static void validateCoordinates(String x, String y) {
@@ -87,21 +95,24 @@ public class ValidationUtils {
         }
     }
 
-    // 로그인된 사용자 ID와 요청된 userId가 일치하는지 확인하는 메서드
-    public static void validateUserRequest(Long requestUserId) {
-        Long currentUserId = getCurrentUserId();
-        if (!currentUserId.equals(requestUserId)) {
-            throw new CustomException(HttpStatus.FORBIDDEN, ErrorCode.UNAUTHORIZED_CLIENT);
-        }
-    }
-
-    // 현재 로그인된 사용자 ID를 반환하는 메서드
-    public static Long getCurrentUserId() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication != null && authentication.getPrincipal() instanceof OAuth2User) {
-            OAuth2User user = (OAuth2User) authentication.getPrincipal();
-            return Long.parseLong(user.getAttribute("id"));
-        }
-        throw new CustomException(HttpStatus.UNAUTHORIZED, ErrorCode.AUTHENTICATION_FAILED);
-    }
+//    // 로그인된 사용자 ID와 요청된 userId가 일치하는지 확인하는 메서드
+//    public void validateUserRequest(Long requestUserId) {
+//        Long currentSocialId = getCurrentUserId();
+//        User user = userRepository.findBySocialId(currentSocialId)
+//                .orElseThrow(() -> new CustomException(HttpStatus.BAD_REQUEST, ErrorCode.USER_NOT_FOUND));
+//
+//        if (!user.getUserId().equals(requestUserId)) {
+//            throw new CustomException(HttpStatus.FORBIDDEN, ErrorCode.UNAUTHORIZED_CLIENT);
+//        }
+//    }
+//
+//    // 현재 로그인된 사용자 ID를 반환하는 메서드
+//    public Long getCurrentUserId() {
+//        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+//        if (authentication != null && authentication.getPrincipal() instanceof OAuth2User) {
+//            OAuth2User user = (OAuth2User) authentication.getPrincipal();
+//            return Long.parseLong(user.getAttribute("id"));
+//        }
+//        throw new CustomException(HttpStatus.UNAUTHORIZED, ErrorCode.AUTHENTICATION_FAILED);
+//    }
 }

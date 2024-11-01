@@ -19,13 +19,14 @@ import org.springframework.web.bind.annotation.RestController;
 public class FollowController {
 
     private final FollowService followService;
+    private final ValidationUtils validationUtils;
 
     @PostMapping("/add")
     public ResponseEntity<FollowResponseDto> followUser(@RequestBody FollowRequestDto followRequestDto) {
-        log.info("{}", followRequestDto);
+        log.info("{}", followRequestDto.getUserId());
         // 유효성 검증: id 검증
         ValidationUtils.validateUserId(followRequestDto.getUserId());
-        ValidationUtils.validateUserRequest(followRequestDto.getUserId());
+//        validationUtils.validateUserRequest(followRequestDto.getUserId());
         ValidationUtils.validateUserId(followRequestDto.getWantsToFollowId());
 
         FollowResponseDto response = followService.followUser(followRequestDto.getUserId(), followRequestDto.getWantsToFollowId());
