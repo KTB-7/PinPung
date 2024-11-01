@@ -38,10 +38,16 @@ spring:
       naming:
         physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
       ddl-auto: update
-
-
 kakao:
   client_id: ${KAKAO_CLIENT_ID}
   redirect_uri: ${REDIRECT_URI}
-
+# Actuator 설정 추가
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
+  endpoint:
+    health:
+      show-details: always
 

@@ -53,6 +53,9 @@ dependencies {
 
 	// OAuth2 클라이언트
 	implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
+
+	// for health check
+	implementation 'org.springframework.boot:spring-boot-starter-actuator'
 }
 
 tasks.named('test') {
