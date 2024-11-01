@@ -1,6 +1,7 @@
 package com.ktb7.pinpung.service;
 
 import com.ktb7.pinpung.dto.FollowResponseDto;
+import com.ktb7.pinpung.dto.UnfollowResponseDto;
 import com.ktb7.pinpung.entity.Follow;
 import com.ktb7.pinpung.entity.User;
 import com.ktb7.pinpung.exception.common.CustomException;
@@ -44,4 +45,30 @@ public class FollowService {
         // FollowResponseDto 반환
         return new FollowResponseDto(userId, wantsToFollowId);
     }
+
+    public UnfollowResponseDto unfollowUser(Long userId, Long wantsToUnfollowId) {
+        // 두 아이디가 존재하는지 확인하고 유저 불러오기
+        User user = userRepository.findByUserId(userId).orElseThrow(() ->
+                new CustomException(HttpStatus.BAD_REQUEST, ErrorCode.USER_NOT_FOUND));
+
+        User wantsToUnfollow = userRepository.findByUserId(wantsToUnfollowId).orElseThrow(() ->
+                new CustomException(HttpStatus.BAD_REQUEST, ErrorCode.USER_NOT_FOUND));
+
+        // Follow 관계가 존재하는지 확인
+        Follow follow = followRepository.findByFollowerAndFollowing(user, wantsToUnfollow).orElseThrow(() ->
+                new CustomException(HttpStatus.BAD_REQUEST, ErrorCode.FOLLOW_RELATION_NOT_FOUND));
+
+        try {
+            // Follow 엔티티 삭제
+            followRepository.delete(follow);
+            log.info("User {} unfollowed User {}", userId, wantsToUnfollowId);
+        } catch (Exception e) {
+            log.error("Error deleting follow relationship between user {} and user {}", userId, wantsToUnfollowId, e);
+            throw new CustomException(HttpStatus.INTERNAL_SERVER_ERROR, ErrorCode.DATABASE_ERROR);
+        }
+
+        // UnfollowResponseDto 반환
+        return new UnfollowResponseDto(userId, wantsToUnfollowId);
+    }
+
 }
