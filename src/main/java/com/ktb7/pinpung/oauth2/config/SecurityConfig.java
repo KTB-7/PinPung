@@ -26,9 +26,9 @@ public class SecurityConfig {
         http
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/actuator/health").permitAll()  // 헬스 체크 엔드포인트
                         // 로그인 필요 없음 (permitAll)
                         .requestMatchers("/login", "/logout-success", "/places/nearby", "/places/{placeId}", "/pungs/{placeId}", "/places/tag-reviews").permitAll()
-                        .requestMatchers("/actuator/health").permitAll()  // 헬스 체크 엔드포인트
                         // 로그인 필요 (authenticated)
                         .requestMatchers("/pungs", "/reviews", "/logout").authenticated()
 
