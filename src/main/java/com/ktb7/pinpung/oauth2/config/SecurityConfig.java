@@ -7,6 +7,7 @@ import com.ktb7.pinpung.oauth2.service.CustomOAuth2UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.Order;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.web.SecurityFilterChain;
@@ -14,6 +15,7 @@ import org.springframework.security.web.SecurityFilterChain;
 @Configuration
 @RequiredArgsConstructor
 @EnableWebSecurity
+@Order(2)
 public class SecurityConfig {
 
     private final CustomOAuth2UserService customOAuth2UserService;
@@ -28,7 +30,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         // 로그인 필요 없음 (permitAll)
                         .requestMatchers("/login", "/logout-success", "/places/nearby", "/places/{placeId}", "/pungs/{placeId}", "/places/tag-reviews").permitAll()
-                        .requestMatchers("/actuator/health").permitAll()  // 헬스 체크 엔드포인트
+
                         // 로그인 필요 (authenticated)
                         .requestMatchers("/pungs", "/reviews", "/logout").authenticated()
 
@@ -45,6 +47,8 @@ public class SecurityConfig {
                         .logoutUrl("/logout")
                         .addLogoutHandler(oAuth2LogoutCustomHandler)
                 );
+
+
         return http.build();
     }
 }
