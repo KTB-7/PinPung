@@ -1,5 +1,5 @@
 #!/bin/bash
-HEALTH_CHECK_URL="http://localhost:8080/health"
+HEALTH_CHECK_URL="http://localhost:8080/actuator/health"
 
 for i in {1..10}; do
     RESPONSE=$(curl -s -o /dev/null -w "%{http_code}" ${HEALTH_CHECK_URL})
