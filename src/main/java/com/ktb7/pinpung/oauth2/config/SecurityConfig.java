@@ -29,7 +29,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/actuator/health").permitAll()
                         // 로그인 필요 없음 (permitAll)
-                        .requestMatchers("/login", "/logout-success", "/places/nearby", "/places/{placeId}", "/pungs/{placeId}", "/places/tag-reviews").permitAll()
+                        .requestMatchers("/login", "/logout-success", "/places/nearby", "/places/{placeId}", "/pungs/{placeId}", "/places/tag-reviews", "reviews/upload").permitAll()
 
                         // 로그인 필요 (authenticated)
                         .requestMatchers("/pungs", "/reviews", "/logout").authenticated()

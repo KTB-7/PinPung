@@ -15,31 +15,32 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 @RestController
+@Slf4j
 @RequestMapping("/reviews")
 @AllArgsConstructor
-@Slf4j
 public class ReviewController {
 
     private final ReviewService reviewService;
 
     @PostMapping("/upload")
-    public ResponseEntity<String> uploadPungs(
+    public ResponseEntity<String> uploadReviews(
             @RequestParam Long userId,
             @RequestParam Long placeId,
-            @RequestParam MultipartFile image,
+            @RequestParam(required = false) MultipartFile image,
             @RequestParam String text
     ) {
         // 로그 출력
-        log.info("uploadPungs: {} {} {}", userId, placeId, text);
+        log.info("uploadReviews: {} {} {}", userId, placeId, text);
 
         // 유효성 검증
         ValidationUtils.validateUserAndPlaceId(userId, placeId);
-        ValidationUtils.validateFile(image, "image");
+//        ValidationUtils.validateFile(image, "image");
 
         try {
             reviewService.uploadReview(userId, placeId, image, text);
             return ResponseEntity.ok("Review upload success");
         } catch (Exception e) {
+            log.error("Review upload failed: {}", e.getMessage(), e);
             throw new CustomException(HttpStatus.INTERNAL_SERVER_ERROR, ErrorCode.FILE_UPLOAD_FAILED, ErrorCode.FILE_UPLOAD_FAILED.getMsg());
         }
     }
