@@ -30,32 +30,31 @@ public class ReviewService {
     public void uploadReview(Long userId, Long placeId, MultipartFile reviewImage, String text) {
         log.info("uploadReview 호출됨: userId={}, placeId={}, text={}", userId, placeId, text);
         try {
-            Boolean isReview = true;
+            Long imageId = null;
 
-            // 1. Image 엔티티 생성 후 저장하여 imageId 얻기
-            Image image = new Image();
-            imageRepository.save(image);
-            Long imageId = image.getImageId();
+            // 1. 이미지가 존재할 때만 Image 엔티티 생성 및 S3 업로드 수행
+            if (reviewImage != null && !reviewImage.isEmpty()) {
+                Image image = new Image();
+                imageRepository.save(image);
+                imageId = image.getImageId();
 
-            // 2. S3에 이미지 업로드
-            Map<String, String> imageKeys = s3Service.uploadFile(null, reviewImage, imageId, isReview);
-            System.out.println(imageKeys);
+                // S3에 이미지 업로드
+                Map<String, String> imageKeys = s3Service.uploadFile(null, reviewImage, imageId, true);
+                image.setImageTextKey(imageKeys.get("imageTextKey"));
+                image.setPureImageKey(imageKeys.get("pureImageKey"));
+                imageRepository.save(image); // 키가 업데이트된 Image 엔티티 저장
+            }
 
-            // 3. Image 엔티티에 S3 키값 업데이트 후 저장
-            image.setImageTextKey(imageKeys.get("imageTextKey"));
-            image.setPureImageKey(imageKeys.get("pureImageKey"));
-            imageRepository.save(image);
-
-            // 4. review 엔티티 생성 후 저장
+            // 2. Review 엔티티 생성 후 저장 (imageId가 없으면 null로 저장됨)
             Review review = new Review();
             review.setUserId(userId);
             review.setPlaceId(placeId);
-            review.setImageId(imageId);
+            review.setImageId(imageId);  // 이미지가 없을 경우 null로 설정
             review.setText(text);
             reviewRepository.save(review);
         } catch (Exception e) {
-            log.error("이미지 업로드 및 Pung 저장 중 오류 발생: {}", e.getMessage(), e);
-            throw new CustomException(HttpStatus.INTERNAL_SERVER_ERROR, ErrorCode.FILE_UPLOAD_FAILED, "Pung 업로드 중 오류가 발생했습니다.");
+            log.error("리뷰 업로드 중 오류 발생: {}", e.getMessage(), e);
+            throw new CustomException(HttpStatus.INTERNAL_SERVER_ERROR, ErrorCode.FILE_UPLOAD_FAILED, "리뷰 업로드 중 오류가 발생했습니다.");
         }
     }
 }

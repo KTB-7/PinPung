@@ -6,6 +6,7 @@ import com.ktb7.pinpung.exception.common.CustomException;
 import com.ktb7.pinpung.exception.common.ErrorCode;
 import com.ktb7.pinpung.service.PungService;
 import com.ktb7.pinpung.util.ValidationUtils;
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -18,12 +19,9 @@ import org.springframework.web.multipart.MultipartFile;
 @RestController
 @Slf4j
 @RequestMapping("/pungs")
+@AllArgsConstructor
 public class PungController {
     private final PungService pungService;
-
-    public PungController(PungService pungService) {
-        this.pungService = pungService;
-    }
 
     @GetMapping("/{placeId}")
     public ResponseEntity<PungsResponseDto> getPungs(
