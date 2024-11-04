@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @AllArgsConstructor
 @Slf4j
-@RequestMapping("/follows")
+@RequestMapping("/api/follows")
 public class FollowController {
 
     private final FollowService followService;

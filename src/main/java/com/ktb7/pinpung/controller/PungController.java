@@ -18,7 +18,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @Slf4j
-@RequestMapping("/pungs")
+@RequestMapping("/api/pungs")
 @AllArgsConstructor
 public class PungController {
     private final PungService pungService;

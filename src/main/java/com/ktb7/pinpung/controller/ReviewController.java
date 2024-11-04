@@ -13,7 +13,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @Slf4j
-@RequestMapping("/reviews")
+@RequestMapping("/api/reviews")
 @AllArgsConstructor
 public class ReviewController {
 
