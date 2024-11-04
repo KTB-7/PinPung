@@ -35,7 +35,7 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/login", "/logout-success", "/places/nearby", "/places/{placeId}", "/pungs/{placeId}", "/places/tag-reviews").permitAll()
-                        .requestMatchers("/pungs", "/reviews", "/logout", "/follows/add").authenticated()
+                        .requestMatchers("/pungs", "/reviews", "/logout", "/follows/add", "follows/delete").authenticated()
                         .anyRequest().authenticated()
                 )
                 .oauth2Login(oauth2 -> oauth2

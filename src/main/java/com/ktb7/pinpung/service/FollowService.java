@@ -1,6 +1,8 @@
 package com.ktb7.pinpung.service;
 
 import com.ktb7.pinpung.dto.FollowResponseDto;
+import com.ktb7.pinpung.dto.FollowReponseDto;
+import com.ktb7.pinpung.dto.SimpleUserDto;
 import com.ktb7.pinpung.dto.UnfollowResponseDto;
 import com.ktb7.pinpung.entity.Follow;
 import com.ktb7.pinpung.entity.User;
@@ -12,6 +14,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -71,4 +76,29 @@ public class FollowService {
         return new UnfollowResponseDto(userId, wantsToUnfollowId);
     }
 
+    public FollowReponseDto getFollowers(Long userId) {
+        // 사용자가 존재하는지 확인
+        userRepository.findByUserId(userId).orElseThrow(() ->
+                new CustomException(HttpStatus.BAD_REQUEST, ErrorCode.USER_NOT_FOUND));
+
+        List<User> followers = followRepository.findFollowersByUserId(userId);
+        List<SimpleUserDto> followerList = followers.stream()
+                .map(follower -> new SimpleUserDto(follower.getUserId(), follower.getUserName()))
+                .collect(Collectors.toList());
+
+        return new FollowReponseDto(followerList.size(), followerList);
+    }
+
+    public FollowReponseDto getFollowings(Long userId) {
+        // 사용자가 존재하는지 확인
+        userRepository.findByUserId(userId).orElseThrow(() ->
+                new CustomException(HttpStatus.BAD_REQUEST, ErrorCode.USER_NOT_FOUND));
+
+        List<User> followings = followRepository.findFollowingsByUserId(userId);
+        List<SimpleUserDto> followingList = followings.stream()
+                .map(follower -> new SimpleUserDto(follower.getUserId(), follower.getUserName()))
+                .collect(Collectors.toList());
+
+        return new FollowReponseDto(followingList.size(), followingList);
+    }
 }

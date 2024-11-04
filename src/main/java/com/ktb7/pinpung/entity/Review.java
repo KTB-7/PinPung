@@ -26,6 +26,9 @@ public class Review {
     @Column(name = "placeId")
     private Long placeId;
 
+    @Column(name = "imageId")
+    private Long imageId;
+
     @Column(name = "text")
     private String text;
 

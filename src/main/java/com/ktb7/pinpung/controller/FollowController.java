@@ -2,6 +2,7 @@ package com.ktb7.pinpung.controller;
 
 import com.ktb7.pinpung.dto.FollowRequestDto;
 import com.ktb7.pinpung.dto.FollowResponseDto;
+import com.ktb7.pinpung.dto.FollowReponseDto;
 import com.ktb7.pinpung.dto.UnfollowResponseDto;
 import com.ktb7.pinpung.service.FollowService;
 import com.ktb7.pinpung.util.ValidationUtils;
@@ -40,4 +41,23 @@ public class FollowController {
         return ResponseEntity.ok(response);
     }
 
+    @GetMapping(value = "/followers", produces = "application/json")
+    public ResponseEntity<FollowReponseDto> getFollowers(@RequestParam Long userId) {
+        // 유효성 검증: id 검증
+        ValidationUtils.validateUserId(userId);
+
+        FollowReponseDto response = followService.getFollowers(userId);
+
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping(value = "/followings", produces = "application/json")
+    public ResponseEntity<FollowReponseDto> getFollowings(@RequestParam Long userId) {
+        // 유효성 검증: id 검증
+        ValidationUtils.validateUserId(userId);
+
+        FollowReponseDto response = followService.getFollowings(userId);
+
+        return ResponseEntity.ok(response);
+    }
 }
