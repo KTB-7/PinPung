@@ -8,15 +8,12 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @Slf4j
-@RequestMapping("/reviews")
+@RequestMapping("/api/reviews")
 @AllArgsConstructor
 public class ReviewController {
 
@@ -44,4 +41,16 @@ public class ReviewController {
             throw new CustomException(HttpStatus.INTERNAL_SERVER_ERROR, ErrorCode.FILE_UPLOAD_FAILED, ErrorCode.FILE_UPLOAD_FAILED.getMsg());
         }
     }
+
+
+//    @PatchMapping("/modify")
+//    public ResponseEntity<String> modifyReviews() {
+//
+//        // 유저아이디와 액세스토큰으로 받은 값 일치하는지(수정해도 되는 사람인지) 확인
+//        // 유저 아이디, 텍스트, 이미지로 구성(placeid는 수정불가)
+//        // userid, placeid, image, text를 받음
+//        // 해당 리뷰가 존재하는지 확인
+//        // 텍스트, 이미지를 가지고 변경
+//
+//    }
 }

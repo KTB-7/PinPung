@@ -42,39 +42,58 @@ public class PlaceService {
         RestTemplate restTemplate = new RestTemplate();
         HttpHeaders headers = new HttpHeaders();
         headers.set("Authorization", "KakaoAK " + clientId);
-        String requestUrl = KAKAO_LOCAL_API_URL + "?category_group_code=CE7&x=" + x + "&y=" + y + "&radius=" + radius;
 
-        HttpEntity<String> entity = new HttpEntity<>(headers);
-        ResponseEntity<Map> response = restTemplate.exchange(requestUrl, HttpMethod.GET, entity, Map.class);
-
-        if (!response.getStatusCode().is2xxSuccessful()) {
-            log.error("카테고리 검색 API 호출 실패: {}", response.getStatusCode());
-            throw new CustomException(HttpStatus.BAD_REQUEST, ErrorCode.KAKAO_API_CALL_FAILED);
-        }
-
-        List<Map<String, Object>> documents = (List<Map<String, Object>>) response.getBody().get("documents");
         List<Long> placeIds = new ArrayList<>();
+        int page = 1;
+        int size = 15;  // API에서 허용하는 최대 사이즈
+        int maxPage = 3; // 카카오 API의 최대 페이지 제한
+        boolean hasMoreResults = true;
 
-        for (Map<String, Object> document : documents) {
-            String kakaoPlaceId = (String) document.get("id");
+        while (hasMoreResults && page <= maxPage) { // 최대 페이지를 초과하지 않도록 조건 추가
+            String requestUrl = KAKAO_LOCAL_API_URL + "?category_group_code=CE7&x=" + x + "&y=" + y +
+                    "&radius=" + radius + "&page=" + page + "&size=" + size;
 
-            Optional<Place> existingPlace = placeRepository.findByKakaoPlaceId(kakaoPlaceId);
-            if (existingPlace.isPresent()) {
-                placeIds.add(existingPlace.get().getPlaceId());
-            } else {
-                Place place = new Place();
-                place.setKakaoPlaceId(kakaoPlaceId);
-                place.setPlaceName((String) document.get("place_name"));
-                place.setAddress((String) document.get("road_address_name"));
-                place.setX((String) document.get("x"));
-                place.setY((String) document.get("y"));
+            HttpEntity<String> entity = new HttpEntity<>(headers);
+            ResponseEntity<Map> response = restTemplate.exchange(requestUrl, HttpMethod.GET, entity, Map.class);
 
-                Place savedPlace = placeRepository.save(place);
-                placeIds.add(savedPlace.getPlaceId());
+            if (!response.getStatusCode().is2xxSuccessful()) {
+                log.error("카테고리 검색 API 호출 실패: {}", response.getStatusCode());
+                throw new CustomException(HttpStatus.BAD_REQUEST, ErrorCode.KAKAO_API_CALL_FAILED);
             }
+
+            List<Map<String, Object>> documents = (List<Map<String, Object>>) response.getBody().get("documents");
+
+            if (documents == null || documents.isEmpty()) {
+                hasMoreResults = false;
+                break;
+            }
+
+            for (Map<String, Object> document : documents) {
+                String kakaoPlaceId = (String) document.get("id");
+
+                Optional<Place> existingPlace = placeRepository.findByKakaoPlaceId(kakaoPlaceId);
+                if (existingPlace.isPresent()) {
+                    placeIds.add(existingPlace.get().getPlaceId());
+                } else {
+                    Place place = new Place();
+                    place.setKakaoPlaceId(kakaoPlaceId);
+                    place.setPlaceName((String) document.get("place_name"));
+                    place.setAddress((String) document.get("road_address_name"));
+                    place.setX((String) document.get("x"));
+                    place.setY((String) document.get("y"));
+
+                    Place savedPlace = placeRepository.save(place);
+                    placeIds.add(savedPlace.getPlaceId());
+                }
+            }
+
+            // 다음 페이지로 이동
+            page++;
         }
         return placeIds;
     }
+
+
 
     public List<PlaceNearbyDto> getPlacesWithRepresentativeImage(List<Long> placeIds) {
         LocalDateTime yesterday = LocalDateTime.now(clock).minusDays(1);
@@ -91,6 +110,7 @@ public class PlaceService {
             log.info("places/nearby placeId imageUrl: {} {}", placeId, imageWithText);
             return new PlaceNearbyDto(
                     placeId,
+                    place.getPlaceName(),
                     hasPung,
                     imageWithText,
                     place.getX(),

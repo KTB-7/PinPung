@@ -7,6 +7,7 @@ import lombok.Getter;
 @AllArgsConstructor
 public class PlaceNearbyDto {
     private Long placeId;
+    private String placeName;
     private Boolean hasPung;
     private Long imageWithText;
     private String x;
