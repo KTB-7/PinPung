@@ -15,7 +15,6 @@ import org.springframework.security.web.SecurityFilterChain;
 @Configuration
 @RequiredArgsConstructor
 @EnableWebSecurity
-@Order(2)
 public class SecurityConfig {
 
     private final CustomOAuth2UserService customOAuth2UserService;
@@ -47,8 +46,8 @@ public class SecurityConfig {
                 .logout(logout -> logout
                         .logoutUrl("/logout")
                         .addLogoutHandler(oAuth2LogoutCustomHandler)
-                )
-                .securityMatcher("/actuator/health");
+                );
+//                .securityMatcher("/actuator/health");
 
         return http.build();
     }

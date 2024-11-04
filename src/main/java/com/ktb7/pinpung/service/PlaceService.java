@@ -35,7 +35,7 @@ public class PlaceService {
 
     private static final String KAKAO_LOCAL_API_URL = "https://dapi.kakao.com/v2/local/search/category.json";
 
-    @Value("${kakao.client_id}")
+    @Value("${spring.security.oauth2.client.registration.kakao.client-id}")
     private String clientId;
 
     public List<Long> categorySearch(String x, String y, Integer radius) {

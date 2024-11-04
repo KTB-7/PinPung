@@ -24,10 +24,10 @@ public enum ErrorCode {
     INVALID_TOKEN_OR_SOCIAL_ID("400_INVALID_TOKEN", "유효하지 않은 토큰 또는 소셜 ID 불일치"),
     TOKEN_REFRESH_FAILED("500_TOKEN_REFRESH_FAILED", "액세스 토큰 갱신에 실패했습니다."),
 
-
     // 404 Not Found
     PLACE_NOT_FOUND("404_PLACE_NOT_FOUND", "등록되지 않은 장소입니다."),
     TAG_NOT_FOUND("404_TAG_NOT_FOUND", "해당 태그를 찾을 수 없습니다."),
+    FOLLOW_RELATION_NOT_FOUND("404_FOLLOW_RELATION_NOT_FOUND", "팔로우 관계를 찾을 수 없습니다."),
     KAKAO_API_CALL_FAILED("500_KAKAO_API_CALL_FAILED", "카카오 API 호출에 실패했습니다."),
 
     // 500 Internal Server Error

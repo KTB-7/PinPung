@@ -2,6 +2,8 @@ package com.ktb7.pinpung.service;
 
 import com.ktb7.pinpung.exception.common.CustomException;
 import com.ktb7.pinpung.exception.common.ErrorCode;
+import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
@@ -19,6 +21,7 @@ import java.util.Map;
 
 @Service
 @Slf4j
+@RequiredArgsConstructor
 public class S3Service {
 
     private final S3Client s3Client;
@@ -26,26 +29,26 @@ public class S3Service {
     @Value("${spring.cloud.aws.s3.bucket}")
     private String bucketName;
 
-    public S3Service(S3Client s3Client) {
-        this.s3Client = s3Client;
-    }
-
-    public Map<String, String> uploadFile(MultipartFile imageWithText, MultipartFile pureImage, Long imageId) {
+    public Map<String, String> uploadFile(MultipartFile imageWithText, MultipartFile pureImage, Long imageId, Boolean isReview) {
         try {
-            String imageTextKey = "uploaded-images/" + imageId;
+            String imageTextKey = null;
+            if (!isReview) imageTextKey = "uploaded-images/" + imageId;
             String pureImageKey = "original-images/" + imageId;
 
             log.info("S3 업로드 시작 - bucket: {}, imageTextKey: {}, pureImageKey: {}", bucketName, imageTextKey, pureImageKey);
 
             // imageWithText 파일을 임시 파일로 변환 후 업로드
-            Path tempImageTextFile = Files.createTempFile("temp-" + imageWithText.getOriginalFilename(), null);
-            imageWithText.transferTo(tempImageTextFile);
-            s3Client.putObject(
-                    PutObjectRequest.builder()
-                            .bucket(bucketName)
-                            .key(imageTextKey)
-                            .build(),
-                    tempImageTextFile);
+            if (!isReview) {
+                Path tempImageTextFile = Files.createTempFile("temp-" + imageWithText.getOriginalFilename(), null);
+                imageWithText.transferTo(tempImageTextFile);
+                s3Client.putObject(
+                        PutObjectRequest.builder()
+                                .bucket(bucketName)
+                                .key(imageTextKey)
+                                .build(),
+                        tempImageTextFile);
+                Files.deleteIfExists(tempImageTextFile);
+            }
 
             // pureImage 파일을 임시 파일로 변환 후 업로드
             Path tempPureImageFile = Files.createTempFile("temp-" + pureImage.getOriginalFilename(), null);
@@ -58,7 +61,6 @@ public class S3Service {
                     tempPureImageFile);
 
             // 업로드 후 임시 파일 삭제
-            Files.deleteIfExists(tempImageTextFile);
             Files.deleteIfExists(tempPureImageFile);
 
             Map<String, String> imageKeys = new HashMap<>();

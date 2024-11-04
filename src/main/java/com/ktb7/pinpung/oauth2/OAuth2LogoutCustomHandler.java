@@ -16,7 +16,7 @@ import java.io.IOException;
 @Component
 public class OAuth2LogoutCustomHandler implements LogoutHandler {
 
-    @Value("${kakao.client_id}")
+    @Value("${spring.security.oauth2.client.registration.kakao.client-id}")
     private String clientId;
 
     @Value("${LOGOUT_REDIRECT_URI}")
