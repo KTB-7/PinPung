@@ -8,6 +8,7 @@ import com.ktb7.pinpung.exception.common.CustomException;
 import com.ktb7.pinpung.exception.common.ErrorCode;
 import com.ktb7.pinpung.service.PlaceService;
 import com.ktb7.pinpung.util.ValidationUtils;
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,12 +19,10 @@ import java.util.List;
 @Slf4j
 @RestController
 @RequestMapping("/places")
+@AllArgsConstructor
 public class PlaceController {
     private final PlaceService placeService;
 
-    public PlaceController(PlaceService placeService) {
-        this.placeService = placeService;
-    }
 
     @GetMapping("/nearby")
     public ResponseEntity<PlaceNearbyResponseDto> getPlacesWithRepresentativeImage(
