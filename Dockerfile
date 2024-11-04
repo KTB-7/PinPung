@@ -13,6 +13,9 @@ RUN chmod +x ./gradlew
 # 테스트 제외한 Gradle 빌드 실행
 RUN ./gradlew build -x test
 
+# JAVA_OPTS 환경 변수 설정 (메모리 제한)
+ENV JAVA_OPTS="-Xms512m -Xmx1024m"
+
 # 빌드된 JAR 파일을 바로 실행
 ENTRYPOINT ["java", "-jar", "/app/build/libs/pinpung-0.0.1-SNAPSHOT.jar"]
 
