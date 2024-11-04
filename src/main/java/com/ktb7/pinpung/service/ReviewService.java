@@ -46,7 +46,7 @@ public class ReviewService {
             image.setPureImageKey(imageKeys.get("pureImageKey"));
             imageRepository.save(image);
 
-            // 4. Pung 엔티티 생성 후 저장
+            // 4. review 엔티티 생성 후 저장
             Review review = new Review();
             review.setUserId(userId);
             review.setPlaceId(placeId);

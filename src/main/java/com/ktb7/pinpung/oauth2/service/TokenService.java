@@ -22,7 +22,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 @RequiredArgsConstructor
 public class TokenService {
 
-    @Value("${kakao.client_id}")
+    @Value("${spring.security.oauth2.client.registration.kakao.client-id}")
     private String clientId;
 
     @Value("${spring.security.oauth2.client.provider.kakao.token-uri}")

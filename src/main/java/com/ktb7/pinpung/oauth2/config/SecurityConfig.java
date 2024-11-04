@@ -7,20 +7,15 @@ import com.ktb7.pinpung.oauth2.service.CustomOAuth2UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.Order;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.web.cors.CorsConfiguration;
-import org.springframework.web.cors.CorsConfigurationSource;
-import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-
-import java.util.List;
-
-import static org.springframework.security.config.Customizer.withDefaults;
 
 @Configuration
 @RequiredArgsConstructor
 @EnableWebSecurity
+@Order(2)
 public class SecurityConfig {
 
     private final CustomOAuth2UserService customOAuth2UserService;
@@ -31,12 +26,16 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                .cors(withDefaults()) // CORS 설정 적용
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/actuator/health").permitAll()
+                        // 로그인 필요 없음 (permitAll)
                         .requestMatchers("/login", "/logout-success", "/places/nearby", "/places/{placeId}", "/pungs/{placeId}", "/places/tag-reviews").permitAll()
-                        .requestMatchers("/pungs", "/reviews", "/logout", "/follows/add", "follows/delete").authenticated()
-                        .anyRequest().authenticated()
+
+                        // 로그인 필요 (authenticated)
+                        .requestMatchers("/pungs", "/reviews", "/logout").authenticated()
+
+                        .anyRequest().authenticated()  // 나머지 요청도 인증 필요
                 )
                 .oauth2Login(oauth2 -> oauth2
                         .successHandler(oAuth2LoginSuccessHandler)
@@ -48,20 +47,9 @@ public class SecurityConfig {
                 .logout(logout -> logout
                         .logoutUrl("/logout")
                         .addLogoutHandler(oAuth2LogoutCustomHandler)
-                );
+                )
+                .securityMatcher("/actuator/health");
+
         return http.build();
-    }
-
-    @Bean
-    public CorsConfigurationSource corsConfigurationSource() {
-        CorsConfiguration config = new CorsConfiguration();
-        config.setAllowCredentials(true);
-        config.setAllowedOrigins(List.of("http://localhost:8080"));
-        config.setAllowedHeaders(List.of("*"));
-        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", config);
-        return source;
     }
 }
