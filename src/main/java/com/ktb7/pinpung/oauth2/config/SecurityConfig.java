@@ -29,10 +29,10 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/actuator/health").permitAll()
                         // 로그인 필요 없음 (permitAll)
-                        .requestMatchers("/login", "/logout-success", "api/places/nearby", "api/places/{placeId}", "api/pungs/{placeId}", "api/places/tag-reviews", "api/reviews/upload").permitAll()
+                        .requestMatchers("/login", "/logout-success", "api/places/nearby", "api/places/{placeId}", "api/pungs/{placeId}", "api/places/tag-reviews").permitAll()
 
                         // 로그인 필요 (authenticated)
-                        .requestMatchers("api/pungs", "api/reviews", "/logout").authenticated()
+                        .requestMatchers("api/pungs", "api/reviews/modify", "/logout", "api/reviews/upload").authenticated()
 
                         .anyRequest().authenticated()  // 나머지 요청도 인증 필요
                 )

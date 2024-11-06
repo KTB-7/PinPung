@@ -26,6 +26,7 @@ public enum ErrorCode {
 
     // 404 Not Found
     PLACE_NOT_FOUND("404_PLACE_NOT_FOUND", "등록되지 않은 장소입니다."),
+    REVIEW_NOT_FOUND("404_REVIEW_NOT_FOUND", "등록되지 않은 리뷰 정보입니다."),
     TAG_NOT_FOUND("404_TAG_NOT_FOUND", "해당 태그를 찾을 수 없습니다."),
     FOLLOW_RELATION_NOT_FOUND("404_FOLLOW_RELATION_NOT_FOUND", "팔로우 관계를 찾을 수 없습니다."),
     KAKAO_API_CALL_FAILED("500_KAKAO_API_CALL_FAILED", "카카오 API 호출에 실패했습니다."),
