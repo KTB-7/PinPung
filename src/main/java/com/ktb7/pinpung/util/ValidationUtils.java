@@ -53,9 +53,9 @@ public class ValidationUtils {
         if (placeIds == null || placeIds.isEmpty()) {
             throw new CustomException(HttpStatus.BAD_REQUEST, ErrorCode.MISSING_PARAMETER);
         }
-        if (placeIds.size() > 100) {
-            throw new CustomException(HttpStatus.BAD_REQUEST, ErrorCode.INVALID_PARAMETER);
-        }
+//        if (placeIds.size() > 100) {
+//            throw new CustomException(HttpStatus.BAD_REQUEST, ErrorCode.INVALID_PARAMETER);
+//        }
     }
 
     // userId와 placeId의 유효성을 검사하는 메서드

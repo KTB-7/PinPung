@@ -12,7 +12,8 @@ import java.time.LocalDateTime;
 public class Follow {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @Column(name = "id", nullable = false)
+    private Long followId;
 
     @ManyToOne
     @JoinColumn(name = "follower_id", referencedColumnName = "id")
@@ -23,9 +24,10 @@ public class Follow {
     private User following;
 
     @CreationTimestamp
-    @Column(updatable = false)
+    @Column(name = "createdAt", updatable = false)
     private LocalDateTime createdAt;
 
     @UpdateTimestamp
+    @Column(name = "updatedAt")
     private LocalDateTime updatedAt;
 }

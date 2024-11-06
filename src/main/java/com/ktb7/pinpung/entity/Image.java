@@ -16,16 +16,20 @@ public class Image {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name="id")
+    @Column(name="id", nullable = false)
     private Long imageId;
 
+    @Column(name="imageTextKey")
     private String imageTextKey;
+
+    @Column(name="pureImageKey")
     private String pureImageKey;
 
     @CreationTimestamp
-    @Column(updatable = false)
+    @Column(name = "createdAt", updatable = false)
     private LocalDateTime createdAt;
 
     @UpdateTimestamp
+    @Column(name = "updatedAt")
     private LocalDateTime updatedAt;
 }

@@ -32,9 +32,10 @@ public class User {
     private Long profileImageId;
 
     @CreationTimestamp
-    @Column(updatable = false)
+    @Column(name = "createdAt", updatable = false)
     private LocalDateTime createdAt;
 
     @UpdateTimestamp
+    @Column(name = "updatedAt")
     private LocalDateTime updatedAt;
 }

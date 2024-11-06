@@ -21,6 +21,7 @@ import org.springframework.security.web.authentication.AuthenticationSuccessHand
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+import java.time.Instant;
 import java.util.Map;
 
 @Slf4j
@@ -43,7 +44,7 @@ public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
                         oauthToken.getAuthorizedClientRegistrationId(), oauthToken.getName());
 
                 if (authorizedClient == null) {
-                    throw new CustomException(HttpStatus.UNAUTHORIZED, ErrorCode.UNAUTHORIZED_CLIENT, "인증된 클라이언트를 찾을 수 없습니다.");
+                    throw new CustomException(HttpStatus.UNAUTHORIZED, ErrorCode.UNAUTHORIZED_CLIENT, ErrorCode.UNAUTHORIZED_CLIENT.getMsg());
                 }
 
                 Map<String, Object> attributes = oauthToken.getPrincipal().getAttributes();
@@ -68,6 +69,14 @@ public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
                     Token token = tokenRepository.findByUserId(user.getUserId()).orElse(new Token());
                     token.setUserId(user.getUserId());
                     token.setRefreshToken(authorizedClient.getRefreshToken().getTokenValue());
+
+//                    // expiresIn 값을 초 단위로 계산하여 저장
+//                    Instant expiresAt = authorizedClient.getRefreshToken().getExpiresAt();
+//                    if (expiresAt != null) {
+//                        long expiresInSeconds = expiresAt.getEpochSecond() - Instant.now().getEpochSecond();
+//                        token.setExpiresIn(expiresInSeconds);
+//                    }
+
                     tokenRepository.save(token);
                     log.info("Refresh token saved for user ID: {}", user.getUserId());
                 } else {

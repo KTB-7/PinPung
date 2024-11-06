@@ -16,28 +16,29 @@ public class Place {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
+    @Column(name = "id", nullable = false)
     private Long placeId;
 
-    @Column(name = "placeId")
+    @Column(name = "kakaoPlaceId", nullable = false, unique = true)
     private String kakaoPlaceId;
 
-    @Column(name = "placeName")
+    @Column(name = "placeName", nullable = false)
     private String placeName;
 
-    @Column(name = "address")
+    @Column(name = "address", nullable = false)
     private String address;
 
-    @Column(name = "x")
+    @Column(name = "x", nullable = false)
     private String x;
 
-    @Column(name = "y")
+    @Column(name = "y", nullable = false)
     private String y;
 
     @CreationTimestamp
-    @Column(updatable = false)
+    @Column(name = "createdAt", updatable = false)
     private LocalDateTime createdAt;
 
     @UpdateTimestamp
+    @Column(name = "updatedAt")
     private LocalDateTime updatedAt;
 }

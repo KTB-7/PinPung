@@ -5,7 +5,9 @@ import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
+import software.amazon.awssdk.services.s3.endpoints.internal.Value;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
 
 @Entity
@@ -15,22 +17,23 @@ public class Token {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name="id")
+    @Column(name="id", nullable = false)
     private Long tokenId;
 
-    @Column(name="userId")
+    @Column(name="userId", nullable = false)
     private Long userId;
 
-    @Column(name="refreshToken")
+    @Column(name="refreshToken", nullable = false)
     private String refreshToken;
 
     @Column(name="expiresIn")
     private Integer expiresIn;
 
     @CreationTimestamp
-    @Column(updatable = false)
+    @Column(name = "createdAt", updatable = false)
     private LocalDateTime createdAt;
 
     @UpdateTimestamp
+    @Column(name = "updatedAt")
     private LocalDateTime updatedAt;
 }
