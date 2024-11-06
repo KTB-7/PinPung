@@ -28,6 +28,9 @@ public class PlaceController {
     public ResponseEntity<PlaceNearbyResponseDto> getPlacesWithRepresentativeImage(
             @RequestParam String x, @RequestParam String y, @RequestParam Integer radius) {
 
+        // 로그 추가: 요청이 들어왔음을 기록
+        log.info("Received request to /nearby with x={}, y={}, radius={}", x, y, radius);
+
         // 유효성 검증
         ValidationUtils.validateCoordinates(x, y);
         ValidationUtils.validateRadius(radius);
