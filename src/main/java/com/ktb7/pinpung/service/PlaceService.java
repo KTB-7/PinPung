@@ -13,9 +13,10 @@ import com.ktb7.pinpung.repository.TagRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
+import org.springframework.web.reactive.function.client.WebClient;
 
 import java.time.Clock;
 import java.time.LocalDateTime;
@@ -38,35 +39,32 @@ public class PlaceService {
     @Value("${spring.security.oauth2.client.registration.kakao.client-id}")
     private String clientId;
 
-    public List<Long> categorySearch(String x, String y, Integer radius) {
-        RestTemplate restTemplate = new RestTemplate();
-        HttpHeaders headers = new HttpHeaders();
-        headers.set("Authorization", "KakaoAK " + clientId);
+    private final WebClient webClient = WebClient.builder().build();
 
+    public List<Long> categorySearch(String x, String y, Integer radius) {
+        Set<String> uniqueKakaoPlaceIds = new HashSet<>();
         List<Long> placeIds = new ArrayList<>();
         int page = 1;
-        int size = 15;  // API에서 허용하는 최대 사이즈
-        int maxPage = 3; // 카카오 API의 최대 페이지 제한
-        boolean hasMoreResults = true;
+        int size = 15;
+        int maxPage = 3;
 
-        while (hasMoreResults && page <= maxPage) { // 최대 페이지를 초과하지 않도록 조건 추가
+        while (page <= maxPage) {
             String requestUrl = KAKAO_LOCAL_API_URL + "?category_group_code=CE7&x=" + x + "&y=" + y +
                     "&radius=" + radius + "&page=" + page + "&size=" + size;
 
-            HttpEntity<String> entity = new HttpEntity<>(headers);
-            ResponseEntity<Map> response = restTemplate.exchange(requestUrl, HttpMethod.GET, entity, Map.class);
+            Map<String, Object> response = webClient.get()
+                    .uri(requestUrl)
+                    .header(HttpHeaders.AUTHORIZATION, "KakaoAK " + clientId)
+                    .retrieve()
+                    .onStatus(status -> status.is4xxClientError() || status.is5xxServerError(), clientResponse -> {
+                        log.error("카테고리 검색 API 호출 실패: {}", clientResponse.statusCode());
+                        return clientResponse.createException();
+                    })
+                    .bodyToMono(new ParameterizedTypeReference<Map<String, Object>>() {})
+                    .block();
 
-            if (!response.getStatusCode().is2xxSuccessful()) {
-                log.error("카테고리 검색 API 호출 실패: {}", response.getStatusCode());
-                throw new CustomException(HttpStatus.BAD_REQUEST, ErrorCode.KAKAO_API_CALL_FAILED);
-            }
-
-            List<Map<String, Object>> documents = (List<Map<String, Object>>) response.getBody().get("documents");
-
-            if (documents == null || documents.isEmpty()) {
-                hasMoreResults = false;
-                break;
-            }
+            List<Map<String, Object>> documents = (List<Map<String, Object>>) response.get("documents");
+            int documentCount = documents.size();  // 페이지당 결과 수 확인
 
             for (Map<String, Object> document : documents) {
                 String kakaoPlaceId = (String) document.get("id");
@@ -87,12 +85,15 @@ public class PlaceService {
                 }
             }
 
-            // 다음 페이지로 이동
+            // 문서 수가 15개 미만일 경우 반복문 종료
+            if (documentCount < size) {
+                break;
+            }
+
             page++;
         }
         return placeIds;
     }
-
 
 
     public List<PlaceNearbyDto> getPlacesWithRepresentativeImage(List<Long> placeIds) {
