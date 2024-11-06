@@ -21,6 +21,7 @@ import org.springframework.web.multipart.MultipartFile;
 @RequestMapping("/api/pungs")
 @AllArgsConstructor
 public class PungController {
+
     private final PungService pungService;
 
     @GetMapping("/{placeId}")
