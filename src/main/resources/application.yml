@@ -57,6 +57,8 @@ management:
     health:
       show-details: always
 logging:
+  file:
+    name: /home/ec2-user/app.log
   level:
     org.springframework:
       boot.actuate.endpoint.web.servlet: TRACE
