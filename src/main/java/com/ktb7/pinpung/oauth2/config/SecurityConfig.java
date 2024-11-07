@@ -27,7 +27,7 @@ import java.util.List;
 @Configuration
 @AllArgsConstructor
 @Slf4j
-@EnableWebSecurity
+//@EnableWebSecurity
 public class SecurityConfig {
 
     private final CustomOAuth2UserService customOAuth2UserService;
