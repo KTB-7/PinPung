@@ -98,4 +98,24 @@ public class ReviewService {
         }
     }
 
+    @Transactional
+    public void deleteReview(Long userId, Long reviewId, Long placeId) {
+        // 해당 리뷰가 정확히 하나 존재하는지 확인
+        List<Review> reviews = reviewRepository.findByUserIdAndPlaceIdAndReviewId(userId, placeId, reviewId);
+
+        if (reviews.isEmpty()) {
+            throw new CustomException(HttpStatus.NOT_FOUND, ErrorCode.REVIEW_NOT_FOUND, ErrorCode.REVIEW_NOT_FOUND.getMsg());
+        } else if (reviews.size() > 1) {
+            throw new CustomException(HttpStatus.INTERNAL_SERVER_ERROR, ErrorCode.DATABASE_ERROR, ErrorCode.DATABASE_ERROR.getMsg());
+        }
+
+        Review review = reviews.get(0);
+
+        try {
+            reviewRepository.delete(review);
+        } catch (Exception e) {
+            log.error("리뷰 삭제 중 오류 발생: {}", e.getMessage(), e);
+            throw new CustomException(HttpStatus.INTERNAL_SERVER_ERROR, ErrorCode.DATABASE_ERROR, ErrorCode.DATABASE_ERROR.getMsg());
+        }
+    }
 }

@@ -72,4 +72,27 @@ public class ReviewController {
             throw new CustomException(HttpStatus.INTERNAL_SERVER_ERROR, ErrorCode.FILE_UPLOAD_FAILED, ErrorCode.FILE_UPLOAD_FAILED.getMsg());
         }
     }
+
+    @DeleteMapping("/delete")
+    public ResponseEntity<String> deleteReviews(
+            @RequestParam Long userId,
+            @RequestParam Long reviewId,
+            @RequestParam Long placeId
+    ) {
+        // 로그 출력
+        log.info("deleteReviews: {} {} {}", userId, placeId, reviewId);
+
+        // 유효성 검증
+        ValidationUtils.validateUserAndPlaceId(userId, placeId);
+
+        try {
+            reviewService.deleteReview(userId, reviewId, placeId);
+            return ResponseEntity.ok("Review delete success");
+        } catch (CustomException ex) {
+            throw ex;
+        } catch (Exception e) {
+            log.error("Review delete failed: {}", e.getMessage(), e);
+            throw new CustomException(HttpStatus.INTERNAL_SERVER_ERROR, ErrorCode.DATABASE_ERROR, ErrorCode.DATABASE_ERROR.getMsg());
+        }
+    }
 }
