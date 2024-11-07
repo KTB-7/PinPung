@@ -78,6 +78,14 @@ public class TokenService {
 
         if (kakaoTokenResponseDto != null && kakaoTokenResponseDto.getAccessToken() != null) {
             String newAccessToken = kakaoTokenResponseDto.getAccessToken();
+
+            // 새로운 refreshToken이 응답에 포함된 경우 갱신
+            if (kakaoTokenResponseDto.getRefreshToken() != null) {
+                token.setRefreshToken(kakaoTokenResponseDto.getRefreshToken());
+//                token.setExpiresIn(kakaoTokenResponseDto.getExpiresIn());
+                tokenRepository.save(token);
+            }
+
             TokenResponseDto tokenResponseDto = new TokenResponseDto(userId, newAccessToken);
             return ResponseEntity.ok(tokenResponseDto);
         } else {

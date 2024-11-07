@@ -19,7 +19,7 @@ public class ErrorDto {
                 .body(ErrorDto.builder()
                         .status(ex.getStatus().value())
                         .errorCode(ex.getErrorCode().getCode())
-                        .msg(ex.getMessage())
+                        .msg(ex.getErrorCode().getMsg())
                         .build());
     }
 }
