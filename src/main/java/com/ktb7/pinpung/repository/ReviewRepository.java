@@ -14,4 +14,5 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
             "GROUP BY p.placeId")
     List<Object[]> findReviewCountsByPlaceIds(@Param("placeIds") List<Long> placeIds);
     List<Review> findByPlaceId(Long placeId);
+    List<Review> findByUserIdAndPlaceIdAndReviewId(Long userId, Long placeId, Long reviewId);
 }

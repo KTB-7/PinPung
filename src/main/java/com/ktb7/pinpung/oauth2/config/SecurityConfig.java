@@ -59,7 +59,7 @@ public class SecurityConfig {
                         .requestMatchers("/login", "/logout-success", "/api/places/nearby", "/api/places/{placeId}", "/api/pungs/{placeId}", "/api/places/tag-reviews").permitAll()
 
                         // 로그인 필요 (authenticated)
-                        .requestMatchers("/api/reviews/upload", "/logout", "/api/pungs/upload").authenticated()
+                        .requestMatchers("/api/reviews/upload", "/logout", "/api/pungs/upload", "/api/reviews/modify").authenticated()
 
                         .anyRequest().authenticated()  // 나머지 요청도 인증 필요
                 )

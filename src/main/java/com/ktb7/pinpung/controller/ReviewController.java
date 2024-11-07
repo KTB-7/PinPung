@@ -23,15 +23,11 @@ public class ReviewController {
 
     @PostMapping("/upload")
     public ResponseEntity<String> uploadReviews(
-            HttpServletRequest request,
             @RequestParam Long userId,
             @RequestParam Long placeId,
             @RequestParam(required = false) MultipartFile image,
             @RequestParam String text) {
         // 로그 출력
-        String token = request.getHeader("Authorization");
-        ValidationUtils.validateAccessToken(token);
-        log.debug("Received Authorization Token: {}", token);
         log.info("uploadReviews: {} {} {}", userId, placeId, text);
 
         // 유효성 검증
@@ -41,36 +37,39 @@ public class ReviewController {
         try {
             reviewService.uploadReview(userId, placeId, image, text);
             return ResponseEntity.ok("Review upload success");
+        } catch (CustomException ex) {
+            throw ex;
         } catch (Exception e) {
-            log.error("Review upload failed: {}", e.getMessage(), e);
+            log.error("Review modify failed: {}", e.getMessage(), e);
             throw new CustomException(HttpStatus.INTERNAL_SERVER_ERROR, ErrorCode.FILE_UPLOAD_FAILED, ErrorCode.FILE_UPLOAD_FAILED.getMsg());
         }
     }
 
-//
-//    @PatchMapping("/modify")
-//    public ResponseEntity<String> modifyReviews(
-//            @RequestParam Long userId,
-//            @RequestParam Long reviewId,
-//            @RequestParam Long placeId,
-//            @RequestParam(required = false) MultipartFile image,
-//            @RequestParam String text
-//    ) {
-//        // 로그 출력
-//        log.info("modifyReviews: {} {} {}", userId, placeId, text);
-//
-//        // 유효성 검증
-//        ValidationUtils.validateUserAndPlaceId(userId, placeId);
-////        ValidationUtils.validateReviewId(reviewId);
-////        ValidationUtils.validateFile(image, "image");
-//
-//        try {
-//            reviewService.modifyReview(userId, reviewId, placeId, image, text);
-//            return ResponseEntity.ok("Review modify success");
-//        } catch (Exception e) {
-//            log.error("Review modify failed: {}", e.getMessage(), e);
-//            throw new CustomException(HttpStatus.INTERNAL_SERVER_ERROR, ErrorCode.FILE_UPLOAD_FAILED, ErrorCode.FILE_UPLOAD_FAILED.getMsg());
-//        }
-//
-//    }
+
+    @PatchMapping("/modify")
+    public ResponseEntity<String> modifyReviews(
+            @RequestParam Long userId,
+            @RequestParam Long reviewId,
+            @RequestParam Long placeId,
+            @RequestParam(required = false) MultipartFile image,
+            @RequestParam String text
+    ) {
+        // 로그 출력
+        log.info("modifyReviews: {} {} {}", userId, placeId, text);
+
+        // 유효성 검증
+        ValidationUtils.validateUserAndPlaceId(userId, placeId);
+//        ValidationUtils.validateReviewId(reviewId);
+//        ValidationUtils.validateFile(image, "image");
+
+        try {
+            reviewService.modifyReview(userId, reviewId, placeId, image, text);
+            return ResponseEntity.ok("Review modify success");
+        } catch (CustomException ex) {
+            throw ex;
+        } catch (Exception e) {
+            log.error("Review modify failed: {}", e.getMessage(), e);
+            throw new CustomException(HttpStatus.INTERNAL_SERVER_ERROR, ErrorCode.FILE_UPLOAD_FAILED, ErrorCode.FILE_UPLOAD_FAILED.getMsg());
+        }
+    }
 }
