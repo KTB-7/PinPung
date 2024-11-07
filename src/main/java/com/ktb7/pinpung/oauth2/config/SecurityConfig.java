@@ -56,7 +56,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/actuator/health").permitAll()
                         // 로그인 필요 없음 (permitAll)
-                        .requestMatchers("/login", "/logout-success", "/api/places/nearby", "/api/places/{placeId}", "/api/pungs/{placeId}", "/api/places/tag-reviews").permitAll()
+                        .requestMatchers("/login", "/api/test", "/logout-success", "/api/places/nearby", "/api/places/{placeId}", "/api/pungs/{placeId}", "/api/places/tag-reviews").permitAll()
 
                         // 로그인 필요 (authenticated)
                         .requestMatchers("/api/reviews/upload", "/logout", "/api/pungs/upload", "/api/reviews/modify").authenticated()
