@@ -35,6 +35,7 @@ public class PlaceService {
     private final ReviewRepository reviewRepository;
 
     private static final String KAKAO_LOCAL_API_URL = "https://dapi.kakao.com/v2/local/search/category.json";
+    private final S3Service s3Service;
 
     @Value("${spring.security.oauth2.client.registration.kakao.client-id}")
     private String clientId;
@@ -42,7 +43,6 @@ public class PlaceService {
     private final WebClient webClient = WebClient.builder().build();
 
     public List<Long> categorySearch(String x, String y, Integer radius) {
-        Set<String> uniqueKakaoPlaceIds = new HashSet<>();
         List<Long> placeIds = new ArrayList<>();
         int page = 1;
         int size = 15;
@@ -108,7 +108,7 @@ public class PlaceService {
             Place place = placeRepository.findById(placeId)
                     .orElseThrow(() -> new CustomException(HttpStatus.NOT_FOUND, ErrorCode.PLACE_NOT_FOUND));
 
-            log.info("places/nearby placeId imageUrl: {} {}", placeId, imageWithText);
+//            log.info("places/nearby placeId imageUrl: {} {}", placeId, imageWithText);
             return new PlaceNearbyDto(
                     placeId,
                     place.getPlaceName(),
@@ -131,13 +131,20 @@ public class PlaceService {
         List<String> tags = tagObjects.stream()
                 .map(tagObj -> (String) tagObj[1])
                 .collect(Collectors.toList());
-        log.info("places/{placeId} tags {}", tags);
+//        log.info("places/{placeId} tags {}", tags);
 
+        // 대표 펑 & 이미지 조회
         Optional<Pung> representativePung = pungRepository.findFirstByPlaceIdAndCreatedAtAfterOrderByCreatedAtDesc(placeId, yesterday);
-        log.info("places/{placeId} representativePung: {}", representativePung);
+        byte[] imageData = null;
+        if (representativePung.isPresent()) {
+            Long imageId = representativePung.get().getImageWithText();
+            if (imageId != null) {
+                imageData = s3Service.getImageFile("uploaded-image/" + imageId); // S3에서 이미지 데이터 가져오기
+            }
+        }
 
+        // 리뷰 조회
         List<Review> reviewList = reviewRepository.findByPlaceId(placeId);
-        log.info("places/{placeId} reviews {}", reviewList);
         ReviewsDto reviews = new ReviewsDto(reviewList.size(), reviewList);
 
         return new PlaceInfoResponseDto(
@@ -146,7 +153,8 @@ public class PlaceService {
                 place.getAddress(),
                 tags,
                 reviews,
-                representativePung.orElse(null)
+                representativePung.orElse(null),
+                imageData
         );
     }
 

@@ -45,6 +45,15 @@ public class KakaoTokenAuthenticationFilter extends OncePerRequestFilter {
         filterChain.doFilter(request, response);
     }
 
+    @Override
+    protected boolean shouldNotFilter(HttpServletRequest request) {
+        String requestURI = request.getRequestURI();
+        // 특정 URL에 대해서만 필터가 적용되도록 설정
+        return !(requestURI.startsWith("/api/reviews/upload") ||
+                requestURI.startsWith("/api/pungs/upload") ||
+                requestURI.startsWith("/api/reviews/modify"));
+    }
+
     private Long validateTokenAndExtractUserId(String token) {
         KakaoTokenInfoResponseDto kakaoTokenInfoResponseDto = WebClient.create(kakaoUserInfoUrl)
                 .get()
