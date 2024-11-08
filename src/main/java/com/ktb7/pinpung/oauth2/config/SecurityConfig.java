@@ -27,7 +27,7 @@ import java.util.List;
 @Configuration
 @AllArgsConstructor
 @Slf4j
-//@EnableWebSecurity
+@EnableWebSecurity
 public class SecurityConfig {
 
     private final CustomOAuth2UserService customOAuth2UserService;
@@ -38,7 +38,7 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(List.of("http://localhost:8080", "https://pinpung.net"));
+        configuration.setAllowedOrigins(List.of("http://localhost:8080", "https://pinpung.net", "http://localhost:3000"));
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("*"));
         configuration.setAllowCredentials(true);
@@ -53,6 +53,7 @@ public class SecurityConfig {
         log.info("Applying Security Filter Chain");
         http
                 .csrf(csrf -> csrf.disable())
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/actuator/health").permitAll()
                         // 로그인 필요 없음 (permitAll)
@@ -77,7 +78,7 @@ public class SecurityConfig {
 //                .sessionManagement(session -> session
 //                        .sessionCreationPolicy(SessionCreationPolicy.ALWAYS)
 //                )
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+//                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .securityContext(securityContext -> securityContext
                         .requireExplicitSave(true)
                 )

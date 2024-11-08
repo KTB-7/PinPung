@@ -38,6 +38,7 @@ public class PlaceController {
         List<Long> placeIds = placeService.categorySearch(x, y, radius);
         List<PlaceNearbyDto> places = placeService.getPlacesWithRepresentativeImage(placeIds);
         PlaceNearbyResponseDto response = new PlaceNearbyResponseDto(places.size(), places);
+        log.info("{}", response.getCount());
         return ResponseEntity.ok(response);
     }
 
