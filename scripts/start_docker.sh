@@ -14,9 +14,13 @@ REDIRECT_URI=$(aws ssm get-parameter --name "/pinpung/REDIRECT_URI" --query "Par
 S3_BUCKET_NAME=$(aws ssm get-parameter --name "/pinpung/S3_BUCKET_NAME" --query "Parameter.Value" --output text --region ap-northeast-2)
 LOGOUT_REDIRECT_URI=$(aws ssm get-parameter --name "/pinpung/LOGOUT_REDIRECT_URI" --query "Parameter.Value" --output text --region ap-northeast-2)
 
-# Docker 컨테이너 실행 시 환경 변수로 전달
+# Docker 컨테이너 실행 시 환경 변수로 전달 및 CloudWatch 로그 드라이버 설정
 docker stop pinpung-develop-backend || true && docker rm pinpung-develop-backend || true
 docker run -d --name pinpung-develop-backend \
+    --log-driver=awslogs \
+    --log-opt awslogs-region=$AWS_REGION \
+    --log-opt awslogs-group=pinpung-backend-ec2-logs \
+    --log-opt awslogs-stream=$(curl -s http://169.254.169.254/latest/meta-data/instance-id) \
     -e AWS_REGION=$AWS_REGION \
     -e DB_HOST=$DB_HOST \
     -e DB_NAME=$DB_NAME \
