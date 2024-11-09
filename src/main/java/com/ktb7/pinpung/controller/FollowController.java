@@ -23,7 +23,6 @@ public class FollowController {
     public ResponseEntity<FollowResponseDto> followUser(@RequestBody FollowRequestDto followRequestDto) {
         // 유효성 검증: id 검증
         ValidationUtils.validateUserId(followRequestDto.getUserId());
-//        validationUtils.validateUserRequest(followRequestDto.getUserId());
         ValidationUtils.validateUserId(followRequestDto.getWantsToFollowId());
 
         FollowResponseDto response = followService.followUser(followRequestDto.getUserId(), followRequestDto.getWantsToFollowId());

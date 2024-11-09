@@ -1,5 +1,6 @@
 package com.ktb7.pinpung.service;
 
+import com.ktb7.pinpung.dto.GenerateTagsRequestDto;
 import com.ktb7.pinpung.entity.Image;
 import com.ktb7.pinpung.entity.Pung;
 import com.ktb7.pinpung.dto.PungsResponseDto;
@@ -29,6 +30,7 @@ public class PungService {
     private final ImageRepository imageRepository;
     private final S3Service s3Service;
     private final Clock clock;
+    private final AiService aiService;
 
     public PungsResponseDto getPungsByPlaceId(Long placeId, Pageable pageable) {
         LocalDateTime yesterday = LocalDateTime.now(clock).minusDays(1);
@@ -46,7 +48,6 @@ public class PungService {
     public void uploadPung(Long userId, Long placeId, MultipartFile imageWithText, MultipartFile pureImage, String text) {
         log.info("uploadPung 호출됨: userId={}, placeId={}, text={}", userId, placeId, text);
         try {
-
             // 1. Image 엔티티 생성 후 저장하여 imageId 얻기
             Image image = new Image();
             imageRepository.save(image);
@@ -54,12 +55,13 @@ public class PungService {
 
             // 2. S3에 이미지 업로드
             Map<String, String> imageKeys = s3Service.uploadFile(imageWithText, pureImage, imageId, false);
-            System.out.println(imageKeys);
+            log.info("S3 업로드 완료: {}", imageKeys);
 
             // 3. Image 엔티티에 S3 키값 업데이트 후 저장
             image.setImageTextKey(imageKeys.get("imageTextKey"));
             image.setPureImageKey(imageKeys.get("pureImageKey"));
             imageRepository.save(image);
+            log.info("Image 저장 완료, imageId: {}", image.getImageId());
 
             // 4. Pung 엔티티 생성 후 저장
             Pung pung = new Pung();
@@ -68,9 +70,20 @@ public class PungService {
             pung.setImageWithText(imageId);
             pung.setText(text);
             pungRepository.save(pung);
+            log.info("Pung 저장 완료, pungId: {}", pung.getPungId());
+
+            // 5. AI에 이미지 전달 (실패해도 프론트엔드에 영향 없음)
+            try {
+                aiService.genTags(placeId, text, "/Users/leemir/Desktop/kakaotech/pinpung/AI/dummy/47.webp");
+                log.info("AI 태그 생성 요청 완료");
+            } catch (Exception aiException) {
+                log.error("AI 태그 생성 중 오류 발생: {}", aiException.getMessage(), aiException);
+            }
+
         } catch (Exception e) {
             log.error("이미지 업로드 및 Pung 저장 중 오류 발생: {}", e.getMessage(), e);
             throw new CustomException(HttpStatus.INTERNAL_SERVER_ERROR, ErrorCode.FILE_UPLOAD_FAILED, "Pung 업로드 중 오류가 발생했습니다.");
         }
     }
+
 }

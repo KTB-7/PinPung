@@ -10,6 +10,7 @@ import com.ktb7.pinpung.exception.common.CustomException;
 import com.ktb7.pinpung.exception.common.ErrorCode;
 import com.ktb7.pinpung.repository.FollowRepository;
 import com.ktb7.pinpung.repository.UserRepository;
+import com.ktb7.pinpung.util.RepositoryHelper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -25,14 +26,12 @@ public class FollowService {
 
     private final UserRepository userRepository;
     private final FollowRepository followRepository;
+    private final RepositoryHelper repositoryHelper;
 
     public FollowResponseDto followUser(Long userId, Long wantsToFollowId) {
         // db에 두 아이디가 존재하는지 확인하고 유저 불러오기
-        User user = userRepository.findByUserId(userId).orElseThrow(() ->
-                new CustomException(HttpStatus.BAD_REQUEST, ErrorCode.USER_NOT_FOUND));
-
-        User wantsToFollow = userRepository.findByUserId(wantsToFollowId).orElseThrow(() ->
-                new CustomException(HttpStatus.BAD_REQUEST, ErrorCode.USER_NOT_FOUND));
+        User user = repositoryHelper.findUserById(userId);
+        User wantsToFollow = repositoryHelper.findUserById(userId);
 
         Follow follow = new Follow();
         follow.setFollower(user);

@@ -140,6 +140,7 @@ public class PlaceService {
         String imageBase64 = null;
         if (representativePung.isPresent()) {
             Long imageId = representativePung.get().getImageWithText();
+            log.info("imageid {}", imageId);
             if (imageId != null) {
                 InputStream imageStream = s3Service.getImageFileStream("uploaded-images/" + imageId);
                 try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {

@@ -35,7 +35,7 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(List.of("http://localhost:8080", "https://pinpung.net", "https://www.pinpung.net", "http://localhost:3000"));
+        configuration.setAllowedOrigins(List.of("http://localhost:8080", "https://pinpung.net", "http://localhost:3000"));
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("*"));
         configuration.setAllowCredentials(true);
@@ -54,7 +54,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/actuator/health").permitAll()
                         .requestMatchers("/login", "/api/test", "/logout-success", "/api/places/nearby", "/api/places/{placeId}", "/api/pungs/{placeId}", "/api/places/tag-reviews").permitAll()
-                        .requestMatchers("/api/reviews/upload", "/logout", "/api/pungs/upload", "/api/reviews/modify").authenticated()
+                        .requestMatchers("/api/reviews/upload", "/api/follows", "/logout", "/api/pungs/upload", "/api/reviews/modify").authenticated()
                         .anyRequest().authenticated()
                 )
                 .oauth2Login(oauth2 -> oauth2

@@ -35,7 +35,6 @@ public class KakaoTokenAuthenticationFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
         String authorizationHeader = request.getHeader("Authorization");
-        log.info("{}", "dfdfdfdfdfdf");
 
         if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
             String token = authorizationHeader.substring(7);
@@ -66,9 +65,10 @@ public class KakaoTokenAuthenticationFilter extends OncePerRequestFilter {
     protected boolean shouldNotFilter(HttpServletRequest request) {
         String requestURI = request.getRequestURI();
         // 특정 URL에 대해서만 필터가 적용되도록 설정
-        return !(requestURI.startsWith("/api/reviews/upload") ||
-                requestURI.startsWith("/api/pungs/upload") ||
-                requestURI.startsWith("/api/reviews/modify"));
+        return !(requestURI.startsWith("/api/reviews") ||
+                requestURI.startsWith("/api/pungs") ||
+                requestURI.startsWith("/api/follows")
+        );
     }
 
     private Long validateTokenAndExtractUserId(String token) {
@@ -81,18 +81,18 @@ public class KakaoTokenAuthenticationFilter extends OncePerRequestFilter {
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + token)
                 .retrieve()
                 .onStatus(status -> status.is4xxClientError(), response ->
-                        Mono.error(new CustomException(HttpStatus.UNAUTHORIZED, ErrorCode.INVALID_TOKEN_OR_SOCIAL_ID))
+                        Mono.error(new CustomException(HttpStatus.UNAUTHORIZED, ErrorCode.INVALID_TOKEN_OR_SOCIAL_ID, ErrorCode.INVALID_TOKEN_OR_SOCIAL_ID.getMsg()))
                 )
                 .onStatus(status -> status.is5xxServerError(), response ->
-                        Mono.error(new CustomException(HttpStatus.INTERNAL_SERVER_ERROR, ErrorCode.INTERNAL_SERVER_ERROR))
+                        Mono.error(new CustomException(HttpStatus.INTERNAL_SERVER_ERROR, ErrorCode.INTERNAL_SERVER_ERROR, ErrorCode.INTERNAL_SERVER_ERROR.getMsg()))
                 )
                 .bodyToMono(KakaoTokenInfoResponseDto.class)
                 .block();
 
         if (kakaoTokenInfoResponseDto == null) {
-            throw new CustomException(HttpStatus.UNAUTHORIZED, ErrorCode.INVALID_TOKEN_OR_SOCIAL_ID);
+            throw new CustomException(HttpStatus.UNAUTHORIZED, ErrorCode.INVALID_TOKEN_OR_SOCIAL_ID, ErrorCode.INVALID_TOKEN_OR_SOCIAL_ID.getMsg());
         }
-
+        log.info("{}", kakaoTokenInfoResponseDto.getExpires_in());
         return kakaoTokenInfoResponseDto.getId();
     }
 }

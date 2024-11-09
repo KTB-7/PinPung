@@ -94,25 +94,4 @@ public class ValidationUtils {
             throw new CustomException(HttpStatus.BAD_REQUEST, ErrorCode.MISSING_PARAMETER);
         }
     }
-
-//    // 로그인된 사용자 ID와 요청된 userId가 일치하는지 확인하는 메서드
-//    public void validateUserRequest(Long requestUserId) {
-//        Long currentSocialId = getCurrentUserId();
-//        User user = userRepository.findBySocialId(currentSocialId)
-//                .orElseThrow(() -> new CustomException(HttpStatus.BAD_REQUEST, ErrorCode.USER_NOT_FOUND));
-//
-//        if (!user.getUserId().equals(requestUserId)) {
-//            throw new CustomException(HttpStatus.FORBIDDEN, ErrorCode.UNAUTHORIZED_CLIENT);
-//        }
-//    }
-//
-//    // 현재 로그인된 사용자 ID를 반환하는 메서드
-//    public Long getCurrentUserId() {
-//        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-//        if (authentication != null && authentication.getPrincipal() instanceof OAuth2User) {
-//            OAuth2User user = (OAuth2User) authentication.getPrincipal();
-//            return Long.parseLong(user.getAttribute("id"));
-//        }
-//        throw new CustomException(HttpStatus.UNAUTHORIZED, ErrorCode.AUTHENTICATION_FAILED);
-//    }
 }

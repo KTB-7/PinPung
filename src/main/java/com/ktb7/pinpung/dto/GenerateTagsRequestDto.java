@@ -8,4 +8,6 @@ public class GenerateTagsRequestDto {
     private String review_text;
     private String review_image_url;
 
+    public GenerateTagsRequestDto(Long placeId, String text, String pureImageKey) {
+    }
 }
