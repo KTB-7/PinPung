@@ -17,7 +17,7 @@ RUN ./gradlew build -x test
 ENV JAVA_OPTS="-Xms512m -Xmx1024m"
 
 # 빌드된 JAR 파일을 바로 실행
-ENTRYPOINT ["java", "-jar", "/app/build/libs/pinpung-0.0.1-SNAPSHOT.jar"]
+ENTRYPOINT ["java", "-jar", "/app/build/libs/pinpung-0.0.1-SNAPSHOT.jar", "$JAVA_OPTS"]
 
 # 포트 노출 (Spring Boot 기본 포트는 8080)
 EXPOSE 8080
