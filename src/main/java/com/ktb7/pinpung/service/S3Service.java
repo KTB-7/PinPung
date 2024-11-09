@@ -16,6 +16,7 @@ import software.amazon.awssdk.services.s3.model.GetObjectResponse;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -81,19 +82,15 @@ public class S3Service {
     }
 
     //long 타입의 이미지 아이디를 받으면 s3의 uploaded-images/{imageId} url에서 해당 이미지를 받아오는 로직
-    public byte[] getImageFile(String imageKey) {
+    public InputStream getImageFileStream(String imageKey) {
         try {
             GetObjectRequest getObjectRequest = GetObjectRequest.builder()
                     .bucket(bucketName)
                     .key(imageKey)
                     .build();
-
-            ResponseBytes<GetObjectResponse> responseBytes = s3Client.getObjectAsBytes(getObjectRequest);
-            return responseBytes.asByteArray();
+            return s3Client.getObject(getObjectRequest);
         } catch (Exception e) {
-            log.error("이미지 다운로드 중 오류 발생: {}", e.getMessage(), e);
             throw new CustomException(HttpStatus.INTERNAL_SERVER_ERROR, ErrorCode.IMAGE_DOWNLOAD_FAILED, ErrorCode.IMAGE_DOWNLOAD_FAILED.getMsg());
         }
     }
-
 }
