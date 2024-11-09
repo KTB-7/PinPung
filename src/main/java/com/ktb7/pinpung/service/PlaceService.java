@@ -18,6 +18,9 @@ import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.time.Clock;
 import java.time.LocalDateTime;
 import java.util.*;
@@ -131,15 +134,22 @@ public class PlaceService {
         List<String> tags = tagObjects.stream()
                 .map(tagObj -> (String) tagObj[1])
                 .collect(Collectors.toList());
-//        log.info("places/{placeId} tags {}", tags);
 
         // 대표 펑 & 이미지 조회
-        Optional<Pung> representativePung = pungRepository.findFirstByPlaceIdAndCreatedAtAfterOrderByCreatedAtDesc(placeId, yesterday);
-        byte[] imageData = null;
+        Optional<Pung> representativePung = pungRepository.findFirstByPlaceIdAndCreatedAtAfterOrderByCreatedAtDesc(placeId, LocalDateTime.now(clock).minusDays(1));
+        String imageBase64 = null;
         if (representativePung.isPresent()) {
             Long imageId = representativePung.get().getImageWithText();
             if (imageId != null) {
-                imageData = s3Service.getImageFile("uploaded-image/" + imageId); // S3에서 이미지 데이터 가져오기
+                InputStream imageStream = s3Service.getImageFileStream("uploaded-images/" + imageId);
+                try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
+                    imageStream.transferTo(outputStream);
+                    byte[] imageBytes = outputStream.toByteArray();
+                    imageBase64 = Base64.getEncoder().encodeToString(imageBytes);
+                    log.info("{}", imageBase64);
+                } catch (IOException e) {
+                    throw new CustomException(HttpStatus.INTERNAL_SERVER_ERROR, ErrorCode.IMAGE_DOWNLOAD_FAILED, "이미지 변환 중 오류 발생");
+                }
             }
         }
 
@@ -154,7 +164,7 @@ public class PlaceService {
                 tags,
                 reviews,
                 representativePung.orElse(null),
-                imageData
+                imageBase64
         );
     }
 
