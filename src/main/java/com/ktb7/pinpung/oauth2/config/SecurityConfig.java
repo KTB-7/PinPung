@@ -57,6 +57,9 @@ public class SecurityConfig {
                         .requestMatchers("/api/reviews/upload", "/api/follows", "/logout", "/api/pungs/upload", "/api/reviews/modify").authenticated()
                         .anyRequest().authenticated()
                 )
+                .requiresChannel(channel -> channel
+                        .anyRequest().requiresSecure()              // 모든 요청을 HTTPS로 강제
+                )
                 .oauth2Login(oauth2 -> oauth2
                         .successHandler(oAuth2LoginSuccessHandler)
                         .failureHandler(oAuth2LoginFailureHandler)
