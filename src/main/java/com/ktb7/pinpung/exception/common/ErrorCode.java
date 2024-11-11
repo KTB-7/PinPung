@@ -35,10 +35,11 @@ public enum ErrorCode {
     INTERNAL_SERVER_ERROR("500_INTERNAL_SERVER_ERROR", "서버 내부 오류가 발생했습니다."),
     DATABASE_ERROR("500_DATABASE_ERROR", "데이터베이스 처리 중 오류가 발생했습니다."),
     IMAGE_UPLOAD_FAILED("500_IMAGE_UPLOAD_FAILED", "이미지 업로드에 실패했습니다."),
-    IMAGE_DOWNLOAD_FAILED("500_IMAGE_DOWNLOAD_FAILED", "이미지 다운로드 중 오류가 발생했습니다."),
+//    IMAGE_DOWNLOAD_FAILED("500_IMAGE_DOWNLOAD_FAILED", "이미지 다운로드 중 오류가 발생했습니다."),
     FILE_PROCESSING_FAILED("500_FILE_PROCESSING_FAILED", "파일 처리 중 오류가 발생했습니다."),
     FILE_UPLOAD_FAILED("500_FILE_UPLOAD_FAILED", "파일 업로드에 실패했습니다."),
-    UNEXPECTED_ERROR("500_UNEXPECTED_ERROR", "예상치 못한 오류가 발생했습니다.");
+    UNEXPECTED_ERROR("500_UNEXPECTED_ERROR", "예상치 못한 오류가 발생했습니다."),
+    API_CALL_FAILED("500_API_CALL_FAILED", "API CALL에 실패했습니다.");
 
     private final String code;
     private final String msg;

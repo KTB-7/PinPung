@@ -67,14 +67,14 @@ public class PungService {
             Pung pung = new Pung();
             pung.setUserId(userId);
             pung.setPlaceId(placeId);
-            pung.setImageWithText(imageId);
+            pung.setImageId(imageId);
             pung.setText(text);
             pungRepository.save(pung);
             log.info("Pung 저장 완료, pungId: {}", pung.getPungId());
 
             // 5. AI에 이미지 전달 (실패해도 프론트엔드에 영향 없음)
             try {
-                aiService.genTags(placeId, text, "/Users/leemir/Desktop/kakaotech/pinpung/AI/dummy/47.webp");
+                aiService.genTags(placeId, text, "/Users/mir/Desktop/kakao/team/AI/dummy/ice.jpg");
                 log.info("AI 태그 생성 요청 완료");
             } catch (Exception aiException) {
                 log.error("AI 태그 생성 중 오류 발생: {}", aiException.getMessage(), aiException);

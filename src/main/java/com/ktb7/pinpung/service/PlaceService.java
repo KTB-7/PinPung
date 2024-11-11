@@ -61,10 +61,12 @@ public class PlaceService {
                     .retrieve()
                     .onStatus(status -> status.is4xxClientError() || status.is5xxServerError(), clientResponse -> {
                         log.error("카테고리 검색 API 호출 실패: {}", clientResponse.statusCode());
-                        return clientResponse.createException();
+                        return clientResponse.bodyToMono(String.class)
+                                .map(body -> new CustomException(HttpStatus.INTERNAL_SERVER_ERROR, ErrorCode.API_CALL_FAILED, "카테고리 검색 API 호출 실패: " + body));
                     })
                     .bodyToMono(new ParameterizedTypeReference<Map<String, Object>>() {})
                     .block();
+            // block : 비동기 작업인 Mono를 동기적으로 기다려 최종 결과를 반환
 
             List<Map<String, Object>> documents = (List<Map<String, Object>>) response.get("documents");
             int documentCount = documents.size();  // 페이지당 결과 수 확인
@@ -104,7 +106,7 @@ public class PlaceService {
 
         return placeIds.stream().map(placeId -> {
             Long imageWithText = pungRepository.findFirstByPlaceIdAndCreatedAtAfterOrderByCreatedAtDesc(placeId, yesterday)
-                    .map(Pung::getImageWithText)
+                    .map(Pung::getImageId)
                     .orElse(null);
             boolean hasPung = imageWithText != null;
 
@@ -135,21 +137,16 @@ public class PlaceService {
                 .map(tagObj -> (String) tagObj[1])
                 .collect(Collectors.toList());
 
-        // 대표 펑 & 이미지 조회
-        Optional<Pung> representativePung = pungRepository.findFirstByPlaceIdAndCreatedAtAfterOrderByCreatedAtDesc(placeId, LocalDateTime.now(clock).minusDays(1));
-        String imageBase64 = null;
+        // 대표 펑 & 이미지 ID 조회
+        Optional<Pung> representativePung = pungRepository.findFirstByPlaceIdAndCreatedAtAfterOrderByCreatedAtDesc(placeId, yesterday);
+        Long imageId = null;
         if (representativePung.isPresent()) {
-            Long imageId = representativePung.get().getImageWithText();
-            log.info("imageid {}", imageId);
+            imageId = representativePung.get().getImageId();
+            log.info("imageId: {}", imageId);
             if (imageId != null) {
-                InputStream imageStream = s3Service.getImageFileStream("uploaded-images/" + imageId);
-                try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
-                    imageStream.transferTo(outputStream);
-                    byte[] imageBytes = outputStream.toByteArray();
-                    imageBase64 = Base64.getEncoder().encodeToString(imageBytes);
-                    log.info("{}", imageBase64);
-                } catch (IOException e) {
-                    throw new CustomException(HttpStatus.INTERNAL_SERVER_ERROR, ErrorCode.IMAGE_DOWNLOAD_FAILED, "이미지 변환 중 오류 발생");
+                String objectKey = "uploaded-images/" + imageId;
+                if (!s3Service.doesObjectExist(objectKey)) {
+                    throw new CustomException(HttpStatus.INTERNAL_SERVER_ERROR, ErrorCode.DATABASE_ERROR);
                 }
             }
         }
@@ -164,8 +161,7 @@ public class PlaceService {
                 place.getAddress(),
                 tags,
                 reviews,
-                representativePung.orElse(null),
-                imageBase64
+                representativePung.orElse(null)
         );
     }
 

@@ -1,9 +1,6 @@
 package com.ktb7.pinpung.controller;
 
-import com.ktb7.pinpung.dto.FollowRequestDto;
-import com.ktb7.pinpung.dto.FollowResponseDto;
-import com.ktb7.pinpung.dto.FollowReponseDto;
-import com.ktb7.pinpung.dto.UnfollowResponseDto;
+import com.ktb7.pinpung.dto.*;
 import com.ktb7.pinpung.service.FollowService;
 import com.ktb7.pinpung.util.ValidationUtils;
 import lombok.AllArgsConstructor;
@@ -21,27 +18,32 @@ public class FollowController {
 
     @PostMapping("/add")
     public ResponseEntity<FollowResponseDto> followUser(@RequestBody FollowRequestDto followRequestDto) {
+        log.info("Received request to /follows/add with followRequestDto: {} {}", followRequestDto.getUserId(), followRequestDto.getWantsToFollowId());
+
         // 유효성 검증: id 검증
         ValidationUtils.validateUserId(followRequestDto.getUserId());
         ValidationUtils.validateUserId(followRequestDto.getWantsToFollowId());
 
-        FollowResponseDto response = followService.followUser(followRequestDto.getUserId(), followRequestDto.getWantsToFollowId());
+        FollowResponseDto response = followService.followUser(followRequestDto);
         return ResponseEntity.ok(response);
     }
 
     @DeleteMapping("/delete")
-    public ResponseEntity<UnfollowResponseDto> unfollowUser(
-            @RequestParam Long userId, @RequestParam Long wantsToUnfollowId) {
-        // 유효성 검증: id 검증
-        ValidationUtils.validateUserId(userId);
-        ValidationUtils.validateUserId(wantsToUnfollowId);
+    public ResponseEntity<UnfollowResponseDto> unfollowUser(@RequestBody UnfollowRequestDto unfollowRequestDto) {
+        log.info("Received request to /follows/add with: {} {}", unfollowRequestDto.getUserId(), unfollowRequestDto.getWantsToUnfollowId());
 
-        UnfollowResponseDto response = followService.unfollowUser(userId, wantsToUnfollowId);
+        // 유효성 검증: id 검증
+        ValidationUtils.validateUserId(unfollowRequestDto.getUserId());
+        ValidationUtils.validateUserId(unfollowRequestDto.getWantsToUnfollowId());
+
+        UnfollowResponseDto response = followService.unfollowUser(unfollowRequestDto);
         return ResponseEntity.ok(response);
     }
 
     @GetMapping(value = "/followers", produces = "application/json")
     public ResponseEntity<FollowReponseDto> getFollowers(@RequestParam Long userId) {
+        log.info("Received request to /followers with: {}", userId);
+
         // 유효성 검증: id 검증
         ValidationUtils.validateUserId(userId);
 
@@ -52,6 +54,7 @@ public class FollowController {
 
     @GetMapping(value = "/followings", produces = "application/json")
     public ResponseEntity<FollowReponseDto> getFollowings(@RequestParam Long userId) {
+        log.info("Received request to /followings with: {}", userId);
         // 유효성 검증: id 검증
         ValidationUtils.validateUserId(userId);
 

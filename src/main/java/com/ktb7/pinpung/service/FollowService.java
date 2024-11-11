@@ -1,9 +1,6 @@
 package com.ktb7.pinpung.service;
 
-import com.ktb7.pinpung.dto.FollowResponseDto;
-import com.ktb7.pinpung.dto.FollowReponseDto;
-import com.ktb7.pinpung.dto.SimpleUserDto;
-import com.ktb7.pinpung.dto.UnfollowResponseDto;
+import com.ktb7.pinpung.dto.*;
 import com.ktb7.pinpung.entity.Follow;
 import com.ktb7.pinpung.entity.User;
 import com.ktb7.pinpung.exception.common.CustomException;
@@ -28,10 +25,13 @@ public class FollowService {
     private final FollowRepository followRepository;
     private final RepositoryHelper repositoryHelper;
 
-    public FollowResponseDto followUser(Long userId, Long wantsToFollowId) {
+    public FollowResponseDto followUser(FollowRequestDto followRequestDto) {
+        Long userId = followRequestDto.getUserId();
+        Long wantsToFollowId = followRequestDto.getWantsToFollowId();
+
         // db에 두 아이디가 존재하는지 확인하고 유저 불러오기
         User user = repositoryHelper.findUserById(userId);
-        User wantsToFollow = repositoryHelper.findUserById(userId);
+        User wantsToFollow = repositoryHelper.findUserById(wantsToFollowId);
 
         Follow follow = new Follow();
         follow.setFollower(user);
@@ -50,17 +50,16 @@ public class FollowService {
         return new FollowResponseDto(userId, wantsToFollowId);
     }
 
-    public UnfollowResponseDto unfollowUser(Long userId, Long wantsToUnfollowId) {
-        // 두 아이디가 존재하는지 확인하고 유저 불러오기
-        User user = userRepository.findByUserId(userId).orElseThrow(() ->
-                new CustomException(HttpStatus.BAD_REQUEST, ErrorCode.USER_NOT_FOUND));
+    public UnfollowResponseDto unfollowUser(UnfollowRequestDto unfollowRequestDto) {
+        Long userId = unfollowRequestDto.getUserId();
+        Long wantsToUnfollowId = unfollowRequestDto.getWantsToUnfollowId();
 
-        User wantsToUnfollow = userRepository.findByUserId(wantsToUnfollowId).orElseThrow(() ->
-                new CustomException(HttpStatus.BAD_REQUEST, ErrorCode.USER_NOT_FOUND));
+        // 두 아이디가 존재하는지 확인하고 유저 불러오기
+        User user = repositoryHelper.findUserById(userId);
+        User wantsToUnfollow = repositoryHelper.findUserById(wantsToUnfollowId);
 
         // Follow 관계가 존재하는지 확인
-        Follow follow = followRepository.findByFollowerAndFollowing(user, wantsToUnfollow).orElseThrow(() ->
-                new CustomException(HttpStatus.BAD_REQUEST, ErrorCode.FOLLOW_RELATION_NOT_FOUND));
+        Follow follow = repositoryHelper.findFollowRelation(user, wantsToUnfollow);
 
         try {
             // Follow 엔티티 삭제
@@ -77,8 +76,7 @@ public class FollowService {
 
     public FollowReponseDto getFollowers(Long userId) {
         // 사용자가 존재하는지 확인
-        userRepository.findByUserId(userId).orElseThrow(() ->
-                new CustomException(HttpStatus.BAD_REQUEST, ErrorCode.USER_NOT_FOUND));
+        repositoryHelper.findUserById(userId);
 
         List<User> followers = followRepository.findFollowersByUserId(userId);
         List<SimpleUserDto> followerList = followers.stream()
@@ -90,8 +88,7 @@ public class FollowService {
 
     public FollowReponseDto getFollowings(Long userId) {
         // 사용자가 존재하는지 확인
-        userRepository.findByUserId(userId).orElseThrow(() ->
-                new CustomException(HttpStatus.BAD_REQUEST, ErrorCode.USER_NOT_FOUND));
+        repositoryHelper.findUserById(userId);
 
         List<User> followings = followRepository.findFollowingsByUserId(userId);
         List<SimpleUserDto> followingList = followings.stream()

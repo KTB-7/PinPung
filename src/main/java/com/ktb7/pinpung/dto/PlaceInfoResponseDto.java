@@ -17,5 +17,4 @@ public class PlaceInfoResponseDto {
     private List<String> tags;
     private ReviewsDto reviews;
     private Pung representativePung;
-    private String imageBase64;
 }

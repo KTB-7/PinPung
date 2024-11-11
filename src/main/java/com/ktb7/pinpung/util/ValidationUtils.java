@@ -26,7 +26,8 @@ public class ValidationUtils {
             double xCoord = Double.parseDouble(x);
             double yCoord = Double.parseDouble(y);
 
-            if (xCoord < -180 || xCoord > 180 || yCoord < -90 || yCoord > 90) {
+            // 한국 좌표인지 확인
+            if (xCoord < 123 || xCoord > 133 || yCoord < 32 || yCoord > 44) {
                 throw new CustomException(HttpStatus.BAD_REQUEST, ErrorCode.INVALID_PARAMETER);
             }
         } catch (NumberFormatException e) {

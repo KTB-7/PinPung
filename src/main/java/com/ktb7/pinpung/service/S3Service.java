@@ -11,9 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import software.amazon.awssdk.core.ResponseBytes;
 import software.amazon.awssdk.services.s3.S3Client;
-import software.amazon.awssdk.services.s3.model.GetObjectRequest;
-import software.amazon.awssdk.services.s3.model.GetObjectResponse;
-import software.amazon.awssdk.services.s3.model.PutObjectRequest;
+import software.amazon.awssdk.services.s3.model.*;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -82,15 +80,31 @@ public class S3Service {
     }
 
     //long 타입의 이미지 아이디를 받으면 s3의 uploaded-images/{imageId} url에서 해당 이미지를 받아오는 로직
-    public InputStream getImageFileStream(String imageKey) {
+//    public InputStream getImageFileStream(String imageKey) {
+//        try {
+//            GetObjectRequest getObjectRequest = GetObjectRequest.builder()
+//                    .bucket(bucketName)
+//                    .key(imageKey)
+//                    .build();
+//            return s3Client.getObject(getObjectRequest);
+//        } catch (Exception e) {
+//            throw new CustomException(HttpStatus.INTERNAL_SERVER_ERROR, ErrorCode.IMAGE_DOWNLOAD_FAILED, ErrorCode.IMAGE_DOWNLOAD_FAILED.getMsg());
+//        }
+//    }
+
+    public boolean doesObjectExist(String objectKey) {
         try {
-            GetObjectRequest getObjectRequest = GetObjectRequest.builder()
+            // S3에 객체의 메타데이터만 요청하여 존재 여부를 확인합니다.
+            s3Client.headObject(HeadObjectRequest.builder()
                     .bucket(bucketName)
-                    .key(imageKey)
-                    .build();
-            return s3Client.getObject(getObjectRequest);
-        } catch (Exception e) {
-            throw new CustomException(HttpStatus.INTERNAL_SERVER_ERROR, ErrorCode.IMAGE_DOWNLOAD_FAILED, ErrorCode.IMAGE_DOWNLOAD_FAILED.getMsg());
+                    .key(objectKey)
+                    .build());
+            return true;
+        } catch (S3Exception e) {
+            if (e.statusCode() == 404) {
+                return false;
+            }
+            throw e;
         }
     }
 }
