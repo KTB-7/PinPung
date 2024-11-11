@@ -18,7 +18,7 @@ pipeline {
             steps {
                 script {
                     sh """
-                    docker build -t pinpung-develop-backend:latest .
+                    docker build --no-cache -t pinpung-develop-backend:latest .
                     docker tag pinpung-develop-backend:latest ${ECR_REPO}:latest
                     """
                 }
@@ -73,6 +73,13 @@ pipeline {
         }
         failure {
             echo 'Deployment failed.'
+        }
+        always {
+            script {
+                // Clean up Docker images after build
+                sh "docker rmi pinpung-develop-backend:latest || true"
+                sh "docker rmi ${ECR_REPO}:latest || true"
+            }
         }
     }
 }
