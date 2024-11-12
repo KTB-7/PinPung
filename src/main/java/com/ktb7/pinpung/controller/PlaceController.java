@@ -43,6 +43,8 @@ public class PlaceController {
 
     @GetMapping("/{placeId}")
     public ResponseEntity<PlaceInfoResponseDto> getPlaceInfo(@PathVariable Long placeId) {
+        log.info("Received request to /{placeId} with :{}", placeId);
+
         // 유효성 검증
         ValidationUtils.validatePlaceId(placeId);
 
@@ -56,6 +58,8 @@ public class PlaceController {
     @GetMapping("/tags-reviews")
     public ResponseEntity<List<SearchResponseDto>> getPlacesWithReviewCountsAndTags(
             @RequestParam List<Long> placeIds) {
+        log.info("Received request to /tag-reviews with :{}", placeIds);
+
         // 유효성 검증
         ValidationUtils.validatePlaceIds(placeIds);
 
