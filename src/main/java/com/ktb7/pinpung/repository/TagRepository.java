@@ -13,6 +13,6 @@ public interface TagRepository extends JpaRepository<Tag, Long> {
     @Query("SELECT p.placeId, t.tagName " +
             "FROM PlaceTag pt JOIN Tag t ON pt.tagId = t.tagId " +
             "JOIN Place p ON pt.placeId = p.placeId " +
-            "WHERE p.placeId IN :placeIds")
+            "WHERE p.placeId IN :placeIds AND pt.isRepresentative = true")
     List<Object[]> findTagsByPlaceIds(@Param("placeIds") List<Long> placeIds);
 }

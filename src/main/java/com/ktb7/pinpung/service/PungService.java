@@ -74,7 +74,7 @@ public class PungService {
 
             // 5. AI에 이미지 전달 (실패해도 프론트엔드에 영향 없음)
             try {
-                aiService.genTags(placeId, text, "/Users/mir/Desktop/kakao/team/AI/dummy/ice.jpg");
+                aiService.genTags(placeId, text, "https://pinpung-s3.s3.ap-northeast-2.amazonaws.com/original-images/"+imageId);
                 log.info("AI 태그 생성 요청 완료");
             } catch (Exception aiException) {
                 log.error("AI 태그 생성 중 오류 발생: {}", aiException.getMessage(), aiException);
