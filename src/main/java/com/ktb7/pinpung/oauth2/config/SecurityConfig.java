@@ -54,13 +54,13 @@ public class SecurityConfig {
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/actuator/health").permitAll()
-                        .requestMatchers("/login", "/favicon.ico", "/api/test", "/logout-success", "/api/places/nearby", "/api/places/{placeId}", "/api/pungs/{placeId}", "/api/places/tag-reviews").permitAll()
+                        .requestMatchers("/login", "/oauth2/authorization/kakao", "/favicon.ico", "/api/test", "/logout-success", "/api/places/nearby", "/api/places/{placeId}", "/api/pungs/{placeId}", "/api/places/tag-reviews").permitAll()
                         .requestMatchers("/api/reviews/upload", "/api/follows", "/logout", "/api/pungs/upload", "/api/reviews/modify").authenticated()
                         .anyRequest().authenticated()
                 )
-                .requiresChannel(channel -> channel
-                        .anyRequest().requiresSecure()              // 모든 요청을 HTTPS로 강제
-                )
+//                .requiresChannel(channel -> channel
+//                        .anyRequest().requiresSecure()              // 모든 요청을 HTTPS로 강제
+//                )
                 .oauth2Login(oauth2 -> oauth2
                         .successHandler(oAuth2LoginSuccessHandler)
                         .failureHandler(oAuth2LoginFailureHandler)
@@ -76,8 +76,8 @@ public class SecurityConfig {
                 )
                 .securityContext(securityContext -> securityContext
                         .requireExplicitSave(true)
-                )
-                .addFilterBefore(new KakaoTokenAuthenticationFilter(userRepository), AnonymousAuthenticationFilter.class);
+                );
+//                .addFilterBefore(new KakaoTokenAuthenticationFilter(userRepository), AnonymousAuthenticationFilter.class);
 
         return http.build();
     }
