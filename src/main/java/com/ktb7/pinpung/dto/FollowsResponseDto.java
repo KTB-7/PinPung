@@ -7,7 +7,7 @@ import java.util.List;
 
 @Data
 @AllArgsConstructor
-public class FollowReponseDto {
+public class FollowsResponseDto {
     private Integer count;
     private List<SimpleUserDto> follows;
 }

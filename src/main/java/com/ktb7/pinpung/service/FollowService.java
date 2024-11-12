@@ -74,7 +74,7 @@ public class FollowService {
         return new UnfollowResponseDto(userId, wantsToUnfollowId);
     }
 
-    public FollowReponseDto getFollowers(Long userId) {
+    public FollowsResponseDto getFollowers(Long userId) {
         // 사용자가 존재하는지 확인
         repositoryHelper.findUserById(userId);
 
@@ -83,10 +83,10 @@ public class FollowService {
                 .map(follower -> new SimpleUserDto(follower.getUserId(), follower.getUserName()))
                 .collect(Collectors.toList());
 
-        return new FollowReponseDto(followerList.size(), followerList);
+        return new FollowsResponseDto(followerList.size(), followerList);
     }
 
-    public FollowReponseDto getFollowings(Long userId) {
+    public FollowsResponseDto getFollowings(Long userId) {
         // 사용자가 존재하는지 확인
         repositoryHelper.findUserById(userId);
 
@@ -95,6 +95,6 @@ public class FollowService {
                 .map(follower -> new SimpleUserDto(follower.getUserId(), follower.getUserName()))
                 .collect(Collectors.toList());
 
-        return new FollowReponseDto(followingList.size(), followingList);
+        return new FollowsResponseDto(followingList.size(), followingList);
     }
 }

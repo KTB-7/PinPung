@@ -2,6 +2,8 @@ package com.ktb7.pinpung.controller;
 
 import com.ktb7.pinpung.dto.PungsResponseDto;
 import com.ktb7.pinpung.dto.UploadPungRequest;
+import com.ktb7.pinpung.dto.UploadPungRequestDto;
+import com.ktb7.pinpung.dto.UploadPungResponseDto;
 import com.ktb7.pinpung.exception.common.CustomException;
 import com.ktb7.pinpung.exception.common.ErrorCode;
 import com.ktb7.pinpung.service.PungService;
@@ -27,8 +29,8 @@ public class PungController {
     @GetMapping("/{placeId}")
     public ResponseEntity<PungsResponseDto> getPungs(
             @PathVariable Long placeId,
-            @RequestParam(defaultValue = "0") int page, // page 쿼리 파라미터, 기본값 0
-            @RequestParam(defaultValue = "3") int size  // size는 3으로 고정 (한 페이지에 3개의 펑)
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "3") int size
     ) {
         // 유효성 검증
         ValidationUtils.validatePlaceId(placeId);
@@ -40,26 +42,21 @@ public class PungController {
     }
 
     @PostMapping("/upload")
-    public ResponseEntity<String> uploadPungs(
-            @RequestParam Long userId,
-            @RequestParam Long placeId,
-            @RequestParam MultipartFile imageWithText,
-            @RequestParam MultipartFile pureImage,
-            @RequestParam String text
-    ) {
-        // 로그 출력
-        log.info("uploadPungs: {} {} {}", userId, placeId, text);
+    public ResponseEntity<UploadPungResponseDto> uploadPungs(@ModelAttribute UploadPungRequestDto request) {
+        log.info("uploadPungs: {} {} {}", request.getUserId(), request.getPlaceId(), request.getText());
 
         // 유효성 검증
-        ValidationUtils.validateUserAndPlaceId(userId, placeId);
-        ValidationUtils.validateFile(imageWithText, "imageWithText");
-        ValidationUtils.validateFile(pureImage, "pureImage");
+        ValidationUtils.validateUserAndPlaceId(request.getUserId(), request.getPlaceId());
+        ValidationUtils.validateFile(request.getImageWithText(), "imageWithText");
+        ValidationUtils.validateFile(request.getPureImage(), "pureImage");
 
-        try {
-            pungService.uploadPung(userId, placeId, imageWithText, pureImage, text);
-            return ResponseEntity.ok("Pung upload success");
-        } catch (Exception e) {
-            throw new CustomException(HttpStatus.INTERNAL_SERVER_ERROR, ErrorCode.FILE_UPLOAD_FAILED, ErrorCode.FILE_UPLOAD_FAILED.getMsg());
-        }
+        pungService.uploadPung(
+                request.getUserId(),
+                request.getPlaceId(),
+                request.getImageWithText(),
+                request.getPureImage(),
+                request.getText()
+        );
+        return ResponseEntity.ok(new UploadPungResponseDto("Pung upload success"));
     }
 }

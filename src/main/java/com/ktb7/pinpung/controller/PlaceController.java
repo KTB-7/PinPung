@@ -16,8 +16,8 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@Slf4j
 @RestController
+@Slf4j
 @RequestMapping("/api/places")
 @AllArgsConstructor
 public class PlaceController {
