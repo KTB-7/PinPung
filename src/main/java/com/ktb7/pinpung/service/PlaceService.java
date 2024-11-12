@@ -10,6 +10,7 @@ import com.ktb7.pinpung.repository.PlaceRepository;
 import com.ktb7.pinpung.repository.PungRepository;
 import com.ktb7.pinpung.repository.ReviewRepository;
 import com.ktb7.pinpung.repository.TagRepository;
+import com.ktb7.pinpung.util.RepositoryHelper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -24,7 +25,8 @@ import java.io.InputStream;
 import java.time.Clock;
 import java.time.LocalDateTime;
 import java.util.*;
-import java.util.stream.Collectors;
+import java.util.stream.Collectors;import reactor.core.publisher.Mono;
+
 
 @Service
 @Slf4j
@@ -39,6 +41,7 @@ public class PlaceService {
 
     private static final String KAKAO_LOCAL_API_URL = "https://dapi.kakao.com/v2/local/search/category.json";
     private final S3Service s3Service;
+    private final RepositoryHelper repositoryHelper;
 
     @Value("${spring.security.oauth2.client.registration.kakao.client-id}")
     private String clientId;
@@ -61,15 +64,19 @@ public class PlaceService {
                     .retrieve()
                     .onStatus(status -> status.is4xxClientError() || status.is5xxServerError(), clientResponse -> {
                         log.error("카테고리 검색 API 호출 실패: {}", clientResponse.statusCode());
-                        return clientResponse.bodyToMono(String.class)
-                                .map(body -> new CustomException(HttpStatus.INTERNAL_SERVER_ERROR, ErrorCode.API_CALL_FAILED, "카테고리 검색 API 호출 실패: " + body));
+                        return Mono.error(new CustomException(HttpStatus.INTERNAL_SERVER_ERROR, ErrorCode.API_CALL_FAILED, "카테고리 검색 API 호출 실패"));
                     })
                     .bodyToMono(new ParameterizedTypeReference<Map<String, Object>>() {})
                     .block();
             // block : 비동기 작업인 Mono를 동기적으로 기다려 최종 결과를 반환
 
             List<Map<String, Object>> documents = (List<Map<String, Object>>) response.get("documents");
-            int documentCount = documents.size();  // 페이지당 결과 수 확인
+            if (documents == null) {
+                log.error("카테고리 검색 API 응답에 문서가 없습니다.");
+                throw new CustomException(HttpStatus.INTERNAL_SERVER_ERROR, ErrorCode.API_CALL_FAILED, "카테고리 검색 API 응답에 문서가 없습니다.");
+            }
+
+            int documentCount = documents.size();
 
             for (Map<String, Object> document : documents) {
                 String kakaoPlaceId = (String) document.get("id");
@@ -89,16 +96,14 @@ public class PlaceService {
                     placeIds.add(savedPlace.getPlaceId());
                 }
             }
-
-            // 문서 수가 15개 미만일 경우 반복문 종료
             if (documentCount < size) {
                 break;
             }
-
             page++;
         }
         return placeIds;
     }
+
 
 
     public List<PlaceNearbyDto> getPlacesWithRepresentativeImage(List<Long> placeIds) {
@@ -110,10 +115,8 @@ public class PlaceService {
                     .orElse(null);
             boolean hasPung = imageWithText != null;
 
-            Place place = placeRepository.findById(placeId)
-                    .orElseThrow(() -> new CustomException(HttpStatus.NOT_FOUND, ErrorCode.PLACE_NOT_FOUND));
+            Place place = repositoryHelper.findPlaceById(placeId);
 
-//            log.info("places/nearby placeId imageUrl: {} {}", placeId, imageWithText);
             return new PlaceNearbyDto(
                     placeId,
                     place.getPlaceName(),
@@ -128,11 +131,11 @@ public class PlaceService {
     public PlaceInfoResponseDto getPlaceInfo(Long placeId) {
         LocalDateTime yesterday = LocalDateTime.now(clock).minusDays(1);
 
-        Place place = placeRepository.findById(placeId)
-                .orElseThrow(() -> new CustomException(HttpStatus.NOT_FOUND, ErrorCode.PLACE_NOT_FOUND));
+        Place place = repositoryHelper.findPlaceById(placeId);
         log.info("places/{placeId} placeId placeInfo: {} {}", placeId, place);
 
-        List<Object[]> tagObjects = tagRepository.findTagsByPlaceIds(Collections.singletonList(placeId));
+        List<Object[]> tagObjects = Optional.ofNullable(tagRepository.findTagsByPlaceIds(List.of(placeId)))
+                .orElse(Collections.emptyList());
         List<String> tags = tagObjects.stream()
                 .map(tagObj -> (String) tagObj[1])
                 .collect(Collectors.toList());
@@ -142,12 +145,10 @@ public class PlaceService {
         Long imageId = null;
         if (representativePung.isPresent()) {
             imageId = representativePung.get().getImageId();
-            log.info("imageId: {}", imageId);
-            if (imageId != null) {
-                String objectKey = "uploaded-images/" + imageId;
-                if (!s3Service.doesObjectExist(objectKey)) {
-                    throw new CustomException(HttpStatus.INTERNAL_SERVER_ERROR, ErrorCode.DATABASE_ERROR);
-                }
+            String objectKey = "uploaded-images/" + imageId;
+            if (!s3Service.doesObjectExist(objectKey)) {
+                log.error("이미지 ID {}에 대한 S3 객체를 찾을 수 없습니다.", imageId);
+                throw new CustomException(HttpStatus.INTERNAL_SERVER_ERROR, ErrorCode.DATABASE_ERROR, "이미지를 찾을 수 없습니다.");
             }
         }
 
@@ -174,14 +175,14 @@ public class PlaceService {
                         row -> (Long) row[0],
                         row -> (Long) row[1]
                 ));
-        log.info("/search/places review counts: {}", reviewCountMap);
+        log.info("/tag-reviews review counts: {}", reviewCountMap);
 
         Map<Long, List<String>> tagMap = tags.stream()
                 .collect(Collectors.groupingBy(
                         row -> (Long) row[0],
                         Collectors.mapping(row -> (String) row[1], Collectors.toList())
                 ));
-        log.info("/search/tags tags: {}", tagMap);
+        log.info("/tag-reviews tags: {}", tagMap);
 
         return placeIds.stream().map(placeId -> {
             Long reviewCount = reviewCountMap.getOrDefault(placeId, 0L);

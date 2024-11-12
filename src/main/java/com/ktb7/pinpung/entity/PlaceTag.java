@@ -24,6 +24,12 @@ public class PlaceTag {
     @Column(name = "placeId", nullable = false)
     private Long placeId;
 
+    @Column(name = "tagCount", nullable = false)
+    private Long tagCount;
+
+    @Column(name = "isRepresentative", nullable = false)
+    private Boolean isRepresentative;
+
     @CreationTimestamp
     @Column(name = "createdAt", updatable = false)
     private LocalDateTime createdAt;
