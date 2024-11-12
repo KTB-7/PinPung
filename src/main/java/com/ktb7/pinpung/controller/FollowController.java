@@ -16,7 +16,7 @@ public class FollowController {
 
     private final FollowService followService;
 
-    @PostMapping("/add")
+    @PostMapping
     public ResponseEntity<FollowResponseDto> followUser(@RequestBody FollowRequestDto followRequestDto) {
         log.info("Received request to /follows/add with followRequestDto: {} {}", followRequestDto.getUserId(), followRequestDto.getWantsToFollowId());
 
@@ -28,7 +28,7 @@ public class FollowController {
         return ResponseEntity.ok(response);
     }
 
-    @DeleteMapping("/delete")
+    @DeleteMapping
     public ResponseEntity<UnfollowResponseDto> unfollowUser(@RequestBody UnfollowRequestDto unfollowRequestDto) {
         log.info("Received request to /follows/add with: {} {}", unfollowRequestDto.getUserId(), unfollowRequestDto.getWantsToUnfollowId());
 
@@ -41,24 +41,24 @@ public class FollowController {
     }
 
     @GetMapping(value = "/followers", produces = "application/json")
-    public ResponseEntity<FollowReponseDto> getFollowers(@RequestParam Long userId) {
+    public ResponseEntity<FollowsResponseDto> getFollowers(@RequestParam Long userId) {
         log.info("Received request to /followers with: {}", userId);
 
         // 유효성 검증: id 검증
         ValidationUtils.validateUserId(userId);
 
-        FollowReponseDto response = followService.getFollowers(userId);
+        FollowsResponseDto response = followService.getFollowers(userId);
 
         return ResponseEntity.ok(response);
     }
 
     @GetMapping(value = "/followings", produces = "application/json")
-    public ResponseEntity<FollowReponseDto> getFollowings(@RequestParam Long userId) {
+    public ResponseEntity<FollowsResponseDto> getFollowings(@RequestParam Long userId) {
         log.info("Received request to /followings with: {}", userId);
         // 유효성 검증: id 검증
         ValidationUtils.validateUserId(userId);
 
-        FollowReponseDto response = followService.getFollowings(userId);
+        FollowsResponseDto response = followService.getFollowings(userId);
 
         return ResponseEntity.ok(response);
     }

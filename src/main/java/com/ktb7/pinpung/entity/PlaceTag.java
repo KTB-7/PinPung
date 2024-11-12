@@ -9,7 +9,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "PlaceTag")
+@Table(name = "Place-Tag")
 @Getter
 public class PlaceTag {
 

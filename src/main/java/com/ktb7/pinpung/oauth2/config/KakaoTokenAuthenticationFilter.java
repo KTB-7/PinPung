@@ -66,8 +66,7 @@ public class KakaoTokenAuthenticationFilter extends OncePerRequestFilter {
         String requestURI = request.getRequestURI();
         // 특정 URL에 대해서만 필터가 적용되도록 설정
         return !(requestURI.startsWith("/api/reviews") ||
-                requestURI.startsWith("/api/pungs") ||
-                requestURI.startsWith("/api/places/nearby") ||
+                requestURI.startsWith("/api/pungs/upload") ||
                 requestURI.startsWith("/api/follows")
         );
     }
