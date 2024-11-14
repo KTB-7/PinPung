@@ -14,6 +14,11 @@ pipeline {
                 checkout scm
             }
         }
+        stage('Clean') {
+            steps {
+                sh 'docker builder prune --force --all'
+            }
+        }
         stage('Build Docker Image') {
             steps {
                 script {
@@ -76,9 +81,8 @@ pipeline {
         }
         always {
             script {
-                // Clean up Docker images after build
-                sh "docker rmi pinpung-develop-backend:latest || true"
-                sh "docker rmi ${ECR_REPO}:latest || true"
+                // 빌드 후 Docker 리소스 완전 정리
+                sh "docker system prune -af --volumes"
             }
         }
     }
