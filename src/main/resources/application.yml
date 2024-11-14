@@ -62,7 +62,7 @@ logging:
     name: /home/ec2-user/app.log
   level:
     org.springframework:
-      boot.actuate.endpoint.web.servlet: TRACE
+      boot.actuate.endpoint.web.servlet: ERROR
       security: DEBUG
 fastapi:
   server:
