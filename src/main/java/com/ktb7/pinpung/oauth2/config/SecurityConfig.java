@@ -24,7 +24,7 @@ import java.util.List;
 @Configuration
 @AllArgsConstructor
 @Slf4j
-@EnableWebSecurity
+@EnableWebSecurity(debug = true)
 public class SecurityConfig {
 
     private final CustomOAuth2UserService customOAuth2UserService;
@@ -68,7 +68,7 @@ public class SecurityConfig {
                                 .userService(customOAuth2UserService)
                         )
                 )
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED))
                 .logout(logout -> logout
                         .logoutUrl("/logout")
                         .logoutSuccessUrl("/logout-success")
