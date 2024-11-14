@@ -14,11 +14,6 @@ pipeline {
                 checkout scm
             }
         }
-        stage('Clean') {
-            steps {
-                sh 'docker builder prune --force --all'
-            }
-        }
         stage('Build Docker Image') {
             steps {
                 script {
