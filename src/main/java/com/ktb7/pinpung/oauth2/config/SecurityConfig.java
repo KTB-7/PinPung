@@ -55,7 +55,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/actuator/health").permitAll()
                         .requestMatchers("/login", "/favicon.ico", "/api/test", "/logout-success", "/api/places/nearby", "/api/places/{placeId}", "/api/pungs/{placeId}", "/api/places/tag-reviews").permitAll()
-                        .requestMatchers("/api/reviews/upload", "/api/follows", "/logout", "/api/pungs/upload", "/api/reviews/modify").authenticated()
+                        .requestMatchers("/api/reviews", "/api/follows", "/logout", "/api/pungs/upload").authenticated()
                         .anyRequest().authenticated()
                 )
                 .requiresChannel(channel -> channel

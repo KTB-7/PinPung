@@ -1,13 +1,16 @@
 package com.ktb7.pinpung.service;
 
+import com.ktb7.pinpung.dto.UploadReviewRequestDto;
+import com.ktb7.pinpung.dto.ModifyReviewRequestDto;
+import com.ktb7.pinpung.dto.DeleteReviewRequestDto;
+import com.ktb7.pinpung.dto.ReviewResponseDto;
 import com.ktb7.pinpung.entity.Image;
-import com.ktb7.pinpung.entity.Pung;
 import com.ktb7.pinpung.entity.Review;
 import com.ktb7.pinpung.exception.common.CustomException;
 import com.ktb7.pinpung.exception.common.ErrorCode;
 import com.ktb7.pinpung.repository.ImageRepository;
-import com.ktb7.pinpung.repository.PungRepository;
 import com.ktb7.pinpung.repository.ReviewRepository;
+import com.ktb7.pinpung.util.RepositoryHelper;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -26,96 +29,89 @@ public class ReviewService {
     private final ImageRepository imageRepository;
     private final ReviewRepository reviewRepository;
     private final S3Service s3Service;
+    private final RepositoryHelper repositoryHelper;
 
     @Transactional
-    public void uploadReview(Long userId, Long placeId, MultipartFile reviewImage, String text) {
-        log.info("uploadReview 호출됨: userId={}, placeId={}, text={}", userId, placeId, text);
-        try {
-            Long imageId = null;
+    public ReviewResponseDto uploadReview(UploadReviewRequestDto uploadReviewRequest) {
+        Long userId = uploadReviewRequest.getUserId();
+        Long placeId = uploadReviewRequest.getPlaceId();
+        String text = uploadReviewRequest.getText();
+        MultipartFile reviewImage = uploadReviewRequest.getReviewImage();
 
-            // 1. 이미지가 존재할 때만 Image 엔티티 생성 및 S3 업로드 수행
-            if (reviewImage != null && !reviewImage.isEmpty()) {
-                Image image = new Image();
-                imageRepository.save(image);
-                imageId = image.getImageId();
+        Long imageId = null;
 
-                // S3에 이미지 업로드
-                Map<String, String> imageKeys = s3Service.uploadFile(null, reviewImage, imageId, true);
-//                image.setImageTextKey(imageKeys.get("imageTextKey"));
-                image.setPureImageKey(imageKeys.get("pureImageKey"));
-                imageRepository.save(image);
-            }
+        // 1. 이미지가 존재할 때만 Image 엔티티 생성 및 S3 업로드 수행
+        if (reviewImage != null && !reviewImage.isEmpty()) {
+            Image image = new Image();
+            imageRepository.save(image);
+            imageId = image.getImageId();
 
-            // 2. Review 엔티티 생성 후 저장 (imageId가 없으면 null로 저장됨)
-            Review review = new Review();
-            review.setUserId(userId);
-            review.setPlaceId(placeId);
-            review.setImageId(imageId);  // 이미지가 없을 경우 null로 설정
-            review.setText(text);
-            reviewRepository.save(review);
-        } catch (Exception e) {
-            log.error("리뷰 업로드 중 오류 발생: {}", e.getMessage(), e);
-            throw new CustomException(HttpStatus.INTERNAL_SERVER_ERROR, ErrorCode.FILE_UPLOAD_FAILED, "리뷰 업로드 중 오류가 발생했습니다.");
+            // S3에 이미지 업로드
+            Map<String, String> imageKeys = s3Service.uploadFile(null, reviewImage, imageId, true);
+            image.setPureImageKey(imageKeys.get("pureImageKey"));
+            imageRepository.save(image);
         }
+
+        // 2. Review 엔티티 생성 후 저장 (imageId가 없으면 null로 저장됨)
+        Review review = new Review();
+        review.setUserId(userId);
+        review.setPlaceId(placeId);
+        review.setImageId(imageId);  // 이미지가 없을 경우 null로 설정
+        review.setText(text);
+        reviewRepository.save(review);
+
+        return new ReviewResponseDto("Review upload success");
     }
 
     @Transactional
-    public void modifyReview(Long userId, Long reviewId, Long placeId, MultipartFile reviewImage, String text) {
+    public ReviewResponseDto modifyReview(ModifyReviewRequestDto modifyReviewRequest) {
+        Long userId = modifyReviewRequest.getUserId();
+        Long reviewId = modifyReviewRequest.getReviewId();
+        Long placeId = modifyReviewRequest.getPlaceId();
+        String text = modifyReviewRequest.getText();
+        MultipartFile reviewImage = modifyReviewRequest.getReviewImage();
 
-        // 해당 리뷰가 정확히 하나 존재하는지 확인
-        List<Review> reviews = reviewRepository.findByUserIdAndPlaceIdAndReviewId(userId, placeId, reviewId);
+        // 유일한 리뷰 조회
+        Review review = repositoryHelper.findUniqueReview(userId, placeId, reviewId);
+        Long imageId = review.getImageId();
 
-        if (reviews.isEmpty()) {
-            throw new CustomException(HttpStatus.NOT_FOUND, ErrorCode.REVIEW_NOT_FOUND, ErrorCode.REVIEW_NOT_FOUND.getMsg());
-        } else if (reviews.size() > 1) {
-            throw new CustomException(HttpStatus.INTERNAL_SERVER_ERROR, ErrorCode.DATABASE_ERROR, ErrorCode.DATABASE_ERROR.getMsg());
+        // 1. 이미지가 존재할 때만 Image 엔티티 생성 및 S3 업로드 수행
+        if (reviewImage != null && !reviewImage.isEmpty()) {
+            Image image = new Image();
+            imageRepository.save(image);
+            imageId = image.getImageId();
+
+            // S3에 이미지 업로드
+            Map<String, String> imageKeys = s3Service.uploadFile(null, reviewImage, imageId, true);
+            image.setPureImageKey(imageKeys.get("pureImageKey"));
+            imageRepository.save(image);
         }
 
-        Review review = reviews.get(0);
+        // 텍스트 및 이미지 ID 업데이트
+        review.setText(text);
+        review.setImageId(imageId);
 
-        try {
-            Long imageId = review.getImageId();
-
-            // 1. 이미지가 존재할 때만 Image 엔티티 생성 및 S3 업로드 수행
-            if (reviewImage != null && !reviewImage.isEmpty()) {
-                Image image = new Image();
-                imageRepository.save(image);
-                imageId = image.getImageId();
-
-                // S3에 이미지 업로드
-                Map<String, String> imageKeys = s3Service.uploadFile(null, reviewImage, imageId, true);
-                image.setPureImageKey(imageKeys.get("pureImageKey"));
-                imageRepository.save(image);
-            }
-
-            // 텍스트 및 이미지 ID 업데이트
-            review.setText(text);
-            review.setImageId(imageId);
-
-        } catch (Exception e) {
-            log.error("리뷰 수정 중 오류 발생: {}", e.getMessage(), e);
-            throw new CustomException(HttpStatus.INTERNAL_SERVER_ERROR, ErrorCode.FILE_UPLOAD_FAILED, ErrorCode.FILE_UPLOAD_FAILED.getMsg());
-        }
+        return new ReviewResponseDto("Review modify success");
     }
 
     @Transactional
-    public void deleteReview(Long userId, Long reviewId, Long placeId) {
-        // 해당 리뷰가 정확히 하나 존재하는지 확인
-        List<Review> reviews = reviewRepository.findByUserIdAndPlaceIdAndReviewId(userId, placeId, reviewId);
+    public ReviewResponseDto deleteReview(DeleteReviewRequestDto deleteReviewRequest) {
+        Long userId = deleteReviewRequest.getUserId();
+        Long reviewId = deleteReviewRequest.getReviewId();
+        Long placeId = deleteReviewRequest.getPlaceId();
 
-        if (reviews.isEmpty()) {
-            throw new CustomException(HttpStatus.NOT_FOUND, ErrorCode.REVIEW_NOT_FOUND, ErrorCode.REVIEW_NOT_FOUND.getMsg());
-        } else if (reviews.size() > 1) {
-            throw new CustomException(HttpStatus.INTERNAL_SERVER_ERROR, ErrorCode.DATABASE_ERROR, ErrorCode.DATABASE_ERROR.getMsg());
+        // 유일한 리뷰 조회
+        Review review = repositoryHelper.findUniqueReview(userId, placeId, reviewId);
+        Long imageId = review.getImageId();
+
+        // 리뷰 삭제
+        reviewRepository.delete(review);
+
+        // 삭제 여부 확인
+        boolean existsAfterDelete = reviewRepository.existsById(reviewId);
+        if (existsAfterDelete) {
+            throw new CustomException(HttpStatus.INTERNAL_SERVER_ERROR, ErrorCode.DATABASE_ERROR, "리뷰 삭제에 실패했습니다.");
         }
-
-        Review review = reviews.get(0);
-
-        try {
-            reviewRepository.delete(review);
-        } catch (Exception e) {
-            log.error("리뷰 삭제 중 오류 발생: {}", e.getMessage(), e);
-            throw new CustomException(HttpStatus.INTERNAL_SERVER_ERROR, ErrorCode.DATABASE_ERROR, ErrorCode.DATABASE_ERROR.getMsg());
-        }
+        return new ReviewResponseDto("Review delete success");
     }
 }
