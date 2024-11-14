@@ -1,17 +1,15 @@
 package com.ktb7.pinpung.controller;
 
-import com.ktb7.pinpung.dto.ReviewRequestDto;
-import com.ktb7.pinpung.exception.common.CustomException;
-import com.ktb7.pinpung.exception.common.ErrorCode;
+import com.ktb7.pinpung.dto.UploadReviewRequestDto;
+import com.ktb7.pinpung.dto.ModifyReviewRequestDto;
+import com.ktb7.pinpung.dto.DeleteReviewRequestDto;
+import com.ktb7.pinpung.dto.ReviewResponseDto;
 import com.ktb7.pinpung.service.ReviewService;
 import com.ktb7.pinpung.util.ValidationUtils;
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @Slf4j
@@ -22,77 +20,33 @@ public class ReviewController {
     private final ReviewService reviewService;
 
     @PostMapping("/upload")
-    public ResponseEntity<String> uploadReviews(
-            @RequestParam Long userId,
-            @RequestParam Long placeId,
-            @RequestParam(required = false) MultipartFile image,
-            @RequestParam String text) {
-        // 로그 출력
-        log.info("uploadReviews: {} {} {}", userId, placeId, text);
+    public ResponseEntity<ReviewResponseDto> uploadReview(@ModelAttribute UploadReviewRequestDto uploadReviewRequest) {
+        log.info("{}", uploadReviewRequest);
+        log.info("uploadReview: {} {} {}", uploadReviewRequest.getUserId(), uploadReviewRequest.getPlaceId(), uploadReviewRequest.getText());
 
-        // 유효성 검증
-        ValidationUtils.validateUserAndPlaceId(userId, placeId);
-//        ValidationUtils.validateFile(image, "image");
+        ValidationUtils.validateUserAndPlaceId(uploadReviewRequest.getUserId(), uploadReviewRequest.getPlaceId());
 
-        try {
-            reviewService.uploadReview(userId, placeId, image, text);
-            return ResponseEntity.ok("Review upload success");
-        } catch (CustomException ex) {
-            throw ex;
-        } catch (Exception e) {
-            log.error("Review modify failed: {}", e.getMessage(), e);
-            throw new CustomException(HttpStatus.INTERNAL_SERVER_ERROR, ErrorCode.FILE_UPLOAD_FAILED, ErrorCode.FILE_UPLOAD_FAILED.getMsg());
-        }
+        ReviewResponseDto response = reviewService.uploadReview(uploadReviewRequest);
+        return ResponseEntity.ok(response);
     }
 
-
     @PatchMapping("/modify")
-    public ResponseEntity<String> modifyReviews(
-            @RequestParam Long userId,
-            @RequestParam Long reviewId,
-            @RequestParam Long placeId,
-            @RequestParam(required = false) MultipartFile image,
-            @RequestParam String text
-    ) {
-        // 로그 출력
-        log.info("modifyReviews: {} {} {}", userId, placeId, text);
+    public ResponseEntity<ReviewResponseDto> modifyReview(@ModelAttribute ModifyReviewRequestDto modifyReviewRequest) {
+        log.info("modifyReview: {} {} {}", modifyReviewRequest.getUserId(), modifyReviewRequest.getPlaceId(), modifyReviewRequest.getText());
 
-        // 유효성 검증
-        ValidationUtils.validateUserAndPlaceId(userId, placeId);
-//        ValidationUtils.validateReviewId(reviewId);
-//        ValidationUtils.validateFile(image, "image");
+        ValidationUtils.validateUserAndPlaceId(modifyReviewRequest.getUserId(), modifyReviewRequest.getPlaceId());
 
-        try {
-            reviewService.modifyReview(userId, reviewId, placeId, image, text);
-            return ResponseEntity.ok("Review modify success");
-        } catch (CustomException ex) {
-            throw ex;
-        } catch (Exception e) {
-            log.error("Review modify failed: {}", e.getMessage(), e);
-            throw new CustomException(HttpStatus.INTERNAL_SERVER_ERROR, ErrorCode.FILE_UPLOAD_FAILED, ErrorCode.FILE_UPLOAD_FAILED.getMsg());
-        }
+        ReviewResponseDto response = reviewService.modifyReview(modifyReviewRequest);
+        return ResponseEntity.ok(response);
     }
 
     @DeleteMapping("/delete")
-    public ResponseEntity<String> deleteReviews(
-            @RequestParam Long userId,
-            @RequestParam Long reviewId,
-            @RequestParam Long placeId
-    ) {
-        // 로그 출력
-        log.info("deleteReviews: {} {} {}", userId, placeId, reviewId);
+    public ResponseEntity<ReviewResponseDto> deleteReview(@ModelAttribute DeleteReviewRequestDto deleteReviewRequest) {
+        log.info("deleteReview: {} {} {}", deleteReviewRequest.getUserId(), deleteReviewRequest.getPlaceId(), deleteReviewRequest.getReviewId());
 
-        // 유효성 검증
-        ValidationUtils.validateUserAndPlaceId(userId, placeId);
+        ValidationUtils.validateUserAndPlaceId(deleteReviewRequest.getUserId(), deleteReviewRequest.getPlaceId());
 
-        try {
-            reviewService.deleteReview(userId, reviewId, placeId);
-            return ResponseEntity.ok("Review delete success");
-        } catch (CustomException ex) {
-            throw ex;
-        } catch (Exception e) {
-            log.error("Review delete failed: {}", e.getMessage(), e);
-            throw new CustomException(HttpStatus.INTERNAL_SERVER_ERROR, ErrorCode.DATABASE_ERROR, ErrorCode.DATABASE_ERROR.getMsg());
-        }
+        ReviewResponseDto response = reviewService.deleteReview(deleteReviewRequest);
+        return ResponseEntity.ok(response);
     }
 }

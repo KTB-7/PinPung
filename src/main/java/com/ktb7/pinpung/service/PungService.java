@@ -1,6 +1,7 @@
 package com.ktb7.pinpung.service;
 
 import com.ktb7.pinpung.dto.GenerateTagsRequestDto;
+import com.ktb7.pinpung.dto.UploadPungRequestDto;
 import com.ktb7.pinpung.entity.Image;
 import com.ktb7.pinpung.entity.Pung;
 import com.ktb7.pinpung.dto.PungsResponseDto;
@@ -45,7 +46,12 @@ public class PungService {
 
 
     @Transactional
-    public void uploadPung(Long userId, Long placeId, MultipartFile imageWithText, MultipartFile pureImage, String text) {
+    public void uploadPung(UploadPungRequestDto uploadPungRequestDto) {
+        Long userId = uploadPungRequestDto.getUserId();
+        Long placeId = uploadPungRequestDto.getPlaceId();
+        MultipartFile imageWithText = uploadPungRequestDto.getImageWithText();
+        MultipartFile pureImage = uploadPungRequestDto.getPureImage();
+        String text = uploadPungRequestDto.getText();
         log.info("uploadPung 호출됨: userId={}, placeId={}, text={}", userId, placeId, text);
         try {
             // 1. Image 엔티티 생성 후 저장하여 imageId 얻기

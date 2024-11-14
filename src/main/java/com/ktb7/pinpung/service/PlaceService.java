@@ -140,6 +140,8 @@ public class PlaceService {
                 .map(tagObj -> (String) tagObj[1])
                 .collect(Collectors.toList());
 
+        log.info("tags {}:", tags);
+
         // 대표 펑 & 이미지 ID 조회
         Optional<Pung> representativePung = pungRepository.findFirstByPlaceIdAndCreatedAtAfterOrderByCreatedAtDesc(placeId, yesterday);
         Long imageId = null;
