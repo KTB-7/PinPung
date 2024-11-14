@@ -64,12 +64,22 @@ public class KakaoTokenAuthenticationFilter extends OncePerRequestFilter {
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) {
         String requestURI = request.getRequestURI();
-        // 특정 URL에 대해서만 필터가 적용되도록 설정
-        return !(requestURI.startsWith("/api/reviews") ||
-                requestURI.startsWith("/api/pungs/upload") ||
-                requestURI.startsWith("/api/follows")
-        );
+        String method = request.getMethod();
+
+        // GET 요청의 경우 필터가 적용되지 않도록 설정
+        if (requestURI.startsWith("/api/pungs/") && "GET".equalsIgnoreCase(method)) {
+            return true;
+        }
+
+        // 로그인 없이 접근 가능한 기타 URL 경로 설정
+        return requestURI.startsWith("/login") ||
+                requestURI.startsWith("/api/places/nearby") ||
+                requestURI.startsWith("/api/places") ||
+                requestURI.startsWith("/favicon.ico") ||
+                requestURI.startsWith("/logout-success") ||
+                requestURI.startsWith("/api/test");
     }
+
 
     private Long validateTokenAndExtractUserId(String token) {
         WebClient webClient = WebClient.builder()
