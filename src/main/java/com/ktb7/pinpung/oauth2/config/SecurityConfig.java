@@ -61,6 +61,9 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .anyRequest().permitAll()
                 )
+                .requiresChannel(channel -> channel
+                        .anyRequest().requiresSecure() // HTTPS 강제
+                )
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 
         return http.build();
