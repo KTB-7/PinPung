@@ -54,6 +54,7 @@ public class SecurityConfig {
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/actuator/health").permitAll()
+                        .requestMatchers("/api/**").permitAll()
                         .requestMatchers("/oauth2/authorization/kakao", "/login", "/favicon.ico", "/api/test", "/logout-success", "/api/places/nearby", "/api/places/{placeId}", "/api/pungs/{placeId}", "/api/places/tag-reviews").permitAll()
                         .requestMatchers("/api/reviews", "/api/follows", "/logout", "/api/pungs/upload").authenticated()
                         .anyRequest().authenticated()
