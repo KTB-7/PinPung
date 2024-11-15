@@ -55,7 +55,7 @@ public class SecurityConfig {
         log.info("Applying Public Security Filter Chain!");
 
         http
-                .securityMatcher("/api/test", "/api/places", "/api/places/{placeId}", "/api/pungs/{placeId}", "/api/places/nearby","/api/places/tag-reviews", "/actuator/health", "/favicon.ico")
+                .securityMatcher("/api/api/places","/api/test", "/api/places", "/api/places/{placeId}", "/api/pungs/{placeId}", "/api/places/nearby","/api/places/tag-reviews", "/actuator/health", "/favicon.ico")
                 .csrf(csrf -> csrf.disable())
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests(auth -> auth
