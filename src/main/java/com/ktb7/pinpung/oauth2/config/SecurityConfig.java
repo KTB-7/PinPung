@@ -9,10 +9,10 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.Order;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.oauth2.client.web.OAuth2LoginAuthenticationFilter;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.AnonymousAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
@@ -46,22 +46,41 @@ public class SecurityConfig {
         return source;
     }
 
+    /**
+     * 필터체인 1: 검증이 필요 없는 경로
+     */
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        log.info("Applying Security Filter Chain!!!!!");
+    @Order(1)
+    public SecurityFilterChain publicSecurityFilterChain(HttpSecurity http) throws Exception {
+        log.info("Applying Public Security Filter Chain!");
+
+        http
+                .securityMatcher("/api/test", "/api/places/nearby", "/api/places/{placeId}", "/api/pungs/{placeId}", "/api/places/tag-reviews", "/actuator/health", "/favicon.ico")
+                .csrf(csrf -> csrf.disable())
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+                .authorizeHttpRequests(auth -> auth
+                        .anyRequest().permitAll()
+                )
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+
+        return http.build();
+    }
+
+    /**
+     * 필터체인 2: 검증이 필요한 경로
+     */
+    @Bean
+    @Order(2)
+    public SecurityFilterChain authenticatedSecurityFilterChain(HttpSecurity http) throws Exception {
+        log.info("Applying Authenticated Security Filter Chain!");
+
         http
                 .csrf(csrf -> csrf.disable())
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/actuator/health").permitAll()
-                        .requestMatchers("/api/**").permitAll()
-                        .requestMatchers("/login", "/favicon.ico", "/api/test", "/logout-success", "/api/places/nearby", "/api/places/{placeId}", "/api/pungs/{placeId}", "/api/places/tag-reviews").permitAll()
                         .requestMatchers("/api/reviews", "/api/follows", "/logout", "/api/pungs/upload").authenticated()
                         .anyRequest().authenticated()
                 )
-//                .requiresChannel(channel -> channel
-//                        .anyRequest().requiresSecure()              // 모든 요청을 HTTPS로 강제
-//                )
                 .oauth2Login(oauth2 -> oauth2
                         .successHandler(oAuth2LoginSuccessHandler)
                         .failureHandler(oAuth2LoginFailureHandler)
@@ -75,10 +94,7 @@ public class SecurityConfig {
                         .logoutSuccessUrl("/logout-success")
                         .addLogoutHandler(oAuth2LogoutCustomHandler)
                 )
-                .securityContext(securityContext -> securityContext
-                        .requireExplicitSave(true)
-                )
-                .addFilterBefore(new KakaoTokenAuthenticationFilter(userRepository), AnonymousAuthenticationFilter.class);
+                .addFilterBefore(new KakaoTokenAuthenticationFilter(userRepository), AnonymousAuthenticationFilter.class); // 카카오 필터 추가
 
         return http.build();
     }
