@@ -58,9 +58,9 @@ public class SecurityConfig {
                         .requestMatchers("/api/reviews", "/api/follows", "/logout", "/api/pungs/upload").authenticated()
                         .anyRequest().authenticated()
                 )
-                .requiresChannel(channel -> channel
-                        .anyRequest().requiresSecure()              // 모든 요청을 HTTPS로 강제
-                )
+//                .requiresChannel(channel -> channel
+//                        .anyRequest().requiresSecure()              // 모든 요청을 HTTPS로 강제
+//                )
                 .oauth2Login(oauth2 -> oauth2
                         .successHandler(oAuth2LoginSuccessHandler)
                         .failureHandler(oAuth2LoginFailureHandler)
@@ -68,7 +68,7 @@ public class SecurityConfig {
                                 .userService(customOAuth2UserService)
                         )
                 )
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED))
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .logout(logout -> logout
                         .logoutUrl("/logout")
                         .logoutSuccessUrl("/logout-success")
