@@ -55,7 +55,7 @@ public class SecurityConfig {
         log.info("Applying Public Security Filter Chain!");
 
         http
-                .securityMatcher("/api/test", "/api/places/nearby", "/api/places/{placeId}", "/api/pungs/{placeId}", "/api/places/tag-reviews", "/actuator/health", "/favicon.ico")
+                .securityMatcher("/api/test", "/api/places", "/api/places/{placeId}", "/api/pungs/{placeId}", "/api/places/nearby","/api/places/tag-reviews", "/actuator/health", "/favicon.ico")
                 .csrf(csrf -> csrf.disable())
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests(auth -> auth
@@ -81,6 +81,9 @@ public class SecurityConfig {
                         .requestMatchers("/api/reviews", "/api/follows", "/logout", "/api/pungs/upload").authenticated()
                         .anyRequest().authenticated()
                 )
+                .requiresChannel(channel -> channel
+                        .anyRequest().requiresSecure() // HTTPS 강제
+                )
                 .oauth2Login(oauth2 -> oauth2
                         .successHandler(oAuth2LoginSuccessHandler)
                         .failureHandler(oAuth2LoginFailureHandler)
@@ -94,7 +97,7 @@ public class SecurityConfig {
                         .logoutSuccessUrl("/logout-success")
                         .addLogoutHandler(oAuth2LogoutCustomHandler)
                 )
-                .addFilterBefore(new KakaoTokenAuthenticationFilter(userRepository), AnonymousAuthenticationFilter.class); // 카카오 필터 추가
+                .addFilterBefore(new KakaoTokenAuthenticationFilter(userRepository), AnonymousAuthenticationFilter.class);
 
         return http.build();
     }
