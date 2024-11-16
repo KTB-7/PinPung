@@ -84,19 +84,18 @@ public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
                     throw new CustomException(HttpStatus.BAD_REQUEST, ErrorCode.MISSING_PARAMETER, "리프레시 토큰이 누락되었습니다.");
                 }
 
-                // Access Token 생성
+                // 액세스 토큰 및 유저 정보 JSON 응답 생성
                 String accessToken = authorizedClient.getAccessToken().getTokenValue();
-
-                // 리디렉션 URL 생성
-                String redirectUrl = String.format(
-                        "https://your-frontend-domain.com/login-success?accessToken=%s&userId=%s&userName=%s",
-                        accessToken, user.getUserId(), user.getUserName()
+                String jsonResponse = String.format(
+                        "{\"accessToken\":\"%s\", \"userId\": \"%s\", \"userName\": \"%s\", \"userEmail\": \"%s\"}",
+                        accessToken, user.getUserId(), user.getUserName(), user.getUserEmail()
                 );
 
-                // 프론트엔드로 리디렉션
-                response.sendRedirect(redirectUrl);
-            } else {
-                response.sendRedirect("/login-failure");
+                log.info("JSON Response: {}", jsonResponse);
+
+                response.setContentType("application/json");
+                response.setCharacterEncoding("UTF-8");
+                response.getWriter().write(jsonResponse);
             }
         } catch (CustomException e) {
             log.error("CustomException during onAuthenticationSuccess: 상태 코드={}, 에러 메시지={}", e.getStatus(), e.getErrorCode().getMsg(), e);

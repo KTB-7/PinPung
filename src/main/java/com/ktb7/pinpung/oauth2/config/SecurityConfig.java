@@ -56,16 +56,14 @@ public class SecurityConfig {
 
         http
                 .securityMatcher(
-                        "/swagger-ui/**",
-                        "/api-docs/**",
+                        "/logout-success",
+                        "/api/test",
+                        "/api/places/**",
+                        "/api/pungs/{placeId}",
                         "/actuator/health",
                         "/favicon.ico",
-                        "/login",
-                        "/oauth2/authorization/kakao",
-                        "/logout-success",
-                        "/api/places/**",
-                        "/api/pungs/{placeId}"
-                        )
+                        "/login"
+                )
                 .csrf(csrf -> csrf.disable())
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests(auth -> auth
@@ -92,8 +90,8 @@ public class SecurityConfig {
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
-                                "/api/reviews/**",
-                                "/api/follows/**",
+                                "/api/reviews",
+                                "/api/follows",
                                 "/logout",
                                 "/api/pungs/upload"
                         ).authenticated()
