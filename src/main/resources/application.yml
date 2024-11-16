@@ -67,7 +67,7 @@ logging:
   level:
     org.springframework:
       boot.actuate.endpoint.web.servlet: ERROR
-      security: DEBUG
+#      security: DEBUG
 fastapi:
   server:
     url: http://0.0.0.0:8000
