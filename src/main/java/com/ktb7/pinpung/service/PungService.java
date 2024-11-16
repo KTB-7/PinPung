@@ -1,10 +1,9 @@
 package com.ktb7.pinpung.service;
 
-import com.ktb7.pinpung.dto.GenerateTagsRequestDto;
-import com.ktb7.pinpung.dto.UploadPungRequestDto;
+import com.ktb7.pinpung.dto.Pung.PungsResponseDto;
+import com.ktb7.pinpung.dto.Pung.UploadPungRequestDto;
 import com.ktb7.pinpung.entity.Image;
 import com.ktb7.pinpung.entity.Pung;
-import com.ktb7.pinpung.dto.PungsResponseDto;
 import com.ktb7.pinpung.exception.common.CustomException;
 import com.ktb7.pinpung.exception.common.ErrorCode;
 import com.ktb7.pinpung.repository.ImageRepository;
@@ -16,7 +15,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.Clock;

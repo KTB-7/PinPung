@@ -11,6 +11,7 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 
 @Entity
+@Table(name = "Token")
 @Setter
 @Getter
 public class Token {

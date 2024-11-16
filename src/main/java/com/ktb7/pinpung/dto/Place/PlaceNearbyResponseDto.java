@@ -1,6 +1,5 @@
-package com.ktb7.pinpung.dto;
+package com.ktb7.pinpung.dto.Place;
 
-import com.ktb7.pinpung.entity.Review;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -8,8 +7,7 @@ import java.util.List;
 
 @Getter
 @AllArgsConstructor
-public class ReviewsDto {
+public class PlaceNearbyResponseDto {
     private Integer count;
-    private List<Review> reviews;
-
+    private List<PlaceNearbyDto> places;
 }

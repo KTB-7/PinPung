@@ -1,8 +1,7 @@
-package com.ktb7.pinpung.dto;
+package com.ktb7.pinpung.dto.Follow;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import org.springframework.web.multipart.MultipartFile;
 
 @Getter
 @AllArgsConstructor

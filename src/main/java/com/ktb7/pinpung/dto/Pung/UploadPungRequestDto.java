@@ -1,4 +1,4 @@
-package com.ktb7.pinpung.dto;
+package com.ktb7.pinpung.dto.Pung;
 
 import lombok.Getter;
 import lombok.Setter;

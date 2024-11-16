@@ -55,7 +55,17 @@ public class SecurityConfig {
         log.info("Applying Public Security Filter Chain!");
 
         http
-                .securityMatcher("/api/api/places","/api/test", "/api/places", "/api/places/{placeId}", "/api/pungs/{placeId}", "/api/places/nearby","/api/places/tag-reviews", "/actuator/health", "/favicon.ico")
+                .securityMatcher(
+                        "/swagger-ui/**",
+                        "/api-docs/**",
+                        "/actuator/health",
+                        "/favicon.ico",
+                        "/login",
+                        "/oauth2/authorization/kakao",
+                        "/logout-success",
+                        "/api/places/**",
+                        "/api/pungs/{placeId}"
+                        )
                 .csrf(csrf -> csrf.disable())
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests(auth -> auth
@@ -81,7 +91,12 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/reviews", "/api/follows", "/logout", "/api/pungs/upload").authenticated()
+                        .requestMatchers(
+                                "/api/reviews/**",
+                                "/api/follows/**",
+                                "/logout",
+                                "/api/pungs/upload"
+                        ).authenticated()
                         .anyRequest().authenticated()
                 )
                 .requiresChannel(channel -> channel

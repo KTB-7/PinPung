@@ -1,16 +1,18 @@
-package com.ktb7.pinpung.dto;
+package com.ktb7.pinpung.dto.Review;
 
 import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.springframework.web.multipart.MultipartFile;
 
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class ReviewRequestDto {
+public class UploadReviewRequestDto {
     private Long userId;
     private Long placeId;
+    private MultipartFile reviewImage;
     private String text;
-    private MultipartFile image;
 }
