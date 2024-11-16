@@ -1,4 +1,4 @@
-package com.ktb7.pinpung.dto;
+package com.ktb7.pinpung.dto.Review;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;

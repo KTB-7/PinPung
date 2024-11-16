@@ -1,6 +1,6 @@
 package com.ktb7.pinpung.service;
 
-import com.ktb7.pinpung.dto.*;
+import com.ktb7.pinpung.dto.Follow.*;
 import com.ktb7.pinpung.entity.Follow;
 import com.ktb7.pinpung.entity.User;
 import com.ktb7.pinpung.exception.common.CustomException;

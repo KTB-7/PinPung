@@ -1,11 +1,10 @@
-package com.ktb7.pinpung.dto;
+package com.ktb7.pinpung.dto.Place;
 
+import com.ktb7.pinpung.dto.Review.ReviewsDto;
 import com.ktb7.pinpung.entity.Pung;
-import com.ktb7.pinpung.entity.Review;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
-import java.io.InputStream;
 import java.util.List;
 
 @Getter

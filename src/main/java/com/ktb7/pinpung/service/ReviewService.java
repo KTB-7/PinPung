@@ -1,9 +1,9 @@
 package com.ktb7.pinpung.service;
 
-import com.ktb7.pinpung.dto.UploadReviewRequestDto;
-import com.ktb7.pinpung.dto.ModifyReviewRequestDto;
-import com.ktb7.pinpung.dto.DeleteReviewRequestDto;
-import com.ktb7.pinpung.dto.ReviewResponseDto;
+import com.ktb7.pinpung.dto.Review.UploadReviewRequestDto;
+import com.ktb7.pinpung.dto.Review.ModifyReviewRequestDto;
+import com.ktb7.pinpung.dto.Review.DeleteReviewRequestDto;
+import com.ktb7.pinpung.dto.Review.ReviewResponseDto;
 import com.ktb7.pinpung.entity.Image;
 import com.ktb7.pinpung.entity.Review;
 import com.ktb7.pinpung.exception.common.CustomException;
@@ -18,7 +18,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.List;
 import java.util.Map;
 
 @Service

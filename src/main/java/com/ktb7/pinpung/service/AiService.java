@@ -1,7 +1,6 @@
 package com.ktb7.pinpung.service;
 
-import com.ktb7.pinpung.dto.GenerateTagsRequestDto;
-import com.ktb7.pinpung.dto.GenerateTagsResponseDto;
+import com.ktb7.pinpung.dto.AI.GenerateTagsResponseDto;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
