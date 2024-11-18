@@ -48,15 +48,14 @@ public class PlaceService {
 
     private final WebClient webClient = WebClient.builder().build();
 
-    public List<Long> categorySearch(String x, String y, Integer radius) {
+    public List<Long> categorySearch(String swLng, String swLat, String neLng, String neLat) {
         List<Long> placeIds = new ArrayList<>();
         int page = 1;
         int size = 15;
         int maxPage = 3;
 
         while (page <= maxPage) {
-            String requestUrl = KAKAO_LOCAL_API_URL + "?category_group_code=CE7&x=" + x + "&y=" + y +
-                    "&radius=" + radius + "&page=" + page + "&size=" + size;
+            String requestUrl = KAKAO_LOCAL_API_URL + "?category_group_code=CE7&rect=" + swLng + "," + swLat + "," + neLng + "," + neLat + "&page=" + page + "&size=" + size;
 
             Map<String, Object> response = webClient.get()
                     .uri(requestUrl)
@@ -68,15 +67,12 @@ public class PlaceService {
                     })
                     .bodyToMono(new ParameterizedTypeReference<Map<String, Object>>() {})
                     .block();
-            // block : 비동기 작업인 Mono를 동기적으로 기다려 최종 결과를 반환
 
             List<Map<String, Object>> documents = (List<Map<String, Object>>) response.get("documents");
             if (documents == null) {
                 log.error("카테고리 검색 API 응답에 문서가 없습니다.");
                 throw new CustomException(HttpStatus.INTERNAL_SERVER_ERROR, ErrorCode.API_CALL_FAILED, "카테고리 검색 API 응답에 문서가 없습니다.");
             }
-
-            int documentCount = documents.size();
 
             for (Map<String, Object> document : documents) {
                 String kakaoPlaceId = (String) document.get("id");
@@ -96,14 +92,13 @@ public class PlaceService {
                     placeIds.add(savedPlace.getPlaceId());
                 }
             }
-            if (documentCount < size) {
+            if (documents.size() < size) {
                 break;
             }
             page++;
         }
         return placeIds;
     }
-
 
 
     public List<PlaceNearbyDto> getPlacesWithRepresentativeImage(List<Long> placeIds) {

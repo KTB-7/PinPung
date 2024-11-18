@@ -21,17 +21,34 @@ public class ValidationUtils {
     private final UserRepository userRepository;
 
     // x, y 좌표 값의 유효성을 검사하는 메서드
-    public static void validateCoordinates(String x, String y) {
-        try {
-            double xCoord = Double.parseDouble(x);
-            double yCoord = Double.parseDouble(y);
+//    public static void validateCoordinates(String x, String y) {
+//        try {
+//            double xCoord = Double.parseDouble(x);
+//            double yCoord = Double.parseDouble(y);
+//
+//            // 한국 좌표인지 확인
+//            if (xCoord < 123 || xCoord > 133 || yCoord < 32 || yCoord > 44) {
+//                throw new CustomException(HttpStatus.BAD_REQUEST, ErrorCode.INVALID_PARAMETER);
+//            }
+//        } catch (NumberFormatException e) {
+//            throw new CustomException(HttpStatus.BAD_REQUEST, ErrorCode.INVALID_PARAMETER);
+//        }
+//    }
 
-            // 한국 좌표인지 확인
-            if (xCoord < 123 || xCoord > 133 || yCoord < 32 || yCoord > 44) {
-                throw new CustomException(HttpStatus.BAD_REQUEST, ErrorCode.INVALID_PARAMETER);
+    // rect 값의 유효성을 검사하는 메서드
+    public static void validateRect(String swLng, String swLat, String neLng, String neLat) {
+        try {
+            double swLngValue = Double.parseDouble(swLng);
+            double swLatValue = Double.parseDouble(swLat);
+            double neLngValue = Double.parseDouble(neLng);
+            double neLatValue = Double.parseDouble(neLat);
+
+            if (swLngValue < 123 || swLngValue > 133 || swLatValue < 32 || swLatValue > 44 ||
+                    neLngValue < 123 || neLngValue > 133 || neLatValue < 32 || neLatValue > 44) {
+                throw new CustomException(HttpStatus.BAD_REQUEST, ErrorCode.INVALID_PARAMETER, "좌표 범위가 유효하지 않습니다.");
             }
         } catch (NumberFormatException e) {
-            throw new CustomException(HttpStatus.BAD_REQUEST, ErrorCode.INVALID_PARAMETER);
+            throw new CustomException(HttpStatus.BAD_REQUEST, ErrorCode.INVALID_PARAMETER, "좌표 값은 숫자로 변환할 수 있어야 합니다.");
         }
     }
 
