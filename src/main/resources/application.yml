@@ -76,3 +76,6 @@ springdoc:
     path: /api-docs
   swagger-ui:
     path: /swagger-ui.html
+#openai:
+#  model: text-davinci-002
+#  secret-key: ${OPENAI_KEY}

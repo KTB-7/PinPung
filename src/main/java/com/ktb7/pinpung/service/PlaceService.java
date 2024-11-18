@@ -39,7 +39,7 @@ public class PlaceService {
     private final TagRepository tagRepository;
     private final ReviewRepository reviewRepository;
 
-    private static final String KAKAO_LOCAL_API_URL = "https://dapi.kakao.com/v2/local/search/category.json";
+    private static final String KAKAO_LOCAL_API_URL = "https://dapi.kakao.com/v2/local/search/keyword.json";
     private final S3Service s3Service;
     private final RepositoryHelper repositoryHelper;
 
@@ -48,14 +48,18 @@ public class PlaceService {
 
     private final WebClient webClient = WebClient.builder().build();
 
-    public List<Long> categorySearch(String swLng, String swLat, String neLng, String neLat) {
+    public List<Long> categorySearch(String keyword, String swLng, String swLat, String neLng, String neLat) {
         List<Long> placeIds = new ArrayList<>();
         int page = 1;
         int size = 15;
         int maxPage = 3;
 
         while (page <= maxPage) {
-            String requestUrl = KAKAO_LOCAL_API_URL + "?category_group_code=CE7&rect=" + swLng + "," + swLat + "," + neLng + "," + neLat + "&page=" + page + "&size=" + size;
+            String requestUrl = KAKAO_LOCAL_API_URL +
+                    "?query=" + keyword +
+                    "&rect=" + swLng + "," + swLat + "," + neLng + "," + neLat +
+                    "&page=" + page +
+                    "&size=" + size;
 
             Map<String, Object> response = webClient.get()
                     .uri(requestUrl)
