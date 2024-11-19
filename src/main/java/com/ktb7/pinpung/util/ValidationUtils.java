@@ -20,20 +20,20 @@ public class ValidationUtils {
 
     private final UserRepository userRepository;
 
-    // x, y 좌표 값의 유효성을 검사하는 메서드
-//    public static void validateCoordinates(String x, String y) {
-//        try {
-//            double xCoord = Double.parseDouble(x);
-//            double yCoord = Double.parseDouble(y);
-//
-//            // 한국 좌표인지 확인
-//            if (xCoord < 123 || xCoord > 133 || yCoord < 32 || yCoord > 44) {
-//                throw new CustomException(HttpStatus.BAD_REQUEST, ErrorCode.INVALID_PARAMETER);
-//            }
-//        } catch (NumberFormatException e) {
-//            throw new CustomException(HttpStatus.BAD_REQUEST, ErrorCode.INVALID_PARAMETER);
-//        }
-//    }
+//     x, y 좌표 값의 유효성을 검사하는 메서드
+    public static void validateCoordinates(String x, String y) {
+        try {
+            double xCoord = Double.parseDouble(x);
+            double yCoord = Double.parseDouble(y);
+
+            // 한국 좌표인지 확인
+            if (xCoord < 123 || xCoord > 133 || yCoord < 32 || yCoord > 44) {
+                throw new CustomException(HttpStatus.BAD_REQUEST, ErrorCode.INVALID_PARAMETER);
+            }
+        } catch (NumberFormatException e) {
+            throw new CustomException(HttpStatus.BAD_REQUEST, ErrorCode.INVALID_PARAMETER);
+        }
+    }
 
     // rect 값의 유효성을 검사하는 메서드
     public static void validateRect(String swLng, String swLat, String neLng, String neLat) {
@@ -109,6 +109,12 @@ public class ValidationUtils {
     // AccessToken의 유효성을 검사하는 메서드 (null 또는 빈 문자열인지 확인)
     public static void validateAccessToken(String token) {
         if (token == null || token.isEmpty()) {
+            throw new CustomException(HttpStatus.BAD_REQUEST, ErrorCode.MISSING_PARAMETER);
+        }
+    }
+
+    public static void validateKeyword(String keyword) {
+        if (keyword == null || keyword.isEmpty()) {
             throw new CustomException(HttpStatus.BAD_REQUEST, ErrorCode.MISSING_PARAMETER);
         }
     }

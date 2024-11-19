@@ -39,11 +39,9 @@ public class PlaceController {
         // 유효성 검증
         ValidationUtils.validateRect(swLng, swLat, neLng, neLat);
 
-        // 서비스 호출
-        List<Long> placeIds = placeService.categorySearch(swLng, swLat, neLng, neLat);
+        List<Long> placeIds = placeService.categorySearch("카페", swLng, swLat, neLng, neLat);
         List<PlaceNearbyDto> places = placeService.getPlacesWithRepresentativeImage(placeIds);
 
-        // 응답 구성
         PlaceNearbyResponseDto response = new PlaceNearbyResponseDto(places.size(), places);
         log.info("Nearby places count: {}", response.getCount());
         return ResponseEntity.ok(response);
