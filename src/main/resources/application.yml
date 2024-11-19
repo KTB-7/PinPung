@@ -50,6 +50,9 @@ spring:
       naming:
         physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
       ddl-auto: update
+  ai:
+    openai:
+      api-key: ${OPENAI_KEY}
 kakao:
   logout_redirect_uri: ${LOGOUT_REDIRECT_URI}
 # Actuator 설정 추가
@@ -76,6 +79,3 @@ springdoc:
     path: /api-docs
   swagger-ui:
     path: /swagger-ui.html
-#openai:
-#  model: text-davinci-002
-#  secret-key: ${OPENAI_KEY}

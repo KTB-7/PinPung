@@ -98,7 +98,7 @@ public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
 
                 // 리다이렉트
                 log.info("Redirecting to: {}", redirectUrl);
-                response.sendRedirect(redirectUrl);
+//                response.sendRedirect(redirectUrl);
             }
         } catch (CustomException e) {
             log.error("CustomException occurred during authentication success handling: {}", e.getMessage(), e);

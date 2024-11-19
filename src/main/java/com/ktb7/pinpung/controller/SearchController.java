@@ -2,6 +2,7 @@ package com.ktb7.pinpung.controller;
 
 import com.ktb7.pinpung.dto.Place.PlaceNearbyDto;
 import com.ktb7.pinpung.dto.Place.PlaceNearbyResponseDto;
+import com.ktb7.pinpung.service.PlaceService;
 import com.ktb7.pinpung.service.SearchService;
 import com.ktb7.pinpung.util.ValidationUtils;
 import io.swagger.v3.oas.annotations.Operation;
@@ -15,12 +16,14 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
-@RestController("/api/search")
 @Slf4j
 @RequiredArgsConstructor
+@RestController
+@RequestMapping("/api/search")
 public class SearchController {
 
     private final SearchService searchService;
+    private final PlaceService placeService;
 
     @GetMapping
     @Operation(
@@ -41,11 +44,18 @@ public class SearchController {
         ValidationUtils.validateKeyword(keyword);
 
         Boolean haveLocation = searchService.useGpt(keyword);
+        List<Long> placeIdList;
 
-//        if (haveLocation) {
-//
-//        } else {
-//
-//        }
+        if (haveLocation) {
+            // rect 없이 요청 보내기
+            placeIdList = placeService.categorySearch(keyword, null, null, null, null);
+        } else {
+            // rect 포함하여 요청 보내기
+            placeIdList = placeService.categorySearch(keyword, swLng, swLat, neLng, neLat);
+        }
+
+        log.info("placeIdList {}: ", placeIdList);
+        // placeidlist 없을 때에 대한 예외처리
+        // placeidlist 인공지능으로 넘기기
     }
 }

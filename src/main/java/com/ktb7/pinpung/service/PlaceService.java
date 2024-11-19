@@ -55,14 +55,17 @@ public class PlaceService {
         int maxPage = 3;
 
         while (page <= maxPage) {
-            String requestUrl = KAKAO_LOCAL_API_URL +
-                    "?query=" + keyword +
-                    "&rect=" + swLng + "," + swLat + "," + neLng + "," + neLat +
-                    "&page=" + page +
-                    "&size=" + size;
+            StringBuilder requestUrl = new StringBuilder(KAKAO_LOCAL_API_URL)
+                    .append("?query=").append(keyword)
+                    .append("&page=").append(page)
+                    .append("&size=").append(size);
+
+            if (swLng != null && swLat != null && neLng != null && neLat != null) {
+                requestUrl.append("&rect=").append(swLng).append(",").append(swLat).append(",").append(neLng).append(",").append(neLat);
+            }
 
             Map<String, Object> response = webClient.get()
-                    .uri(requestUrl)
+                    .uri(requestUrl.toString())
                     .header(HttpHeaders.AUTHORIZATION, "KakaoAK " + clientId)
                     .retrieve()
                     .onStatus(status -> status.is4xxClientError() || status.is5xxServerError(), clientResponse -> {
