@@ -39,7 +39,7 @@ public class PlaceController {
         // 유효성 검증
         ValidationUtils.validateRect(swLng, swLat, neLng, neLat);
 
-        List<Long> placeIds = placeService.categorySearch("카페", swLng, swLat, neLng, neLat);
+        List<Long> placeIds = placeService.categorySearch("카페", swLng, swLat, neLng, neLat, null, null);
         List<PlaceNearbyDto> places = placeService.getPlacesWithRepresentativeImage(placeIds);
 
         PlaceNearbyResponseDto response = new PlaceNearbyResponseDto(places.size(), places);
@@ -67,20 +67,20 @@ public class PlaceController {
         return ResponseEntity.ok(placeInfo);
     }
 
-    @GetMapping("/tags-reviews")
-    @Operation(
-            summary = "검색 결과별 태그 및 리뷰 조회",
-            description = "여러 장소별 태그 및 리뷰 개수를 조회합니다."
-    )
-    public ResponseEntity<List<SearchResponseDto>> getPlacesWithReviewCountsAndTags(
-            @RequestParam List<Long> placeIds) {
-        log.info("Received request for tags and reviews with placeIds: {}", placeIds);
-
-        // 유효성 검증
-        ValidationUtils.validatePlaceIds(placeIds);
-
-        List<SearchResponseDto> places = placeService.getPlacesWithReviewCountsAndTags(placeIds);
-        log.info("Tags and reviews retrieved for placeIds: {}", placeIds);
-        return ResponseEntity.ok(places);
-    }
+//    @GetMapping("/tags-reviews")
+//    @Operation(
+//            summary = "검색 결과별 태그 및 리뷰 조회",
+//            description = "여러 장소별 태그 및 리뷰 개수를 조회합니다."
+//    )
+//    public ResponseEntity<List<SearchResponseDto>> getPlacesWithReviewCountsAndTags(
+//            @RequestParam List<Long> placeIds) {
+//        log.info("Received request for tags and reviews with placeIds: {}", placeIds);
+//
+//        // 유효성 검증
+//        ValidationUtils.validatePlaceIds(placeIds);
+//
+//        List<SearchResponseDto> places = placeService.getPlacesWithReviewCountsAndTags(placeIds);
+//        log.info("Tags and reviews retrieved for placeIds: {}", placeIds);
+//        return ResponseEntity.ok(places);
+//    }
 }

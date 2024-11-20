@@ -2,7 +2,6 @@ package com.ktb7.pinpung.service;
 
 import com.ktb7.pinpung.dto.Place.PlaceInfoResponseDto;
 import com.ktb7.pinpung.dto.Place.PlaceNearbyDto;
-import com.ktb7.pinpung.dto.Place.SearchResponseDto;
 import com.ktb7.pinpung.dto.Review.ReviewsDto;
 import com.ktb7.pinpung.entity.Place;
 import com.ktb7.pinpung.entity.Pung;
@@ -48,7 +47,7 @@ public class PlaceService {
 
     private final WebClient webClient = WebClient.builder().build();
 
-    public List<Long> categorySearch(String keyword, String swLng, String swLat, String neLng, String neLat) {
+    public List<Long> categorySearch(String keyword, String swLng, String swLat, String neLng, String neLat, String x, String y) {
         List<Long> placeIds = new ArrayList<>();
         int page = 1;
         int size = 15;
@@ -62,6 +61,10 @@ public class PlaceService {
 
             if (swLng != null && swLat != null && neLng != null && neLat != null) {
                 requestUrl.append("&rect=").append(swLng).append(",").append(swLat).append(",").append(neLng).append(",").append(neLat);
+            }
+
+            if (x != null && y != null) {
+                requestUrl.append("&x=").append(x).append("&y=").append(y).append("&sort=distance");
             }
 
             Map<String, Object> response = webClient.get()
@@ -170,29 +173,4 @@ public class PlaceService {
         );
     }
 
-    public List<SearchResponseDto> getPlacesWithReviewCountsAndTags(List<Long> placeIds) {
-        List<Object[]> reviewCounts = reviewRepository.findReviewCountsByPlaceIds(placeIds);
-        List<Object[]> tags = tagRepository.findTagsByPlaceIds(placeIds);
-
-        Map<Long, Long> reviewCountMap = reviewCounts.stream()
-                .collect(Collectors.toMap(
-                        row -> (Long) row[0],
-                        row -> (Long) row[1]
-                ));
-        log.info("/tag-reviews review counts: {}", reviewCountMap);
-
-        Map<Long, List<String>> tagMap = tags.stream()
-                .collect(Collectors.groupingBy(
-                        row -> (Long) row[0],
-                        Collectors.mapping(row -> (String) row[1], Collectors.toList())
-                ));
-        log.info("/tag-reviews tags: {}", tagMap);
-
-        return placeIds.stream().map(placeId -> {
-            Long reviewCount = reviewCountMap.getOrDefault(placeId, 0L);
-            List<String> tagList = tagMap.getOrDefault(placeId, Collections.emptyList());
-
-            return new SearchResponseDto(placeId, tagList, reviewCount);
-        }).collect(Collectors.toList());
-    }
 }

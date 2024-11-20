@@ -1,19 +1,27 @@
 package com.ktb7.pinpung.service;
 
+import com.ktb7.pinpung.dto.Place.PlaceNearbyDto;
+import com.ktb7.pinpung.dto.Search.SearchPlaceInfoDto;
+import com.ktb7.pinpung.dto.Search.SearchResponseDto;
+import com.ktb7.pinpung.dto.Search.SearchTagReviewDto;
 import com.ktb7.pinpung.exception.common.CustomException;
 import com.ktb7.pinpung.exception.common.ErrorCode;
+import com.ktb7.pinpung.repository.ReviewRepository;
+import com.ktb7.pinpung.repository.TagRepository;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
-import reactor.core.publisher.Mono;
 import org.springframework.core.ParameterizedTypeReference;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
+@RequiredArgsConstructor
 public class SearchService {
 
     @Value("${spring.ai.openai.api-key}")
@@ -22,6 +30,9 @@ public class SearchService {
     private static final String OPENAI_API_URL = "https://api.openai.com/v1/chat/completions";
 
     private final WebClient webClient = WebClient.builder().build();
+
+    private final TagRepository tagRepository;
+    private final ReviewRepository reviewRepository;
 
     public Boolean useGpt(String keyword) {
         // 프롬프트 생성
@@ -89,8 +100,65 @@ public class SearchService {
         }
     }
 
-//    public
+    public List<SearchTagReviewDto> getPlacesWithReviewCountsAndTags(List<Long> placeIds) {
+        List<Object[]> reviewCounts = reviewRepository.findReviewCountsByPlaceIds(placeIds);
+        List<Object[]> tags = tagRepository.findTagsByPlaceIds(placeIds);
 
+        Map<Long, Long> reviewCountMap = reviewCounts.stream()
+                .collect(Collectors.toMap(
+                        row -> (Long) row[0],
+                        row -> (Long) row[1]
+                ));
+        log.info("/tag-reviews review counts: {}", reviewCountMap);
 
+        Map<Long, List<String>> tagMap = tags.stream()
+                .collect(Collectors.groupingBy(
+                        row -> (Long) row[0],
+                        Collectors.mapping(row -> (String) row[1], Collectors.toList())
+                ));
+        log.info("/tag-reviews tags: {}", tagMap);
+
+        return placeIds.stream().map(placeId -> {
+            Long reviewCount = reviewCountMap.getOrDefault(placeId, 0L);
+            List<String> tagList = tagMap.getOrDefault(placeId, Collections.emptyList());
+
+            return new SearchTagReviewDto(placeId, tagList, reviewCount);
+        }).collect(Collectors.toList());
+    }
+
+    public SearchResponseDto makeResponse(Long userId, List<PlaceNearbyDto> placeNearbyInfoList, List<SearchTagReviewDto> placeNearbyTagReviewList, String sortType) {
+        // 두개를 placeId 기준으로 합쳐서 search place info 채우기
+        List<SearchPlaceInfoDto> searchPlaceInfoList = placeNearbyInfoList.stream()
+                .map(place -> {
+                    // 태그 및 리뷰 정보를 찾아서 병합
+                    SearchTagReviewDto tagReviewDto = placeNearbyTagReviewList.stream()
+                            .filter(tagReview -> tagReview.getPlaceId().equals(place.getPlaceId()))
+                            .findFirst()
+                            .orElse(null);
+
+                    // SearchPlaceInfoDto 생성
+                    return new SearchPlaceInfoDto(
+                            place.getPlaceId(),
+                            place.getPlaceName(),
+                            place.getHasPung(),
+                            place.getImageId(),
+                            tagReviewDto != null ? tagReviewDto.getTags() : List.of(),
+                            tagReviewDto != null ? tagReviewDto.getReviewCount() : 0L,
+                            place.getX(),
+                            place.getY()
+                    );
+                })
+                .toList();
+
+        // SearchResponseDto 생성
+        SearchResponseDto response = new SearchResponseDto(
+                userId,
+                sortType,
+                (long) searchPlaceInfoList.size(),
+                searchPlaceInfoList
+        );
+
+        return response;
+    }
 
 }
