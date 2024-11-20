@@ -1,6 +1,7 @@
 package com.ktb7.pinpung.controller;
 
 import com.ktb7.pinpung.dto.Place.PlaceNearbyDto;
+import com.ktb7.pinpung.dto.Place.PlaceNearbyResponseDto;
 import com.ktb7.pinpung.dto.Search.SearchPlaceInfoDto;
 import com.ktb7.pinpung.dto.Search.SearchResponseDto;
 import com.ktb7.pinpung.dto.Search.SearchTagReviewDto;
@@ -27,7 +28,50 @@ public class SearchController {
     private final SearchService searchService;
     private final PlaceService placeService;
 
-    @GetMapping("/accuracy")
+    @GetMapping("/map")
+    @Operation(
+            summary = "키워드로 검색하기",
+            description = "사용자가 입력한 키워드로 적절한 카페를 검색합니다."
+    )
+    public ResponseEntity<PlaceNearbyResponseDto> searchInMap(
+            @RequestParam Long userId,
+            @RequestParam String keyword,
+            @RequestParam String swLng,
+            @RequestParam String swLat,
+            @RequestParam String neLng,
+            @RequestParam String neLat
+    ) {
+
+        log.info("Received request to /search/map with keyword {}, SW({},{}) and NE({},{})", keyword, swLng, swLat, neLng, neLat);
+
+        // 유효성 검증
+        ValidationUtils.validateUserId(userId);
+        ValidationUtils.validateRect(swLng, swLat, neLng, neLat);
+        ValidationUtils.validateKeyword(keyword);
+
+        Boolean haveLocation = searchService.useGpt(keyword);
+        List<Long> placeIdListForMap;
+
+        if (haveLocation) {
+            // rect 없이 요청 보내기
+            placeIdListForMap = placeService.categorySearch(keyword, null, null, null, null, null, null);
+        } else {
+            // rect 포함하여 요청 보내기
+            placeIdListForMap = placeService.categorySearch(keyword, swLng, swLat, neLng, neLat, null, null);
+        }
+
+        log.info("placeIdListCount {}: ", placeIdListForMap.size());
+        // placeidlist 없을 때에 대한 예외처리
+        // placeIdList 정확도순 정렬됨
+
+        List<PlaceNearbyDto> placeNearbyInfoList = placeService.getPlacesWithRepresentativeImage(placeIdListForMap);
+
+        PlaceNearbyResponseDto response = new PlaceNearbyResponseDto(placeNearbyInfoList.size(), placeNearbyInfoList);
+        log.info("Nearby places count: {}", response.getCount());
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/list/accuracy")
     @Operation(
             summary = "키워드로 검색하기",
             description = "사용자가 입력한 키워드로 적절한 카페를 검색합니다."
@@ -41,7 +85,7 @@ public class SearchController {
             @RequestParam String neLat
     ) {
 
-        log.info("Received request to /nearby with keyword {}, SW({},{}) and NE({},{})", keyword, swLng, swLat, neLng, neLat);
+        log.info("Received request to /search/accuracy with keyword {}, SW({},{}) and NE({},{})", keyword, swLng, swLat, neLng, neLat);
 
         // 유효성 검증
         ValidationUtils.validateUserId(userId);
@@ -71,7 +115,7 @@ public class SearchController {
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/distance")
+    @GetMapping("/list/distance")
     @Operation(
             summary = "키워드로 검색하기",
             description = "사용자가 입력한 키워드로 적절한 카페를 검색합니다."
@@ -87,7 +131,7 @@ public class SearchController {
             @RequestParam String y
     ) {
 
-        log.info("Received request to /nearby with keyword {}, SW({},{}) and NE({},{})", keyword, swLng, swLat, neLng, neLat);
+        log.info("Received request to /search/distance with keyword {}, SW({},{}) and NE({},{})", keyword, swLng, swLat, neLng, neLat);
 
         // 유효성 검증
         ValidationUtils.validateUserId(userId);
