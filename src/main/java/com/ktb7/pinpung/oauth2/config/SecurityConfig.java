@@ -96,7 +96,8 @@ public class SecurityConfig {
                                 "/api/reviews",
                                 "/api/follows",
                                 "/logout",
-                                "/api/pungs/upload"
+                                "/api/pungs/upload",
+                                "/api/search/**"
                         ).authenticated()
                         .anyRequest().authenticated()
                 )
