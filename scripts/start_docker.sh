@@ -13,6 +13,7 @@ KAKAO_CLIENT_ID=$(aws ssm get-parameter --name "/pinpung/KAKAO_CLIENT_ID" --with
 REDIRECT_URI=$(aws ssm get-parameter --name "/pinpung/REDIRECT_URI" --query "Parameter.Value" --output text --region ap-northeast-2)
 S3_BUCKET_NAME=$(aws ssm get-parameter --name "/pinpung/S3_BUCKET_NAME" --query "Parameter.Value" --output text --region ap-northeast-2)
 LOGOUT_REDIRECT_URI=$(aws ssm get-parameter --name "/pinpung/LOGOUT_REDIRECT_URI" --query "Parameter.Value" --output text --region ap-northeast-2)
+OPENAI_KEY=$(aws ssm get-parameter --name "/pinpung/OPENAI_API_KEY" --with-decryption --query "Parameter.Value" --output text --region ap-northeast-2)
 
 # Docker 컨테이너 실행 시 환경 변수로 전달 및 CloudWatch 로그 드라이버 설정
 docker stop pinpung-develop-backend || true && docker rm pinpung-develop-backend || true
@@ -31,4 +32,5 @@ docker run -d --name pinpung-develop-backend \
     -e REDIRECT_URI=$REDIRECT_URI \
     -e S3_BUCKET_NAME=$S3_BUCKET_NAME \
     -e LOGOUT_REDIRECT_URI=$LOGOUT_REDIRECT_URI \
+    -e OPENAI_KEY=$OPENAI_KEY \
     -p 8080:8080 ${ECR_REPO}:latest
