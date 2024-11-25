@@ -15,4 +15,9 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
     List<Object[]> findReviewCountsByPlaceIds(@Param("placeIds") List<Long> placeIds);
     List<Review> findByPlaceId(Long placeId);
     List<Review> findByUserIdAndPlaceIdAndReviewId(Long userId, Long placeId, Long reviewId);
+
+    List<Review> findByUserId(Long userId);
+
+    @Query("SELECT COUNT(r) FROM Review r WHERE r.userId = :userId")
+    long countByUserId(@Param("userId") Long userId);
 }

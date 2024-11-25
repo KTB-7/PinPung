@@ -74,9 +74,7 @@ public class KakaoTokenAuthenticationFilter extends OncePerRequestFilter {
         }
 
         // 로그인 없이 접근 가능한 기타 URL 경로 설정
-        return requestURI.startsWith("/login") ||
-                requestURI.startsWith("/oauth2/authorization/kakao") ||
-                requestURI.startsWith("/api/places/**") ||
+        return requestURI.startsWith("/api/places/**") ||
                 requestURI.startsWith("/favicon.ico") ||
                 requestURI.startsWith("/logout-success") ||
                 requestURI.startsWith("/api/test");
