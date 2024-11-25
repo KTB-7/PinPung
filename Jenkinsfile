@@ -11,7 +11,7 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                checkout scm
+                git branch: 'main', url: 'https://github.com/KTB-7/backend.git'
             }
         }
         stage('Build Docker Image') {
