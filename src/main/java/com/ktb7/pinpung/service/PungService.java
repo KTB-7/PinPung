@@ -8,6 +8,7 @@ import com.ktb7.pinpung.exception.common.CustomException;
 import com.ktb7.pinpung.exception.common.ErrorCode;
 import com.ktb7.pinpung.repository.ImageRepository;
 import com.ktb7.pinpung.repository.PungRepository;
+import com.ktb7.pinpung.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -27,6 +28,7 @@ import java.util.Map;
 public class PungService {
     private final PungRepository pungRepository;
     private final ImageRepository imageRepository;
+    private final UserRepository userRepository;
     private final S3Service s3Service;
     private final Clock clock;
     private final AiService aiService;
@@ -38,6 +40,20 @@ public class PungService {
         int pungCount = (int) pungsPage.getTotalElements();
         int currentPage = pungsPage.getNumber();
         log.info("pungs/{placeId} pungCount, currentPage: {} {}", pungCount, currentPage);
+
+        return new PungsResponseDto(pungCount, currentPage, pungsPage.getContent());
+    }
+
+    public PungsResponseDto getPungsByUserName(String userName, Pageable pageable) {
+        Long userId = userRepository.findByUserName(userName)
+                .orElseThrow(() -> new CustomException(HttpStatus.NOT_FOUND, ErrorCode.USER_NOT_FOUND))
+                .getUserId();
+
+        Page<Pung> pungsPage = pungRepository.findByUserId(userId, pageable);
+
+        int pungCount = (int) pungsPage.getTotalElements();
+        int currentPage = pungsPage.getNumber();
+        log.info("pungs/{username} pungCount, currentPage: {} {}", pungCount, currentPage);
 
         return new PungsResponseDto(pungCount, currentPage, pungsPage.getContent());
     }

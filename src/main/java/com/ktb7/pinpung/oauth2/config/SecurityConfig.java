@@ -61,11 +61,10 @@ public class SecurityConfig {
                         "/logout-success",
                         "/api/test",
                         "/api/places/**",
-                        "/api/pungs/{placeId}",
+                        "/api/pungs/byUser/**",
+                        "/api/pungs/byPlace/**",
                         "/actuator/health",
-                        "/favicon.ico",
-                        "/login",
-                        "/oauth/**"
+                        "/favicon.ico"
                 )
                 .csrf(csrf -> csrf.disable())
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
@@ -97,7 +96,9 @@ public class SecurityConfig {
                                 "/api/follows",
                                 "/logout",
                                 "/api/pungs/upload",
-                                "/api/search/**"
+                                "/api/search/**",
+                                "/api/{userName}",
+                                "/api/{userName}/**"
                         ).authenticated()
                         .anyRequest().authenticated()
                 )
