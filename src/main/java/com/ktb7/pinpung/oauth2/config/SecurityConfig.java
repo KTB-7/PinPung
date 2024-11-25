@@ -71,9 +71,9 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .anyRequest().permitAll()
                 )
-//                .requiresChannel(channel -> channel
-//                        .anyRequest().requiresSecure() // HTTPS 강제
-//                )
+                .requiresChannel(channel -> channel
+                        .anyRequest().requiresSecure() // HTTPS 강제
+                )
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 
         return http.build();
@@ -102,9 +102,9 @@ public class SecurityConfig {
                         ).authenticated()
                         .anyRequest().authenticated()
                 )
-//                .requiresChannel(channel -> channel
-//                        .anyRequest().requiresSecure() // HTTPS 강제
-//                )
+                .requiresChannel(channel -> channel
+                        .anyRequest().requiresSecure() // HTTPS 강제
+                )
                 .oauth2Login(oauth2 -> oauth2
                         .successHandler(oAuth2LoginSuccessHandler)
                         .failureHandler(oAuth2LoginFailureHandler)
