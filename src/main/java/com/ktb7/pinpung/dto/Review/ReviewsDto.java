@@ -10,6 +10,6 @@ import java.util.List;
 @AllArgsConstructor
 public class ReviewsDto {
     private Integer count;
-    private List<Review> reviews;
+    private List<ReviewDto> reviews;
 
 }

@@ -35,8 +35,16 @@ public class KakaoTokenAuthenticationFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
         String uri = request.getRequestURI();
-        log.debug("Received URI: " + uri); // 초기 요청 경로 확인
+        log.info("Received URI: " + uri); // 초기 요청 경로 확인
+        // 헤더에서 Authorization 값 추출
         String authorizationHeader = request.getHeader("Authorization");
+
+        if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
+            String token = authorizationHeader.substring(7); // "Bearer " 이후의 값 추출
+            log.info("Received Token: {}", token);
+        } else {
+            log.warn("Authorization header is missing or does not start with 'Bearer '");
+        }
 
         if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
             String token = authorizationHeader.substring(7);
@@ -74,7 +82,9 @@ public class KakaoTokenAuthenticationFilter extends OncePerRequestFilter {
         }
 
         // 로그인 없이 접근 가능한 기타 URL 경로 설정
-        return requestURI.startsWith("/api/places/**") ||
+        return requestURI.startsWith("/login") ||
+                requestURI.startsWith("/oauth2/authorization/kakao") ||
+                requestURI.startsWith("/api/places/**") ||
                 requestURI.startsWith("/favicon.ico") ||
                 requestURI.startsWith("/logout-success") ||
                 requestURI.startsWith("/api/test");
@@ -106,4 +116,3 @@ public class KakaoTokenAuthenticationFilter extends OncePerRequestFilter {
         return kakaoTokenInfoResponseDto.getId();
     }
 }
-

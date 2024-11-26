@@ -1,10 +1,10 @@
 server:
   port: 8080
-  forward-headers-strategy: native
-  tomcat:
-    remote-ip-header: x-forwarded-for
-    protocol-header: x-forwarded-proto
-    access-log-enabled: true
+#  forward-headers-strategy: native
+#  tomcat:
+#    remote-ip-header: x-forwarded-for
+#    protocol-header: x-forwarded-proto
+#    access-log-enabled: true
 spring:
   servlet:
     multipart:

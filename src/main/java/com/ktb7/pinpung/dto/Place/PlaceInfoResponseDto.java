@@ -1,5 +1,6 @@
 package com.ktb7.pinpung.dto.Place;
 
+import com.ktb7.pinpung.dto.Pung.PungDto;
 import com.ktb7.pinpung.dto.Review.ReviewsDto;
 import com.ktb7.pinpung.entity.Pung;
 import lombok.AllArgsConstructor;
@@ -15,5 +16,5 @@ public class PlaceInfoResponseDto {
     private String address;
     private List<String> tags;
     private ReviewsDto reviews;
-    private Pung representativePung;
+    private PungDto representativePung;
 }
