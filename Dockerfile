@@ -17,8 +17,9 @@ RUN ./gradlew dependencies --no-daemon
 # 6. 소스 코드 전체 복사 (변경 빈도가 잦음)
 COPY . .
 
-# 7. 테스트를 제외하고 Gradle 빌드 실행
-RUN ./gradlew clean build -x test --no-daemon
+# 7. 테스트를 제외하고 캐시를 삭제하고 Gradle 빌드 실행
+RUN ./gradlew clean build -x test --no-daemon && rm -rf ~/.gradle/caches
+
 
 # 8. JAVA_OPTS 환경 변수 설정 (메모리 제한)
 ENV JAVA_OPTS="-Xms512m -Xmx1024m"
