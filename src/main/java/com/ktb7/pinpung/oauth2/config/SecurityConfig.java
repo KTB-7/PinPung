@@ -36,9 +36,9 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(List.of("http://localhost:8080", "https://pinpung.net", "http://localhost:3000"));
+        configuration.setAllowedOrigins(List.of("http://localhost:3000", "https://pinpung.net", "http://localhost:8080"));
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-        configuration.setAllowedHeaders(List.of("*"));
+        configuration.setAllowedHeaders(List.of("Authorization", "Content-Type", "X-Requested-With", "Accept", "Origin"));
         configuration.setAllowCredentials(true);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
@@ -64,7 +64,9 @@ public class SecurityConfig {
                         "/api/pungs/byUser/**",
                         "/api/pungs/byPlace/**",
                         "/actuator/health",
-                        "/favicon.ico"
+                        "/favicon.ico",
+                        "/oauth/**"
+
                 )
                 .csrf(csrf -> csrf.disable())
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
@@ -92,13 +94,15 @@ public class SecurityConfig {
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
+                                "/api/reviews/**",
                                 "/api/reviews",
                                 "/api/follows",
                                 "/logout",
                                 "/api/pungs/upload",
                                 "/api/search/**",
                                 "/api/{userName}",
-                                "/api/{userName}/**"
+                                "/api/{userName}/**",
+                               "/api/token/refresh"
                         ).authenticated()
                         .anyRequest().authenticated()
                 )

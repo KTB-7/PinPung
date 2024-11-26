@@ -2,16 +2,16 @@ package com.ktb7.pinpung.service;
 
 import com.ktb7.pinpung.dto.Place.PlaceInfoResponseDto;
 import com.ktb7.pinpung.dto.Place.PlaceNearbyDto;
+import com.ktb7.pinpung.dto.Pung.PungDto;
+import com.ktb7.pinpung.dto.Review.ReviewDto;
 import com.ktb7.pinpung.dto.Review.ReviewsDto;
 import com.ktb7.pinpung.entity.Place;
 import com.ktb7.pinpung.entity.Pung;
 import com.ktb7.pinpung.entity.Review;
+import com.ktb7.pinpung.entity.User;
 import com.ktb7.pinpung.exception.common.CustomException;
 import com.ktb7.pinpung.exception.common.ErrorCode;
-import com.ktb7.pinpung.repository.PlaceRepository;
-import com.ktb7.pinpung.repository.PungRepository;
-import com.ktb7.pinpung.repository.ReviewRepository;
-import com.ktb7.pinpung.repository.TagRepository;
+import com.ktb7.pinpung.repository.*;
 import com.ktb7.pinpung.util.RepositoryHelper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -37,6 +37,7 @@ public class PlaceService {
     private final PlaceRepository placeRepository;
     private final TagRepository tagRepository;
     private final ReviewRepository reviewRepository;
+    private final UserRepository userRepository;
 
     private static final String KAKAO_LOCAL_API_URL = "https://dapi.kakao.com/v2/local/search/keyword.json";
     private final S3Service s3Service;
@@ -149,19 +150,57 @@ public class PlaceService {
 
         // 대표 펑 & 이미지 ID 조회
         Optional<Pung> representativePung = pungRepository.findFirstByPlaceIdAndCreatedAtAfterOrderByCreatedAtDesc(placeId, yesterday);
-        Long imageId = null;
+
+        PungDto pungDto = null;
         if (representativePung.isPresent()) {
-            imageId = representativePung.get().getImageId();
+            Pung pung = representativePung.get();
+            Long imageId = pung.getImageId();
             String objectKey = "uploaded-images/" + imageId;
+
             if (!s3Service.doesObjectExist(objectKey)) {
                 log.error("이미지 ID {}에 대한 S3 객체를 찾을 수 없습니다.", imageId);
                 throw new CustomException(HttpStatus.INTERNAL_SERVER_ERROR, ErrorCode.DATABASE_ERROR, "이미지를 찾을 수 없습니다.");
             }
+
+            // userId로 userName 조회
+            String userName = userRepository.findById(pung.getUserId())
+                    .map(User::getUserName)
+                    .orElseThrow(() -> new CustomException(HttpStatus.NOT_FOUND, ErrorCode.USER_NOT_FOUND, "유저를 찾을 수 없습니다."));
+
+            pungDto = new PungDto();
+            pungDto.setPungId(pung.getPungId());
+            pungDto.setUserId(pung.getUserId());
+            pungDto.setUserName(userName); // userName 추가
+            pungDto.setImageId(pung.getImageId());
+            pungDto.setText(pung.getText());
+            pungDto.setCreatedAt(pung.getCreatedAt());
+            pungDto.setUpdatedAt(pung.getUpdatedAt());
         }
 
         // 리뷰 조회
         List<Review> reviewList = reviewRepository.findByPlaceId(placeId);
-        ReviewsDto reviews = new ReviewsDto(reviewList.size(), reviewList);
+
+        // Review -> ReviewDto 변환
+        List<ReviewDto> reviewDtoList = reviewList.stream()
+                .map(review -> {
+                    User user = userRepository.findById(review.getUserId())
+                            .orElseThrow(() -> new CustomException(
+                                    HttpStatus.NOT_FOUND,
+                                    ErrorCode.USER_NOT_FOUND,
+                                    "유저를 찾을 수 없습니다. ID: " + review.getUserId()
+                            ));
+                    return new ReviewDto(
+                            review.getReviewId(),
+                            review.getUserId(),
+                            user.getUserName(),
+                            review.getImageId(),
+                            review.getText(),
+                            review.getCreatedAt(),
+                            review.getUpdatedAt()
+                    );
+                }).toList();
+
+        ReviewsDto reviews = new ReviewsDto(reviewDtoList.size(), reviewDtoList);
 
         return new PlaceInfoResponseDto(
                 place.getPlaceId(),
@@ -169,8 +208,7 @@ public class PlaceService {
                 place.getAddress(),
                 tags,
                 reviews,
-                representativePung.orElse(null)
+                pungDto
         );
     }
-
 }
