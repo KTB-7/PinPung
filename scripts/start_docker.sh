@@ -15,6 +15,9 @@ S3_BUCKET_NAME=$(aws ssm get-parameter --name "/pinpung/S3_BUCKET_NAME" --query 
 LOGOUT_REDIRECT_URI=$(aws ssm get-parameter --name "/pinpung/LOGOUT_REDIRECT_URI" --query "Parameter.Value" --output text --region ap-northeast-2)
 OPENAI_KEY=$(aws ssm get-parameter --name "/pinpung/OPENAI_KEY" --with-decryption --query "Parameter.Value" --output text --region ap-northeast-2)
 
+# 최신 이미지 가져오기
+docker pull ${ECR_REPO}:latest || { echo "Docker pull failed"; exit 1; }
+
 # Docker 컨테이너 실행 시 환경 변수로 전달 및 CloudWatch 로그 드라이버 설정
 docker stop pinpung-develop-backend || true && docker rm pinpung-develop-backend || true
 docker run -d --name pinpung-develop-backend \
