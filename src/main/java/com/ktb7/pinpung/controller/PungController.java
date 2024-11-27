@@ -51,7 +51,7 @@ public class PungController {
         return ResponseEntity.ok(pungs);
     }
 
-    @PostMapping("/upload")
+    @PostMapping
     @Operation(
             summary = "펑 업로드",
             description = "사용자가 업로드한 펑 데이터를 처리합니다.",

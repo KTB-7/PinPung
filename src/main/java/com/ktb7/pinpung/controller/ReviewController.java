@@ -24,7 +24,7 @@ public class ReviewController {
 
     private final ReviewService reviewService;
 
-    @PostMapping("/upload")
+    @PostMapping
     @Operation(
             summary = "리뷰 업로드",
             description = "사용자가 작성한 리뷰를 업로드합니다.",
@@ -42,7 +42,7 @@ public class ReviewController {
         return ResponseEntity.ok(response);
     }
 
-    @PatchMapping("/modify")
+    @PatchMapping
     @Operation(
             summary = "리뷰 수정",
             description = "기존 리뷰 내용을 수정합니다.",
@@ -59,7 +59,7 @@ public class ReviewController {
         return ResponseEntity.ok(response);
     }
 
-    @DeleteMapping("/delete")
+    @DeleteMapping
     @Operation(
             summary = "리뷰 삭제",
             description = "작성된 리뷰를 삭제합니다.",
