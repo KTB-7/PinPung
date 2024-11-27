@@ -31,6 +31,9 @@ public class Pung {
     @Column(name = "text")
     private String text;
 
+    @Column(name = "isReview", columnDefinition = "TINYINT(1)", nullable = false)
+    private Boolean isReview;
+
     @CreationTimestamp
     @Column(name = "createdAt", updatable = false)
     private LocalDateTime createdAt;

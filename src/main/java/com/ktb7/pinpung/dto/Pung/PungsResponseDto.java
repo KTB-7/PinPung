@@ -11,5 +11,5 @@ import java.util.List;
 public class PungsResponseDto {
     private Integer count;
     private Integer currentPage;
-    private List<Pung> pungs;
+    private List<PungDto> pungs;
 }

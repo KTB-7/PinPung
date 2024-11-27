@@ -3,7 +3,7 @@ package com.ktb7.pinpung.controller;
 import com.ktb7.pinpung.dto.Review.UploadReviewRequestDto;
 import com.ktb7.pinpung.dto.Review.ModifyReviewRequestDto;
 import com.ktb7.pinpung.dto.Review.DeleteReviewRequestDto;
-import com.ktb7.pinpung.dto.Review.ReviewResponseDto;
+import com.ktb7.pinpung.dto.Review.MessageResponseDto;
 import com.ktb7.pinpung.service.ReviewService;
 import com.ktb7.pinpung.util.ValidationUtils;
 import lombok.AllArgsConstructor;
@@ -32,13 +32,13 @@ public class ReviewController {
                     @Parameter(name = "uploadReviewRequest", description = "리뷰 업로드 요청 데이터 (userId, placeId, text, 이미지)", required = true)
             }
     )
-    public ResponseEntity<ReviewResponseDto> uploadReview(@ModelAttribute UploadReviewRequestDto uploadReviewRequest) {
+    public ResponseEntity<MessageResponseDto> uploadReview(@ModelAttribute UploadReviewRequestDto uploadReviewRequest) {
         log.info("{}", uploadReviewRequest);
         log.info("uploadReview: {} {} {}", uploadReviewRequest.getUserId(), uploadReviewRequest.getPlaceId(), uploadReviewRequest.getText());
 
         ValidationUtils.validateUserAndPlaceId(uploadReviewRequest.getUserId(), uploadReviewRequest.getPlaceId());
 
-        ReviewResponseDto response = reviewService.uploadReview(uploadReviewRequest);
+        MessageResponseDto response = reviewService.uploadReview(uploadReviewRequest);
         return ResponseEntity.ok(response);
     }
 
@@ -50,12 +50,12 @@ public class ReviewController {
                     @Parameter(name = "modifyReviewRequest", description = "리뷰 수정 요청 데이터 (userId, placeId, text, 이미지)", required = true)
             }
     )
-    public ResponseEntity<ReviewResponseDto> modifyReview(@ModelAttribute ModifyReviewRequestDto modifyReviewRequest) {
+    public ResponseEntity<MessageResponseDto> modifyReview(@ModelAttribute ModifyReviewRequestDto modifyReviewRequest) {
         log.info("modifyReview: {} {} {}", modifyReviewRequest.getUserId(), modifyReviewRequest.getPlaceId(), modifyReviewRequest.getText());
 
         ValidationUtils.validateUserAndPlaceId(modifyReviewRequest.getUserId(), modifyReviewRequest.getPlaceId());
 
-        ReviewResponseDto response = reviewService.modifyReview(modifyReviewRequest);
+        MessageResponseDto response = reviewService.modifyReview(modifyReviewRequest);
         return ResponseEntity.ok(response);
     }
 
@@ -67,12 +67,12 @@ public class ReviewController {
                     @Parameter(name = "deleteReviewRequest", description = "리뷰 삭제 요청 데이터 (userId, placeId, reviewId)", required = true)
             }
     )
-    public ResponseEntity<ReviewResponseDto> deleteReview(@ModelAttribute DeleteReviewRequestDto deleteReviewRequest) {
+    public ResponseEntity<MessageResponseDto> deleteReview(@ModelAttribute DeleteReviewRequestDto deleteReviewRequest) {
         log.info("deleteReview: {} {} {}", deleteReviewRequest.getUserId(), deleteReviewRequest.getPlaceId(), deleteReviewRequest.getReviewId());
 
         ValidationUtils.validateUserAndPlaceId(deleteReviewRequest.getUserId(), deleteReviewRequest.getPlaceId());
 
-        ReviewResponseDto response = reviewService.deleteReview(deleteReviewRequest);
+        MessageResponseDto response = reviewService.deleteReview(deleteReviewRequest);
         return ResponseEntity.ok(response);
     }
 }
