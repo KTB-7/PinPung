@@ -26,5 +26,9 @@ public interface PungRepository extends JpaRepository<Pung, Long> {
     @Query("SELECT new com.ktb7.pinpung.dto.Profile.SimplePung(p.pungId, p.imageId, p.updatedAt) " +
             "FROM Pung p WHERE p.userId = :userId")
     List<SimplePung> findSimplePungByUserId(@Param("userId") Long userId);
+
+    @Query("SELECT p FROM Pung p WHERE p.createdAt >= :yesterday")
+    List<Pung> findCreatedIn24H(@Param("yesterday") LocalDateTime yesterday);
+
 }
 

@@ -64,8 +64,7 @@ public class SecurityConfig {
                         "/api/pungs/byUser/**",
                         "/api/pungs/byPlace/**",
                         "/actuator/health",
-                        "/favicon.ico",
-                        "/oauth/**"
+                        "/favicon.ico"
 
                 )
                 .csrf(csrf -> csrf.disable())
@@ -94,14 +93,13 @@ public class SecurityConfig {
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
-                                "/api/reviews/**",
                                 "/api/reviews",
                                 "/api/follows",
                                 "/logout",
-                                "/api/pungs/upload",
+                                "/api/pungs",
                                 "/api/search/**",
-                                "/api/{userName}",
-                                "/api/{userName}/**",
+                                "/api/{userId}",
+                                "/api/{userId}/**",
                                "/api/token/refresh"
                         ).authenticated()
                         .anyRequest().authenticated()

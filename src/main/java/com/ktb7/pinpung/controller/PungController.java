@@ -2,7 +2,7 @@ package com.ktb7.pinpung.controller;
 
 import com.ktb7.pinpung.dto.Pung.PungsResponseDto;
 import com.ktb7.pinpung.dto.Pung.UploadPungRequestDto;
-import com.ktb7.pinpung.dto.Pung.UploadPungResponseDto;
+import com.ktb7.pinpung.dto.Review.MessageResponseDto;
 import com.ktb7.pinpung.service.PungService;
 import com.ktb7.pinpung.util.ValidationUtils;
 import lombok.AllArgsConstructor;
@@ -51,7 +51,7 @@ public class PungController {
         return ResponseEntity.ok(pungs);
     }
 
-    @PostMapping("/upload")
+    @PostMapping
     @Operation(
             summary = "펑 업로드",
             description = "사용자가 업로드한 펑 데이터를 처리합니다.",
@@ -59,7 +59,7 @@ public class PungController {
                     @Parameter(name = "uploadPungRequest", description = "펑 업로드 요청 데이터 (userId, placeId, text, 이미지 파일 두가지)", required = true)
             }
     )
-    public ResponseEntity<UploadPungResponseDto> uploadPungs(@ModelAttribute UploadPungRequestDto uploadPungRequest) {
+    public ResponseEntity<MessageResponseDto> uploadPungs(@ModelAttribute UploadPungRequestDto uploadPungRequest) {
         log.info("uploadPungs: {} {} {}", uploadPungRequest.getUserId(), uploadPungRequest.getPlaceId(), uploadPungRequest.getText());
 
         // 유효성 검증
@@ -67,8 +67,8 @@ public class PungController {
         ValidationUtils.validateFile(uploadPungRequest.getImageWithText(), "imageWithText");
         ValidationUtils.validateFile(uploadPungRequest.getPureImage(), "pureImage");
 
-        pungService.uploadPung(uploadPungRequest);
-        return ResponseEntity.ok(new UploadPungResponseDto("Pung upload success"));
+        MessageResponseDto response = pungService.uploadPung(uploadPungRequest);
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/byUser/{userId}")
