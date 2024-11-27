@@ -36,7 +36,7 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(List.of("http://localhost:3000", "https://pinpung.net", "http://localhost:8080"));
+        configuration.setAllowedOrigins(List.of("http://localhost:3000", "https://pinpung.net", "http://localhost:8080", "https://www.pinpung.net"));
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("Authorization", "Content-Type", "X-Requested-With", "Accept", "Origin", "Cache-Control", "Expires", "Pragma"));
         configuration.setAllowCredentials(true);
@@ -60,9 +60,6 @@ public class SecurityConfig {
                         "/api-docs/**",
                         "/logout-success",
                         "/api/test",
-                        "/api/places/**",
-                        "/api/pungs/byUser/**",
-                        "/api/pungs/byPlace/**",
                         "/actuator/health",
                         "/favicon.ico"
 
@@ -100,7 +97,10 @@ public class SecurityConfig {
                                 "/api/search/**",
                                 "/api/{userId}",
                                 "/api/{userId}/**",
-                               "/api/token/refresh"
+                                "/api/places/**",
+                                "/api/pungs/byUser/**",
+                                "/api/pungs/byPlace/**",
+                                "/api/token/refresh"
                         ).authenticated()
                         .anyRequest().authenticated()
                 )
