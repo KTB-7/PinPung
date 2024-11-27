@@ -12,6 +12,6 @@ public class LogoutSuccessController {
 
     @GetMapping("/logout-success")
     public void logoutSuccess(HttpServletResponse response) throws IOException {
-        response.sendRedirect("http://localhost:3030/login");
+        response.sendRedirect("https://pinpung.net/login");
     }
 }

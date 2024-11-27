@@ -89,7 +89,7 @@ public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
 
                 // 리다이렉트 URL 구성
                 String redirectUrl = String.format(
-                        "http://localhost:3000/oauth/callback?status=success&token=%s&userId=%s&userName=%s&userEmail=%s",
+                        "https://pinpung.net/oauth/callback?status=success&token=%s&userId=%s&userName=%s&userEmail=%s",
                         URLEncoder.encode(authorizedClient.getAccessToken().getTokenValue(), StandardCharsets.UTF_8),
                         user.getUserId(),
                         URLEncoder.encode(user.getUserName(), StandardCharsets.UTF_8),

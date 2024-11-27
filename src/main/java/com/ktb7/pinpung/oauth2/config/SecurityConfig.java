@@ -38,7 +38,7 @@ public class SecurityConfig {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedOrigins(List.of("http://localhost:3000", "https://pinpung.net", "http://localhost:8080"));
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-        configuration.setAllowedHeaders(List.of("Authorization", "Content-Type", "X-Requested-With", "Accept", "Origin"));
+        configuration.setAllowedHeaders(List.of("Authorization", "Content-Type", "X-Requested-With", "Accept", "Origin", "Cache-Control", "Expires", "Pragma"));
         configuration.setAllowCredentials(true);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
@@ -73,9 +73,9 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .anyRequest().permitAll()
                 )
-//                .requiresChannel(channel -> channel
-//                        .anyRequest().requiresSecure() // HTTPS 강제
-//                )
+                .requiresChannel(channel -> channel
+                        .anyRequest().requiresSecure() // HTTPS 강제
+                )
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 
         return http.build();
@@ -106,9 +106,9 @@ public class SecurityConfig {
                         ).authenticated()
                         .anyRequest().authenticated()
                 )
-//                .requiresChannel(channel -> channel
-//                        .anyRequest().requiresSecure() // HTTPS 강제
-//                )
+                .requiresChannel(channel -> channel
+                        .anyRequest().requiresSecure() // HTTPS 강제
+                )
                 .oauth2Login(oauth2 -> oauth2
                         .successHandler(oAuth2LoginSuccessHandler)
                         .failureHandler(oAuth2LoginFailureHandler)
