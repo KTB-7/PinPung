@@ -141,6 +141,7 @@ public class SearchService {
                             place.getPlaceId(),
                             place.getPlaceName(),
                             place.getHasPung(),
+                            place.getByFriend(),
                             place.getImageId(),
                             tagReviewDto != null ? tagReviewDto.getTags() : List.of(),
                             tagReviewDto != null ? tagReviewDto.getReviewCount() : 0L,

@@ -37,6 +37,8 @@ public class ReviewService {
         String text = uploadReviewRequest.getText();
         MultipartFile reviewImage = uploadReviewRequest.getReviewImage();
 
+        log.info("{}", reviewImage.isEmpty());
+
         Long imageId = null;
 
         // 1. 이미지가 존재할 때만 Image 엔티티 생성 및 S3 업로드 수행

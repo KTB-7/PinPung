@@ -29,6 +29,7 @@ public class PlaceController {
             description = "주어진 좌표(SW, NE) 범위를 기준으로 주변 장소를 검색합니다."
     )
     public ResponseEntity<PlaceNearbyResponseDto> getPlacesWithRepresentativeImage(
+            @RequestParam Long userId,
             @RequestParam String swLng,
             @RequestParam String swLat,
             @RequestParam String neLng,
@@ -39,8 +40,8 @@ public class PlaceController {
         // 유효성 검증
         ValidationUtils.validateRect(swLng, swLat, neLng, neLat);
 
-        List<Long> placeIds = placeService.categorySearch("카페", swLng, swLat, neLng, neLat, null, null);
-        List<PlaceNearbyDto> places = placeService.getPlacesWithRepresentativeImage(placeIds);
+        List<Long> placeIds = placeService.categorySearch(userId, "카페", swLng, swLat, neLng, neLat, null, null);
+        List<PlaceNearbyDto> places = placeService.getPlacesWithRepresentativeImage(userId, placeIds);
 
         PlaceNearbyResponseDto response = new PlaceNearbyResponseDto(places.size(), places);
         log.info("Nearby places count: {}", response.getCount());

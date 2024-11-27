@@ -54,17 +54,17 @@ public class SearchController {
 
         if (haveLocation) {
             // rect 없이 요청 보내기
-            placeIdListForMap = placeService.categorySearch(keyword, null, null, null, null, null, null);
+            placeIdListForMap = placeService.categorySearch(userId, keyword, null, null, null, null, null, null);
         } else {
             // rect 포함하여 요청 보내기
-            placeIdListForMap = placeService.categorySearch(keyword, swLng, swLat, neLng, neLat, null, null);
+            placeIdListForMap = placeService.categorySearch(userId, keyword, swLng, swLat, neLng, neLat, null, null);
         }
 
         log.info("placeIdListCount {}: ", placeIdListForMap.size());
         // placeidlist 없을 때에 대한 예외처리
         // placeIdList 정확도순 정렬됨
 
-        List<PlaceNearbyDto> placeNearbyInfoList = placeService.getPlacesWithRepresentativeImage(placeIdListForMap);
+        List<PlaceNearbyDto> placeNearbyInfoList = placeService.getPlacesWithRepresentativeImage(userId, placeIdListForMap);
 
         PlaceNearbyResponseDto response = new PlaceNearbyResponseDto(placeNearbyInfoList.size(), placeNearbyInfoList);
         log.info("Nearby places count: {}", response.getCount());
@@ -97,17 +97,17 @@ public class SearchController {
 
         if (haveLocation) {
             // rect 없이 요청 보내기
-            placeIdListWithAccuracy = placeService.categorySearch(keyword, null, null, null, null, null, null);
+            placeIdListWithAccuracy = placeService.categorySearch(userId, keyword, null, null, null, null, null, null);
         } else {
             // rect 포함하여 요청 보내기
-            placeIdListWithAccuracy = placeService.categorySearch(keyword, swLng, swLat, neLng, neLat, null, null);
+            placeIdListWithAccuracy = placeService.categorySearch(userId, keyword, swLng, swLat, neLng, neLat, null, null);
         }
 
         log.info("placeIdListCount {}: ", placeIdListWithAccuracy.size());
         // placeidlist 없을 때에 대한 예외처리
         // placeIdList 정확도순 정렬됨
 
-        List<PlaceNearbyDto> placeNearbyInfoList = placeService.getPlacesWithRepresentativeImage(placeIdListWithAccuracy);
+        List<PlaceNearbyDto> placeNearbyInfoList = placeService.getPlacesWithRepresentativeImage(userId, placeIdListWithAccuracy);
         List<SearchTagReviewDto> placeNearbyTagReviewList = searchService.getPlacesWithReviewCountsAndTags(placeIdListWithAccuracy);
 
         SearchResponseDto response = searchService.makeResponse(userId, placeNearbyInfoList, placeNearbyTagReviewList, "accuracy");
@@ -144,17 +144,17 @@ public class SearchController {
 
         if (haveLocation) {
             // rect 없이 요청 보내기
-            placeIdListWithDistance = placeService.categorySearch(keyword, null, null, null, null, x, y);
+            placeIdListWithDistance = placeService.categorySearch(userId, keyword, null, null, null, null, x, y);
         } else {
             // rect 포함하여 요청 보내기
-            placeIdListWithDistance = placeService.categorySearch(keyword, swLng, swLat, neLng, neLat, x, y);
+            placeIdListWithDistance = placeService.categorySearch(userId, keyword, swLng, swLat, neLng, neLat, x, y);
         }
 
         log.info("placeIdListCount {}: ", placeIdListWithDistance.size());
         // placeidlist 없을 때에 대한 예외처리
         // 거리순 정렬된 상태
 
-        List<PlaceNearbyDto> placeNearbyInfoList = placeService.getPlacesWithRepresentativeImage(placeIdListWithDistance);
+        List<PlaceNearbyDto> placeNearbyInfoList = placeService.getPlacesWithRepresentativeImage(userId, placeIdListWithDistance);
         List<SearchTagReviewDto> placeNearbyTagReviewList = searchService.getPlacesWithReviewCountsAndTags(placeIdListWithDistance);
 
         SearchResponseDto response = searchService.makeResponse(userId, placeNearbyInfoList, placeNearbyTagReviewList, "distance");

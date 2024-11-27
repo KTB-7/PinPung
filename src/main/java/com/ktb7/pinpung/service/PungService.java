@@ -44,10 +44,10 @@ public class PungService {
         return new PungsResponseDto(pungCount, currentPage, pungsPage.getContent());
     }
 
-    public PungsResponseDto getPungsByUserName(String userName, Pageable pageable) {
-        Long userId = userRepository.findByUserName(userName)
-                .orElseThrow(() -> new CustomException(HttpStatus.NOT_FOUND, ErrorCode.USER_NOT_FOUND))
-                .getUserId();
+    public PungsResponseDto getPungsByUserId(Long userId, Pageable pageable) {
+//        Long userId = userRepository.findByUserName(userName)
+//                .orElseThrow(() -> new CustomException(HttpStatus.NOT_FOUND, ErrorCode.USER_NOT_FOUND))
+//                .getUserId();
 
         Page<Pung> pungsPage = pungRepository.findByUserId(userId, pageable);
 

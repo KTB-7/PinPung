@@ -18,6 +18,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.*;
+import org.springframework.security.config.http.FormLoginBeanDefinitionParser;
+import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 
@@ -25,6 +27,8 @@ import java.time.Clock;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;import reactor.core.publisher.Mono;
+
+import static java.lang.System.in;
 
 
 @Service
@@ -38,6 +42,7 @@ public class PlaceService {
     private final TagRepository tagRepository;
     private final ReviewRepository reviewRepository;
     private final UserRepository userRepository;
+    private final FollowRepository followRepository;
 
     private static final String KAKAO_LOCAL_API_URL = "https://dapi.kakao.com/v2/local/search/keyword.json";
     private final S3Service s3Service;
@@ -48,7 +53,7 @@ public class PlaceService {
 
     private final WebClient webClient = WebClient.builder().build();
 
-    public List<Long> categorySearch(String keyword, String swLng, String swLat, String neLng, String neLat, String x, String y) {
+    public List<Long> categorySearch(Long userId, String keyword, String swLng, String swLat, String neLng, String neLat, String x, String y) {
         List<Long> placeIds = new ArrayList<>();
         int page = 1;
         int size = 15;
@@ -112,14 +117,33 @@ public class PlaceService {
     }
 
 
-    public List<PlaceNearbyDto> getPlacesWithRepresentativeImage(List<Long> placeIds) {
+    public List<PlaceNearbyDto> getPlacesWithRepresentativeImage(Long userId, List<Long> placeIds) {
         LocalDateTime yesterday = LocalDateTime.now(clock).minusDays(1);
 
+        // 팔로워 리스트를 한 번만 가져옴
+        List<Long> followerList = followRepository.findFollowersByUserId(userId)
+                .stream()
+                .map(User::getUserId)
+                .toList();
+
         return placeIds.stream().map(placeId -> {
-            Long imageWithText = pungRepository.findFirstByPlaceIdAndCreatedAtAfterOrderByCreatedAtDesc(placeId, yesterday)
-                    .map(Pung::getImageId)
+            boolean byFriend = false;
+            boolean hasPung = false;
+            Long imageId = null;
+
+            Pung pung = pungRepository.findFirstByPlaceIdAndCreatedAtAfterOrderByCreatedAtDesc(placeId, yesterday)
                     .orElse(null);
-            boolean hasPung = imageWithText != null;
+
+            if (pung != null) {
+                imageId = pung.getImageId();
+                hasPung = imageId != null;
+
+                // 팔로워 확인
+                Long authorId = pung.getUserId();
+                if (followerList.contains(authorId)) {
+                    byFriend = true;
+                }
+            }
 
             Place place = repositoryHelper.findPlaceById(placeId);
 
@@ -127,12 +151,14 @@ public class PlaceService {
                     placeId,
                     place.getPlaceName(),
                     hasPung,
-                    imageWithText,
+                    byFriend,
+                    imageId,
                     place.getX(),
                     place.getY()
             );
         }).collect(Collectors.toList());
     }
+
 
     public PlaceInfoResponseDto getPlaceInfo(Long placeId) {
         LocalDateTime yesterday = LocalDateTime.now(clock).minusDays(1);

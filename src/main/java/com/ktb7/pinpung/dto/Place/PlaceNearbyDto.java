@@ -9,6 +9,7 @@ public class PlaceNearbyDto {
     private Long placeId;
     private String placeName;
     private Boolean hasPung;
+    private Boolean byFriend;
     private Long imageId;
     private String x;
     private String y;

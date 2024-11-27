@@ -11,6 +11,7 @@ public class SearchPlaceInfoDto {
     private Long placeId;
     private String placeName;
     private Boolean hasPung;
+    private Boolean byFriend;
     private Long imageId;
     private List<String> tags;
     private Long reviewCount;
