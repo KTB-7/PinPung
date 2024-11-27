@@ -1,21 +1,17 @@
 package com.ktb7.pinpung.service;
 
 import com.ktb7.pinpung.dto.Profile.*;
-import com.ktb7.pinpung.entity.Pung;
 import com.ktb7.pinpung.entity.Review;
 import com.ktb7.pinpung.entity.User;
 import com.ktb7.pinpung.exception.common.CustomException;
 import com.ktb7.pinpung.exception.common.ErrorCode;
 import com.ktb7.pinpung.repository.*;
-import com.ktb7.pinpung.util.RepositoryHelper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.time.Clock;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -23,7 +19,7 @@ import java.util.stream.Collectors;
 @Service
 @Slf4j
 @RequiredArgsConstructor
-public class ProfileService {
+public class UserService {
 
     private final UserRepository userRepository;
     private final FollowRepository followRepository;
@@ -32,10 +28,10 @@ public class ProfileService {
     private final ReviewRepository reviewRepository;
     private final PlaceRepository placeRepository;
 
-    public ProfileWithPungResponseDto viewProfileWithPung(String userName) {
-        Long userId = userRepository.findByUserName(userName)
-                .orElseThrow(() -> new CustomException(HttpStatus.NOT_FOUND, ErrorCode.USER_NOT_FOUND))
-                .getUserId();
+    public ProfileWithPungResponseDto viewProfileWithPung(Long userId) {
+//        Long userId = userRepository.findByUserName(userName)
+//                .orElseThrow(() -> new CustomException(HttpStatus.NOT_FOUND, ErrorCode.USER_NOT_FOUND))
+//                .getUserId();
 
         DefaultProfileDto defaultProfileDto = getDefaultProfile(userId);
 
@@ -46,10 +42,10 @@ public class ProfileService {
 
     }
 
-    public ProfileWithReviewResponseDto viewProfileWithReview(String userName) {
-        Long userId = userRepository.findByUserName(userName)
-                .orElseThrow(() -> new CustomException(HttpStatus.NOT_FOUND, ErrorCode.USER_NOT_FOUND))
-                .getUserId();
+    public ProfileWithReviewResponseDto viewProfileWithReview(Long userId) {
+//        Long userId = userRepository.findByUserName(userName)
+//                .orElseThrow(() -> new CustomException(HttpStatus.NOT_FOUND, ErrorCode.USER_NOT_FOUND))
+//                .getUserId();
 
         DefaultProfileDto defaultProfileDto = getDefaultProfile(userId);
         Long pungCount = pungRepository.countByUserId(userId);
