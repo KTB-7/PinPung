@@ -61,7 +61,10 @@ public class SecurityConfig {
                         "/logout-success",
                         "/api/test",
                         "/actuator/health",
-                        "/favicon.ico"
+                        "/favicon.ico",
+                        "/login/oauth2/**",
+                        "/login",
+                        "/oauth/**"
                 )
                 .csrf(csrf -> csrf.disable())
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
