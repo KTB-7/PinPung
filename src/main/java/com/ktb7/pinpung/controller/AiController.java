@@ -9,18 +9,18 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-@RestController
-@RequestMapping("/api/ai")
-@Slf4j
-public class AiController {
-
-    private AiService aiService;
-
-    @GetMapping("/recommend/{userId}")
-    public ResponseEntity<?> recommend(@PathVariable Long userId) {
-
-        
-
-
-    }
-}
+//@RestController
+//@RequestMapping("/api/ai")
+//@Slf4j
+//public class AiController {
+//
+//    private AiService aiService;
+//
+//    @GetMapping("/recommend/{userId}")
+//    public ResponseEntity<?> recommend(@PathVariable Long userId) {
+//
+//
+//
+//
+//    }
+//}
