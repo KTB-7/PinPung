@@ -71,24 +71,25 @@ public class KakaoTokenAuthenticationFilter extends OncePerRequestFilter {
         filterChain.doFilter(request, response);
     }
 
-//    @Override
-//    protected boolean shouldNotFilter(HttpServletRequest request) {
-//        String requestURI = request.getRequestURI();
-//        String method = request.getMethod();
-//
+    @Override
+    protected boolean shouldNotFilter(HttpServletRequest request) {
+        String requestURI = request.getRequestURI();
+        String method = request.getMethod();
+
 //        // GET 요청의 경우 필터가 적용되지 않도록 설정
 //        if (requestURI.startsWith("/api/pungs/") && "GET".equalsIgnoreCase(method)) {
 //            return true;
 //        }
-//
-//        // 로그인 없이 접근 가능한 기타 URL 경로 설정
-//        return requestURI.startsWith("/login") ||
-//                requestURI.startsWith("/oauth2/authorization/kakao") ||
+
+        // 로그인 없이 접근 가능한 기타 URL 경로 설정
+        return
+                requestURI.startsWith("/login") ||
+                requestURI.startsWith("/oauth2/authorization/kakao") ||
 //                requestURI.startsWith("/api/places/**") ||
-//                requestURI.startsWith("/favicon.ico") ||
-//                requestURI.startsWith("/logout-success") ||
-//                requestURI.startsWith("/api/test");
-//    }
+                requestURI.startsWith("/favicon.ico") ||
+                requestURI.startsWith("/logout-success") ||
+                requestURI.startsWith("/api/test");
+    }
 
 
     private Long validateTokenAndExtractUserId(String token) {
