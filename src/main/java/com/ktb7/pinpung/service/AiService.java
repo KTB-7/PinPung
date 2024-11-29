@@ -19,15 +19,15 @@ public class AiService {
         this.webClient = webClientBuilder.baseUrl(fastApiUrl).build(); // FastAPI 서버 URL 설정
     }
 
-    public Boolean genTags(Long placeId, String reviewText, String reviewImageUrl) {
+    public Boolean genTags(Long placeId, String reviewText, String reviewImageUrl, Long userId) {
         log.info("start generating tags");
-        log.info("{}{}{}", placeId, reviewText, reviewImageUrl);
+        log.info("{}{}{}", placeId, reviewText, reviewImageUrl, userId);
 
         GenerateTagsResponseDto response = webClient.post()
                 .uri("/gen_tags/")
                 .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
                 .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-                .body(Mono.just(buildRequestBody(placeId, reviewText, reviewImageUrl)), String.class)
+                .body(Mono.just(buildRequestBody(placeId, reviewText, reviewImageUrl, userId)), String.class)
                 .retrieve()
                 .bodyToMono(GenerateTagsResponseDto.class)
                 .block();
@@ -37,9 +37,13 @@ public class AiService {
         return isGened;
     }
 
-    private String buildRequestBody(Long placeId, String reviewText, String reviewImageUrl) {
+    private String buildRequestBody(Long placeId, String reviewText, String reviewImageUrl, Long userId) {
         // JSON 형식으로 직접 문자열을 작성하여 전송
         return String.format("{\"place_id\": %d, \"review_text\": \"%s\", \"review_image_url\": \"%s\"}",
                 placeId, reviewText, reviewImageUrl);
+    }
+
+    public void recommend() {
+
     }
 }
