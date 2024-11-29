@@ -118,4 +118,10 @@ public class ValidationUtils {
             throw new CustomException(HttpStatus.BAD_REQUEST, ErrorCode.MISSING_PARAMETER);
         }
     }
+
+    public static void validateUserName(String userName) {
+        if (userName == null || userName.trim().isEmpty()) {
+            throw new CustomException(HttpStatus.BAD_REQUEST, ErrorCode.MISSING_PARAMETER);
+        }
+    }
 }

@@ -36,9 +36,9 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(List.of("http://localhost:8080", "https://pinpung.net", "http://localhost:3000"));
+        configuration.setAllowedOrigins(List.of("http://localhost:3000", "https://pinpung.net", "http://localhost:8080", "https://www.pinpung.net"));
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-        configuration.setAllowedHeaders(List.of("*"));
+        configuration.setAllowedHeaders(List.of("Authorization", "Content-Type", "X-Requested-With", "Accept", "Origin", "Cache-Control", "Expires", "Pragma"));
         configuration.setAllowCredentials(true);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
@@ -60,21 +60,17 @@ public class SecurityConfig {
                         "/api-docs/**",
                         "/logout-success",
                         "/api/test",
-                        "/api/places/**",
-                        "/api/pungs/{placeId}",
                         "/actuator/health",
-                        "/favicon.ico",
-                        "/login",
-                        "/oauth/**"
+                        "/favicon.ico"
                 )
                 .csrf(csrf -> csrf.disable())
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests(auth -> auth
                         .anyRequest().permitAll()
                 )
-//                .requiresChannel(channel -> channel
-//                        .anyRequest().requiresSecure() // HTTPS 강제
-//                )
+                .requiresChannel(channel -> channel
+                        .anyRequest().requiresSecure() // HTTPS 강제
+                )
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 
         return http.build();
@@ -96,13 +92,20 @@ public class SecurityConfig {
                                 "/api/reviews",
                                 "/api/follows",
                                 "/logout",
-                                "/api/pungs/upload"
+                                "/api/pungs",
+                                "/api/search/**",
+                                "/api/{userId}",
+                                "/api/{userId}/**",
+                                "/api/places/**",
+                                "/api/pungs/byUser/**",
+                                "/api/pungs/byPlace/**",
+                                "/api/token/refresh"
                         ).authenticated()
                         .anyRequest().authenticated()
                 )
-//                .requiresChannel(channel -> channel
-//                        .anyRequest().requiresSecure() // HTTPS 강제
-//                )
+                .requiresChannel(channel -> channel
+                        .anyRequest().requiresSecure() // HTTPS 강제
+                )
                 .oauth2Login(oauth2 -> oauth2
                         .successHandler(oAuth2LoginSuccessHandler)
                         .failureHandler(oAuth2LoginFailureHandler)
@@ -110,7 +113,7 @@ public class SecurityConfig {
                                 .userService(customOAuth2UserService)
                         )
                 )
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+//                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .logout(logout -> logout
                         .logoutUrl("/logout")
                         .logoutSuccessUrl("/logout-success")

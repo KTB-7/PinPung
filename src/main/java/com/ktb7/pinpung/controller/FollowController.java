@@ -53,37 +53,4 @@ public class FollowController {
         UnfollowResponseDto response = followService.unfollowUser(unfollowRequestDto);
         return ResponseEntity.ok(response);
     }
-
-    @GetMapping(value = "/followers", produces = "application/json")
-    @Operation(
-            summary = "팔로워 목록 조회",
-            description = "특정 사용자의 팔로워 목록을 조회합니다.",
-            parameters = @Parameter(name = "userId", description = "조회할 사용자 ID", required = true, example = "123")
-    )
-    public ResponseEntity<FollowsResponseDto> getFollowers(@RequestParam Long userId) {
-        log.info("Received request to /followers with: {}", userId);
-
-        // 유효성 검증: id 검증
-        ValidationUtils.validateUserId(userId);
-
-        FollowsResponseDto response = followService.getFollowers(userId);
-
-        return ResponseEntity.ok(response);
-    }
-
-    @GetMapping(value = "/followings", produces = "application/json")
-    @Operation(
-            summary = "팔로잉 목록 조회",
-            description = "특정 사용자가 팔로잉한 사용자의 목록을 조회합니다.",
-            parameters = @Parameter(name = "userId", description = "조회할 사용자 ID", required = true, example = "123")
-    )
-    public ResponseEntity<FollowsResponseDto> getFollowings(@RequestParam Long userId) {
-        log.info("Received request to /followings with: {}", userId);
-        // 유효성 검증: id 검증
-        ValidationUtils.validateUserId(userId);
-
-        FollowsResponseDto response = followService.getFollowings(userId);
-
-        return ResponseEntity.ok(response);
-    }
 }

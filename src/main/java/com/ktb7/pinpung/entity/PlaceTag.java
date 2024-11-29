@@ -27,7 +27,7 @@ public class PlaceTag {
     @Column(name = "tagCount", nullable = false)
     private Long tagCount;
 
-    @Column(name = "isRepresentative", nullable = false)
+    @Column(name = "isRepresentative", columnDefinition = "TINYINT(1)", nullable = false)
     private Boolean isRepresentative;
 
     @CreationTimestamp

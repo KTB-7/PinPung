@@ -2,23 +2,24 @@ package com.ktb7.pinpung.service;
 
 import com.ktb7.pinpung.dto.Place.PlaceInfoResponseDto;
 import com.ktb7.pinpung.dto.Place.PlaceNearbyDto;
-import com.ktb7.pinpung.dto.Place.SearchResponseDto;
+import com.ktb7.pinpung.dto.Pung.PungDto;
+import com.ktb7.pinpung.dto.Review.ReviewDto;
 import com.ktb7.pinpung.dto.Review.ReviewsDto;
 import com.ktb7.pinpung.entity.Place;
 import com.ktb7.pinpung.entity.Pung;
 import com.ktb7.pinpung.entity.Review;
+import com.ktb7.pinpung.entity.User;
 import com.ktb7.pinpung.exception.common.CustomException;
 import com.ktb7.pinpung.exception.common.ErrorCode;
-import com.ktb7.pinpung.repository.PlaceRepository;
-import com.ktb7.pinpung.repository.PungRepository;
-import com.ktb7.pinpung.repository.ReviewRepository;
-import com.ktb7.pinpung.repository.TagRepository;
+import com.ktb7.pinpung.repository.*;
 import com.ktb7.pinpung.util.RepositoryHelper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.*;
+import org.springframework.security.config.http.FormLoginBeanDefinitionParser;
+import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 
@@ -26,6 +27,8 @@ import java.time.Clock;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;import reactor.core.publisher.Mono;
+
+import static java.lang.System.in;
 
 
 @Service
@@ -38,6 +41,8 @@ public class PlaceService {
     private final PlaceRepository placeRepository;
     private final TagRepository tagRepository;
     private final ReviewRepository reviewRepository;
+    private final UserRepository userRepository;
+    private final FollowRepository followRepository;
 
     private static final String KAKAO_LOCAL_API_URL = "https://dapi.kakao.com/v2/local/search/keyword.json";
     private final S3Service s3Service;
@@ -48,21 +53,28 @@ public class PlaceService {
 
     private final WebClient webClient = WebClient.builder().build();
 
-    public List<Long> categorySearch(String keyword, String swLng, String swLat, String neLng, String neLat) {
+    public List<Long> categorySearch(Long userId, String keyword, String swLng, String swLat, String neLng, String neLat, String x, String y) {
         List<Long> placeIds = new ArrayList<>();
         int page = 1;
         int size = 15;
         int maxPage = 3;
 
         while (page <= maxPage) {
-            String requestUrl = KAKAO_LOCAL_API_URL +
-                    "?query=" + keyword +
-                    "&rect=" + swLng + "," + swLat + "," + neLng + "," + neLat +
-                    "&page=" + page +
-                    "&size=" + size;
+            StringBuilder requestUrl = new StringBuilder(KAKAO_LOCAL_API_URL)
+                    .append("?query=").append(keyword)
+                    .append("&page=").append(page)
+                    .append("&size=").append(size);
+
+            if (swLng != null && swLat != null && neLng != null && neLat != null) {
+                requestUrl.append("&rect=").append(swLng).append(",").append(swLat).append(",").append(neLng).append(",").append(neLat);
+            }
+
+            if (x != null && y != null) {
+                requestUrl.append("&x=").append(x).append("&y=").append(y).append("&sort=distance");
+            }
 
             Map<String, Object> response = webClient.get()
-                    .uri(requestUrl)
+                    .uri(requestUrl.toString())
                     .header(HttpHeaders.AUTHORIZATION, "KakaoAK " + clientId)
                     .retrieve()
                     .onStatus(status -> status.is4xxClientError() || status.is5xxServerError(), clientResponse -> {
@@ -105,14 +117,33 @@ public class PlaceService {
     }
 
 
-    public List<PlaceNearbyDto> getPlacesWithRepresentativeImage(List<Long> placeIds) {
+    public List<PlaceNearbyDto> getPlacesWithRepresentativeImage(Long userId, List<Long> placeIds) {
         LocalDateTime yesterday = LocalDateTime.now(clock).minusDays(1);
 
+        // 팔로워 리스트를 한 번만 가져옴
+        List<Long> followerList = followRepository.findFollowersByUserId(userId)
+                .stream()
+                .map(User::getUserId)
+                .toList();
+
         return placeIds.stream().map(placeId -> {
-            Long imageWithText = pungRepository.findFirstByPlaceIdAndCreatedAtAfterOrderByCreatedAtDesc(placeId, yesterday)
-                    .map(Pung::getImageId)
+            boolean byFriend = false;
+            boolean hasPung = false;
+            Long imageId = null;
+
+            Pung pung = pungRepository.findFirstByPlaceIdAndCreatedAtAfterOrderByCreatedAtDesc(placeId, yesterday)
                     .orElse(null);
-            boolean hasPung = imageWithText != null;
+
+            if (pung != null) {
+                imageId = pung.getImageId();
+                hasPung = imageId != null;
+
+                // 팔로워 확인
+                Long authorId = pung.getUserId();
+                if (followerList.contains(authorId)) {
+                    byFriend = true;
+                }
+            }
 
             Place place = repositoryHelper.findPlaceById(placeId);
 
@@ -120,12 +151,14 @@ public class PlaceService {
                     placeId,
                     place.getPlaceName(),
                     hasPung,
-                    imageWithText,
+                    byFriend,
+                    imageId,
                     place.getX(),
                     place.getY()
             );
         }).collect(Collectors.toList());
     }
+
 
     public PlaceInfoResponseDto getPlaceInfo(Long placeId) {
         LocalDateTime yesterday = LocalDateTime.now(clock).minusDays(1);
@@ -143,19 +176,57 @@ public class PlaceService {
 
         // 대표 펑 & 이미지 ID 조회
         Optional<Pung> representativePung = pungRepository.findFirstByPlaceIdAndCreatedAtAfterOrderByCreatedAtDesc(placeId, yesterday);
-        Long imageId = null;
+
+        PungDto pungDto = null;
         if (representativePung.isPresent()) {
-            imageId = representativePung.get().getImageId();
+            Pung pung = representativePung.get();
+            Long imageId = pung.getImageId();
             String objectKey = "uploaded-images/" + imageId;
+
             if (!s3Service.doesObjectExist(objectKey)) {
                 log.error("이미지 ID {}에 대한 S3 객체를 찾을 수 없습니다.", imageId);
                 throw new CustomException(HttpStatus.INTERNAL_SERVER_ERROR, ErrorCode.DATABASE_ERROR, "이미지를 찾을 수 없습니다.");
             }
+
+            // userId로 userName 조회
+            String userName = userRepository.findById(pung.getUserId())
+                    .map(User::getUserName)
+                    .orElseThrow(() -> new CustomException(HttpStatus.NOT_FOUND, ErrorCode.USER_NOT_FOUND, "유저를 찾을 수 없습니다."));
+
+            pungDto = new PungDto();
+            pungDto.setPungId(pung.getPungId());
+            pungDto.setUserId(pung.getUserId());
+            pungDto.setUserName(userName); // userName 추가
+            pungDto.setImageId(pung.getImageId());
+            pungDto.setText(pung.getText());
+            pungDto.setCreatedAt(pung.getCreatedAt());
+            pungDto.setUpdatedAt(pung.getUpdatedAt());
         }
 
         // 리뷰 조회
         List<Review> reviewList = reviewRepository.findByPlaceId(placeId);
-        ReviewsDto reviews = new ReviewsDto(reviewList.size(), reviewList);
+
+        // Review -> ReviewDto 변환
+        List<ReviewDto> reviewDtoList = reviewList.stream()
+                .map(review -> {
+                    User user = userRepository.findById(review.getUserId())
+                            .orElseThrow(() -> new CustomException(
+                                    HttpStatus.NOT_FOUND,
+                                    ErrorCode.USER_NOT_FOUND,
+                                    "유저를 찾을 수 없습니다. ID: " + review.getUserId()
+                            ));
+                    return new ReviewDto(
+                            review.getReviewId(),
+                            review.getUserId(),
+                            user.getUserName(),
+                            review.getImageId(),
+                            review.getText(),
+                            review.getCreatedAt(),
+                            review.getUpdatedAt()
+                    );
+                }).toList();
+
+        ReviewsDto reviews = new ReviewsDto(reviewDtoList.size(), reviewDtoList);
 
         return new PlaceInfoResponseDto(
                 place.getPlaceId(),
@@ -163,33 +234,7 @@ public class PlaceService {
                 place.getAddress(),
                 tags,
                 reviews,
-                representativePung.orElse(null)
+                pungDto
         );
-    }
-
-    public List<SearchResponseDto> getPlacesWithReviewCountsAndTags(List<Long> placeIds) {
-        List<Object[]> reviewCounts = reviewRepository.findReviewCountsByPlaceIds(placeIds);
-        List<Object[]> tags = tagRepository.findTagsByPlaceIds(placeIds);
-
-        Map<Long, Long> reviewCountMap = reviewCounts.stream()
-                .collect(Collectors.toMap(
-                        row -> (Long) row[0],
-                        row -> (Long) row[1]
-                ));
-        log.info("/tag-reviews review counts: {}", reviewCountMap);
-
-        Map<Long, List<String>> tagMap = tags.stream()
-                .collect(Collectors.groupingBy(
-                        row -> (Long) row[0],
-                        Collectors.mapping(row -> (String) row[1], Collectors.toList())
-                ));
-        log.info("/tag-reviews tags: {}", tagMap);
-
-        return placeIds.stream().map(placeId -> {
-            Long reviewCount = reviewCountMap.getOrDefault(placeId, 0L);
-            List<String> tagList = tagMap.getOrDefault(placeId, Collections.emptyList());
-
-            return new SearchResponseDto(placeId, tagList, reviewCount);
-        }).collect(Collectors.toList());
     }
 }

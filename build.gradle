@@ -15,6 +15,7 @@ java {
 
 repositories {
 	mavenCentral()
+	maven {url 'https://repo.spring.io/snapshot'} //스냅샷 저장소 추가
 }
 
 dependencies {
@@ -62,8 +63,9 @@ dependencies {
 	// swagger
 	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.2.0'
 
-	// openAI
-	implementation 'com.openai:openai:2.1.1'
+	//spring AI
+	implementation 'org.springframework.ai:spring-ai-openai-spring-boot-starter:1.0.0-SNAPSHOT'
+
 }
 
 tasks.named('test') {

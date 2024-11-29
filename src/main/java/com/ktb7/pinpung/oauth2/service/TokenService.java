@@ -10,6 +10,7 @@ import com.ktb7.pinpung.oauth2.dto.TokenResponseDto;
 import com.ktb7.pinpung.repository.TokenRepository;
 import com.ktb7.pinpung.repository.UserRepository;
 import com.ktb7.pinpung.util.ValidationUtils;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
@@ -34,10 +35,12 @@ public class TokenService {
     private final TokenRepository tokenRepository;
     private final UserRepository userRepository;
 
-    public ResponseEntity<?> validateToken(Long userId, String token) {
+    public ResponseEntity<?> validateToken(Long userId, HttpServletRequest request) {
         // 유효성 검증
         ValidationUtils.validateUserId(userId);
-        ValidationUtils.validateAccessToken(token);
+
+        // 헤더에서 토큰 가져오기
+        String token = extractBearerToken(request);
 
         // 사용자 확인
         User user = userRepository.findById(userId)
@@ -92,4 +95,18 @@ public class TokenService {
             throw new CustomException(HttpStatus.INTERNAL_SERVER_ERROR, ErrorCode.TOKEN_REFRESH_FAILED);
         }
     }
+
+    private String extractBearerToken(HttpServletRequest request) {
+        // 헤더에서 Authorization 값 가져오기
+        String authorizationHeader = request.getHeader("Authorization");
+
+        // Authorization 헤더가 없거나 Bearer 토큰 형식이 아니면 null 반환
+        if (authorizationHeader == null || !authorizationHeader.startsWith("Bearer ")) {
+            throw new CustomException(HttpStatus.UNAUTHORIZED, ErrorCode.INVALID_TOKEN_OR_SOCIAL_ID);
+        }
+
+        // Bearer 뒤의 실제 토큰 값 반환
+        return authorizationHeader.substring(7);
+    }
+
 }
