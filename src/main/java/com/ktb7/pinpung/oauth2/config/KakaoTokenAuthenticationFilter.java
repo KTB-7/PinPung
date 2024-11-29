@@ -63,6 +63,7 @@ public class KakaoTokenAuthenticationFilter extends OncePerRequestFilter {
                     SecurityContextHolder.getContext().setAuthentication(auth);
                 }
             } catch (CustomException e) {
+                log.error("Authentication failed for token: {}, error: {}", token, e.getMessage());
                 response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                 return;
             }
@@ -76,16 +77,10 @@ public class KakaoTokenAuthenticationFilter extends OncePerRequestFilter {
         String requestURI = request.getRequestURI();
         String method = request.getMethod();
 
-//        // GET 요청의 경우 필터가 적용되지 않도록 설정
-//        if (requestURI.startsWith("/api/pungs/") && "GET".equalsIgnoreCase(method)) {
-//            return true;
-//        }
-
         // 로그인 없이 접근 가능한 기타 URL 경로 설정
         return
                 requestURI.startsWith("/login") ||
-                requestURI.startsWith("/oauth2/authorization/kakao") ||
-//                requestURI.startsWith("/api/places/**") ||
+                requestURI.startsWith("/login/oauth2/code/kakao") ||
                 requestURI.startsWith("/favicon.ico") ||
                 requestURI.startsWith("/logout-success") ||
                 requestURI.startsWith("/api/test");

@@ -99,7 +99,8 @@ public class SecurityConfig {
                                 "/api/places/**",
                                 "/api/pungs/byUser/**",
                                 "/api/pungs/byPlace/**",
-                                "/api/token/refresh"
+                                "/api/token/refresh",
+                                "/login/oauth2/code/**"
                         ).authenticated()
                         .anyRequest().authenticated()
                 )
