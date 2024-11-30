@@ -7,8 +7,8 @@ import java.util.List;
 
 @AllArgsConstructor
 @Getter
-public class RecommendTagsResponse {
-    private Integer count;
-    private List<PlacesPerTagDto> placesPerTags;
+public class RecommendTagsAIRequestDto {
+    private Long userId;
+    private List<Long> placeIdList;
 
 }

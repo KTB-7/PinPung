@@ -40,7 +40,7 @@ public class PlaceController {
         // 유효성 검증
         ValidationUtils.validateRect(swLng, swLat, neLng, neLat);
 
-        List<Long> placeIds = placeService.categorySearch(userId, "카페", swLng, swLat, neLng, neLat, null, null);
+        List<Long> placeIds = placeService.categorySearch("카페", swLng, swLat, neLng, neLat, null, null);
         List<PlaceNearbyDto> places = placeService.getPlacesWithRepresentativeImage(userId, placeIds);
 
         PlaceNearbyResponseDto response = new PlaceNearbyResponseDto(places.size(), places);

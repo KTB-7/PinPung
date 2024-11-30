@@ -83,6 +83,7 @@ public class KakaoTokenAuthenticationFilter extends OncePerRequestFilter {
                 requestURI.startsWith("/login/oauth2/code/kakao") ||
                 requestURI.startsWith("/favicon.ico") ||
                 requestURI.startsWith("/logout-success") ||
+                requestURI.startsWith("/cdn-cgi/**") ||
                 requestURI.startsWith("/api/test");
     }
 

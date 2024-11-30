@@ -39,7 +39,13 @@ public enum ErrorCode {
     FILE_PROCESSING_FAILED("500_FILE_PROCESSING_FAILED", "파일 처리 중 오류가 발생했습니다."),
     FILE_UPLOAD_FAILED("500_FILE_UPLOAD_FAILED", "파일 업로드에 실패했습니다."),
     UNEXPECTED_ERROR("500_UNEXPECTED_ERROR", "예상치 못한 오류가 발생했습니다."),
-    API_CALL_FAILED("500_API_CALL_FAILED", "API CALL에 실패했습니다.");
+    API_CALL_FAILED("500_API_CALL_FAILED", "API CALL에 실패했습니다."),
+
+    RECOMMEND_TAGS_REQUEST_FAILED("500_RECOMMEND_TAGS_REQUEST_FAILED", "추천 태그 요청 중 오류가 발생했습니다."),
+    RECOMMEND_TAGS_RESPONSE_INVALID("500_RECOMMEND_TAGS_RESPONSE_INVALID", "추천 태그 API 응답이 유효하지 않습니다."),
+    RECOMMEND_TAGS_DATA_PROCESSING_FAILED("500_RECOMMEND_TAGS_DATA_PROCESSING_FAILED", "추천 태그 데이터를 처리하는 중 오류가 발생했습니다.");
+
+
 
     private final String code;
     private final String msg;

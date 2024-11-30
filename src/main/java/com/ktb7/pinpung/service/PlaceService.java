@@ -53,7 +53,7 @@ public class PlaceService {
 
     private final WebClient webClient = WebClient.builder().build();
 
-    public List<Long> categorySearch(Long userId, String keyword, String swLng, String swLat, String neLng, String neLat, String x, String y) {
+    public List<Long> categorySearch(String keyword, String swLng, String swLat, String neLng, String neLat, String x, String y) {
         List<Long> placeIds = new ArrayList<>();
         int page = 1;
         int size = 15;
