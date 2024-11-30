@@ -43,10 +43,12 @@ public class S3Service {
             if (!isReview) {
                 Path tempImageTextFile = Files.createTempFile("temp-" + imageWithText.getOriginalFilename(), null);
                 imageWithText.transferTo(tempImageTextFile);
+
                 s3Client.putObject(
                         PutObjectRequest.builder()
                                 .bucket(bucketName)
                                 .key(imageTextKey)
+                                .contentType(imageWithText.getContentType())
                                 .build(),
                         tempImageTextFile);
                 Files.deleteIfExists(tempImageTextFile);
@@ -59,6 +61,7 @@ public class S3Service {
                     PutObjectRequest.builder()
                             .bucket(bucketName)
                             .key(pureImageKey)
+                            .contentType(pureImage.getContentType())
                             .build(),
                     tempPureImageFile);
 
@@ -78,19 +81,6 @@ public class S3Service {
             throw new CustomException(HttpStatus.INTERNAL_SERVER_ERROR, ErrorCode.IMAGE_UPLOAD_FAILED, "이미지 업로드 중 오류가 발생했습니다.");
         }
     }
-
-    //long 타입의 이미지 아이디를 받으면 s3의 uploaded-images/{imageId} url에서 해당 이미지를 받아오는 로직
-//    public InputStream getImageFileStream(String imageKey) {
-//        try {
-//            GetObjectRequest getObjectRequest = GetObjectRequest.builder()
-//                    .bucket(bucketName)
-//                    .key(imageKey)
-//                    .build();
-//            return s3Client.getObject(getObjectRequest);
-//        } catch (Exception e) {
-//            throw new CustomException(HttpStatus.INTERNAL_SERVER_ERROR, ErrorCode.IMAGE_DOWNLOAD_FAILED, ErrorCode.IMAGE_DOWNLOAD_FAILED.getMsg());
-//        }
-//    }
 
     public boolean doesObjectExist(String objectKey) {
         try {
