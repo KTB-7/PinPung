@@ -62,7 +62,25 @@ public class AiService {
 
         try {
             return webClient.post()
-                    .uri("/recommend_tags/")
+                    .uri("/get_recs/ai/")
+                    .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
+                    .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+                    .body(Mono.just(buildRecommendRequestBody(userId, placeIdList)), String.class)
+                    .retrieve()
+                    .bodyToMono(RecommendTagsAIResponseDto.class)
+                    .block();
+
+        } catch (Exception e) {
+            log.error("추천 태그 요청 중 오류 발생", e);
+            throw new CustomException(HttpStatus.INTERNAL_SERVER_ERROR, RECOMMEND_TAGS_REQUEST_FAILED, "추천 태그 요청 중 오류가 발생했습니다.");
+        }
+    }
+
+    public RecommendTagsAIResponseDto getTrending(Long userId, List<Long> placeIdList) {
+
+        try {
+            return webClient.post()
+                    .uri("/get_recs/popular")
                     .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
                     .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
                     .body(Mono.just(buildRecommendRequestBody(userId, placeIdList)), String.class)

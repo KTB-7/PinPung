@@ -46,4 +46,27 @@ public class AiController {
         return ResponseEntity.ok(response);
 
     }
+
+    @GetMapping("/trending/{userId}")
+    public ResponseEntity<RecommendTagsResponseDto> trending(
+            @PathVariable Long userId,
+            @RequestParam String swLng,
+            @RequestParam String swLat,
+            @RequestParam String neLng,
+            @RequestParam String neLat,
+            @RequestParam String x,
+            @RequestParam String y
+    ) {
+        // 유효성 검증
+        ValidationUtils.validateUserId(userId);
+        ValidationUtils.validateCoordinates(x, y);
+        ValidationUtils.validateRect(swLng, swLat, neLng, neLat);
+
+        List<Long> placeIdList = placeService.categorySearch("카페", swLng, swLat, neLng, neLat, x, y, "distance");
+        RecommendTagsAIResponseDto recommendTagsAIResponse = aiService.getTrending(userId, placeIdList);
+
+        RecommendTagsResponseDto response = aiService.changeFormat(userId, recommendTagsAIResponse);
+
+        return ResponseEntity.ok(response);
+    }
 }
