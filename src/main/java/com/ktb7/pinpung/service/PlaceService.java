@@ -53,7 +53,7 @@ public class PlaceService {
 
     private final WebClient webClient = WebClient.builder().build();
 
-    public List<Long> categorySearch(String keyword, String swLng, String swLat, String neLng, String neLat, String x, String y) {
+    public List<Long> categorySearch(String keyword, String swLng, String swLat, String neLng, String neLat, String x, String y, String sort) {
         List<Long> placeIds = new ArrayList<>();
         int page = 1;
         int size = 15;
@@ -70,7 +70,7 @@ public class PlaceService {
             }
 
             if (x != null && y != null) {
-                requestUrl.append("&x=").append(x).append("&y=").append(y).append("&sort=distance");
+                requestUrl.append("&x=").append(x).append("&y=").append(y).append("&sort=").append(sort);
             }
 
             Map<String, Object> response = webClient.get()

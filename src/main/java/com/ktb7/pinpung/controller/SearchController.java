@@ -54,10 +54,10 @@ public class SearchController {
 
         if (haveLocation) {
             // rect 없이 요청 보내기
-            placeIdListForMap = placeService.categorySearch(keyword, null, null, null, null, null, null);
+            placeIdListForMap = placeService.categorySearch(keyword, null, null, null, null, null, null, "accuracy");
         } else {
             // rect 포함하여 요청 보내기
-            placeIdListForMap = placeService.categorySearch(keyword, swLng, swLat, neLng, neLat, null, null);
+            placeIdListForMap = placeService.categorySearch(keyword, swLng, swLat, neLng, neLat, null, null, "accuracy");
         }
 
         log.info("placeIdListCount {}: ", placeIdListForMap.size());
@@ -97,10 +97,10 @@ public class SearchController {
 
         if (haveLocation) {
             // rect 없이 요청 보내기
-            placeIdListWithAccuracy = placeService.categorySearch(keyword, null, null, null, null, null, null);
+            placeIdListWithAccuracy = placeService.categorySearch(keyword, null, null, null, null, null, null, "accuracy");
         } else {
             // rect 포함하여 요청 보내기
-            placeIdListWithAccuracy = placeService.categorySearch(keyword, swLng, swLat, neLng, neLat, null, null);
+            placeIdListWithAccuracy = placeService.categorySearch(keyword, swLng, swLat, neLng, neLat, null, null, "accuracy");
         }
 
         log.info("placeIdListCount {}: ", placeIdListWithAccuracy.size());
@@ -144,10 +144,10 @@ public class SearchController {
 
         if (haveLocation) {
             // rect 없이 요청 보내기
-            placeIdListWithDistance = placeService.categorySearch(keyword, null, null, null, null, x, y);
+            placeIdListWithDistance = placeService.categorySearch(keyword, null, null, null, null, x, y, "distance");
         } else {
             // rect 포함하여 요청 보내기
-            placeIdListWithDistance = placeService.categorySearch(keyword, swLng, swLat, neLng, neLat, x, y);
+            placeIdListWithDistance = placeService.categorySearch(keyword, swLng, swLat, neLng, neLat, x, y, "distance");
         }
 
         log.info("placeIdListCount {}: ", placeIdListWithDistance.size());

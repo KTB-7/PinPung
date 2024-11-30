@@ -38,7 +38,7 @@ public class AiController {
         ValidationUtils.validateCoordinates(x, y);
         ValidationUtils.validateRect(swLng, swLat, neLng, neLat);
 
-        List<Long> placeIdList = placeService.categorySearch("카페", swLng, swLat, neLng, neLat, x, y);
+        List<Long> placeIdList = placeService.categorySearch("카페", swLng, swLat, neLng, neLat, x, y, "distance");
         RecommendTagsAIResponseDto recommendTagsAIResponse = aiService.recommend(userId, placeIdList);
 
         RecommendTagsResponseDto response = aiService.changeFormat(userId, recommendTagsAIResponse);
