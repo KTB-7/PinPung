@@ -1,14 +1,9 @@
 //package com.ktb7.pinpung.service;
 //
-//import com.ktb7.pinpung.dto.PlaceInfoResponseDto;
-//import com.ktb7.pinpung.dto.PlaceNearbyResponseDto;
 //import com.ktb7.pinpung.entity.Place;
 //import com.ktb7.pinpung.entity.Pung;
 //import com.ktb7.pinpung.entity.Review;
-//import com.ktb7.pinpung.repository.PlaceRepository;
-//import com.ktb7.pinpung.repository.PungRepository;
-//import com.ktb7.pinpung.repository.ReviewRepository;
-//import com.ktb7.pinpung.repository.TagRepository;
+//import com.ktb7.pinpung.repository.*;
 //import org.junit.jupiter.api.BeforeEach;
 //import org.junit.jupiter.api.DisplayName;
 //import org.junit.jupiter.api.Test;
@@ -44,17 +39,24 @@
 //    private ReviewRepository reviewRepository;
 //
 //    @Mock
+//    private UserRepository userRepository;
+//
+//    @Mock
+//    private FollowRepository followRepository;
+//
+//    @Mock
 //    private Clock clock;
 //
 //    @InjectMocks
 //    private PlaceService placeService;
+//
 //
 //    @BeforeEach
 //    void setUp() {
 //        MockitoAnnotations.openMocks(this);
 //
 //        // 테스트용으로 고정된 시간을 설정
-//        LocalDateTime fixedDateTime = LocalDateTime.of(2024, 10, 10, 12, 0);
+//        LocalDateTime fixedDateTime = LocalDateTime.of(2024, 11, 30, 15, 0);
 //        Clock fixedClock = Clock.fixed(fixedDateTime.atZone(ZoneId.systemDefault()).toInstant(), ZoneId.systemDefault());
 //
 //        // Clock이 고정된 시간을 반환하도록 모킹

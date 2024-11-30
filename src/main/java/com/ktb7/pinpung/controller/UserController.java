@@ -8,6 +8,7 @@ import com.ktb7.pinpung.service.UserService;
 import com.ktb7.pinpung.util.ValidationUtils;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/{userId}")
+@Tag(name = "User API", description = "유저/마이페이지 관련 API")
 @RequiredArgsConstructor
 @Slf4j
 public class UserController {
