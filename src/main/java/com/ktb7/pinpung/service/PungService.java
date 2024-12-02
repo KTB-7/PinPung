@@ -37,7 +37,7 @@ public class PungService {
 
     public PungsResponseDto getPungsByPlaceId(Long placeId, Pageable pageable) {
         LocalDateTime yesterday = LocalDateTime.now(clock).minusDays(1);
-        Page<Pung> pungsPage = pungRepository.findByPlaceIdAndCreatedAtAfter(placeId, yesterday, pageable);
+        Page<Pung> pungsPage = pungRepository.findByPlaceIdAndIsReviewFalse(placeId, pageable);
 
         Page<PungDto> pungDtoPage = pungsPage.map(this::convertToDto);
 

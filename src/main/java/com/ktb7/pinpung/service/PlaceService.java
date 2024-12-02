@@ -131,7 +131,7 @@ public class PlaceService {
             boolean hasPung = false;
             Long imageId = null;
 
-            Pung pung = pungRepository.findFirstByPlaceIdAndCreatedAtAfterOrderByCreatedAtDesc(placeId, yesterday)
+            Pung pung = pungRepository.findFirstByPlaceIdAndIsReviewFalse(placeId)
                     .orElse(null);
 
             if (pung != null) {
@@ -175,7 +175,7 @@ public class PlaceService {
         log.info("tags {}:", tags);
 
         // 대표 펑 & 이미지 ID 조회
-        Optional<Pung> representativePung = pungRepository.findFirstByPlaceIdAndCreatedAtAfterOrderByCreatedAtDesc(placeId, yesterday);
+        Optional<Pung> representativePung = pungRepository.findFirstByPlaceIdAndIsReviewFalse(placeId);
 
         PungDto pungDto = null;
         if (representativePung.isPresent()) {
