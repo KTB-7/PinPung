@@ -13,6 +13,7 @@ import com.ktb7.pinpung.repository.ReviewRepository;
 import com.ktb7.pinpung.util.RepositoryHelper;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -22,7 +23,7 @@ import java.util.Map;
 
 @Service
 @Slf4j
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class ReviewService {
 
     private final ImageRepository imageRepository;
