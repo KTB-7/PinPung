@@ -15,8 +15,8 @@ import java.util.Optional;
 
 @Repository
 public interface PungRepository extends JpaRepository<Pung, Long> {
-    Optional<Pung> findFirstByPlaceIdAndCreatedAtAfterOrderByCreatedAtDesc(Long placeId, LocalDateTime yesterday);
-    Page<Pung> findByPlaceIdAndCreatedAtAfter(Long placeId, LocalDateTime yesterday, Pageable pageable);
+    Optional<Pung> findFirstByPlaceIdAndIsReviewFalse(Long placeId);
+    Page<Pung> findByPlaceIdAndIsReviewFalse(Long placeId, Pageable pageable);
 
     Page<Pung> findByUserId(Long userId, Pageable pageable);
 
@@ -27,7 +27,8 @@ public interface PungRepository extends JpaRepository<Pung, Long> {
             "FROM Pung p WHERE p.userId = :userId")
     List<SimplePung> findSimplePungByUserId(@Param("userId") Long userId);
 
-    @Query("SELECT p FROM Pung p WHERE p.createdAt >= :yesterday")
+    // pung2review 스케줄러에서 24시간내 펑은 isreview 처리
+    @Query("SELECT p FROM Pung p WHERE p.updatedAt >= :yesterday")
     List<Pung> findCreatedIn24H(@Param("yesterday") LocalDateTime yesterday);
 
 }
