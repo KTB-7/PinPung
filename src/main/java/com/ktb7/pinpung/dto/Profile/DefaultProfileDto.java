@@ -5,11 +5,12 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @AllArgsConstructor
-@NoArgsConstructor
 @Getter
 public class DefaultProfileDto {
     private Long userId;
     private String userName;
     private Integer followerCount;
     private Integer followingCount;
+    private Long pungCount;
+    private Long reviewCount;
 }

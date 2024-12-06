@@ -29,26 +29,18 @@ public class UserService {
     private final PlaceRepository placeRepository;
 
     public ProfileWithPungResponseDto viewProfileWithPung(Long userId) {
-//        Long userId = userRepository.findByUserName(userName)
-//                .orElseThrow(() -> new CustomException(HttpStatus.NOT_FOUND, ErrorCode.USER_NOT_FOUND))
-//                .getUserId();
 
         DefaultProfileDto defaultProfileDto = getDefaultProfile(userId);
 
-        Long reviewCount = reviewRepository.countByUserId(userId);
         List<SimplePung> simplePungs = pungRepository.findSimplePungByUserId(userId);
 
-        return new ProfileWithPungResponseDto(defaultProfileDto, simplePungs.stream().count(), reviewCount, simplePungs);
+        return new ProfileWithPungResponseDto(defaultProfileDto, simplePungs);
 
     }
 
     public ProfileWithReviewResponseDto viewProfileWithReview(Long userId) {
-//        Long userId = userRepository.findByUserName(userName)
-//                .orElseThrow(() -> new CustomException(HttpStatus.NOT_FOUND, ErrorCode.USER_NOT_FOUND))
-//                .getUserId();
 
         DefaultProfileDto defaultProfileDto = getDefaultProfile(userId);
-        Long pungCount = pungRepository.countByUserId(userId);
 
         List<Review> reviews = reviewRepository.findByUserId(userId);
 
@@ -75,7 +67,7 @@ public class UserService {
                 ))
                 .toList();
 
-        return new ProfileWithReviewResponseDto(defaultProfileDto, pungCount, reviews.stream().count(), simpleReviews);
+        return new ProfileWithReviewResponseDto(defaultProfileDto, simpleReviews);
 
     }
 
@@ -88,13 +80,17 @@ public class UserService {
         List<User> followers = followRepository.findFollowersByUserId(userId);
         List<User> followings = followRepository.findFollowingsByUserId(userId);
 
+        Long reviewCount = reviewRepository.countByUserId(userId);
+        Long pungCount = pungRepository.countByUserId(userId);
 
         // DefaultProfileDto 반환
         return new DefaultProfileDto(
                 user.getUserId(),
                 user.getUserName(),
                 followers.size(),
-                followings.size()
+                followings.size(),
+                pungCount,
+                reviewCount
         );
     }
 }

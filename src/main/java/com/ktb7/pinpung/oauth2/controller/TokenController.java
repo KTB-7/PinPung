@@ -6,10 +6,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @Slf4j
@@ -21,12 +18,10 @@ public class TokenController {
     private final ValidationUtils validationUtils;
 
     @PostMapping("/refresh")
-    public ResponseEntity<?> refreshToken(@RequestParam Long userId, HttpServletRequest request) {
-        // 유효성 검증: 현재 로그인된 사용자와 요청된 userId가 일치하는지 확인
-        // validationUtils.validateUserRequest(userId);
+    public ResponseEntity<?> refreshToken(@RequestHeader("Authorization") String authorizationHeader) {
 
         // HttpServletRequest를 TokenService로 전달
-        return tokenService.validateToken(userId, request);
+        return tokenService.validateToken(authorizationHeader);
     }
 
 }

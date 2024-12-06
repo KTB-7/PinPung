@@ -9,7 +9,6 @@ import org.springframework.web.multipart.MultipartFile;
 @Setter
 @NoArgsConstructor
 public class ModifyReviewRequestDto {
-    private Long userId;
     private Long reviewId;
     private Long placeId;
     private MultipartFile reviewImage;

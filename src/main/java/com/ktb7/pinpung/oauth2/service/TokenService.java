@@ -35,29 +35,11 @@ public class TokenService {
     private final TokenRepository tokenRepository;
     private final UserRepository userRepository;
 
-    public ResponseEntity<?> validateToken(Long userId, HttpServletRequest request) {
-        // 유효성 검증
-        ValidationUtils.validateUserId(userId);
-
+    public ResponseEntity<?> validateToken(String authorizationHeader) {
         // 헤더에서 토큰 가져오기
-        String token = extractBearerToken(request);
+        String token = extractBearerToken(authorizationHeader);
 
-        // 사용자 확인
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new CustomException(HttpStatus.NOT_FOUND, ErrorCode.USER_NOT_FOUND));
-
-        Long socialId = user.getSocialId();
-
-        // 카카오 API를 통한 토큰 유효성 검증
-        KakaoTokenInfoResponseDto kakaoTokenInfoResponseDto = WebClient.create(kakaoUserInfoUrl).get()
-                .header(HttpHeaders.AUTHORIZATION, "Bearer " + token)
-                .retrieve()
-                .bodyToMono(KakaoTokenInfoResponseDto.class)
-                .block();
-
-        if (kakaoTokenInfoResponseDto == null || !socialId.equals(kakaoTokenInfoResponseDto.getId())) {
-            throw new CustomException(HttpStatus.UNAUTHORIZED, ErrorCode.INVALID_TOKEN_OR_SOCIAL_ID);
-        }
+        Long userId = getUserFromToken(token);
 
         return refreshToken(userId);
     }
@@ -96,17 +78,36 @@ public class TokenService {
         }
     }
 
-    private String extractBearerToken(HttpServletRequest request) {
-        // 헤더에서 Authorization 값 가져오기
-        String authorizationHeader = request.getHeader("Authorization");
-
-        // Authorization 헤더가 없거나 Bearer 토큰 형식이 아니면 null 반환
-        if (authorizationHeader == null || !authorizationHeader.startsWith("Bearer ")) {
+    public String extractBearerToken(String authorizationHeader) {
+        // Authorization 헤더에서 Bearer 뒤의 토큰 추출
+        String token = null;
+        if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
+            token = authorizationHeader.substring(7); // "Bearer " 이후의 토큰 값만 가져옴
+        } else {
             throw new CustomException(HttpStatus.UNAUTHORIZED, ErrorCode.INVALID_TOKEN_OR_SOCIAL_ID);
         }
 
         // Bearer 뒤의 실제 토큰 값 반환
-        return authorizationHeader.substring(7);
+        return token;
     }
 
+    public Long getUserFromToken(String token) {
+        // 카카오 API를 통한 토큰 유효성 검증
+        KakaoTokenInfoResponseDto kakaoTokenInfoResponseDto = WebClient.create(kakaoUserInfoUrl).get()
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + token)
+                .retrieve()
+                .bodyToMono(KakaoTokenInfoResponseDto.class)
+                .block();
+
+        Long userId = null;
+        if (kakaoTokenInfoResponseDto == null) {
+            throw new CustomException(HttpStatus.UNAUTHORIZED, ErrorCode.INVALID_TOKEN_OR_SOCIAL_ID);
+        } else {
+            User user = userRepository.findBySocialId(kakaoTokenInfoResponseDto.getId()).orElse(null);
+            if (user == null) { throw new CustomException(HttpStatus.NOT_FOUND, ErrorCode.USER_NOT_FOUND); }
+            else userId = user.getUserId();
+        }
+
+        return userId;
+    }
 }
