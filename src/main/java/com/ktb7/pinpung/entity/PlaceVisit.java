@@ -9,30 +9,27 @@ import org.hibernate.annotations.UpdateTimestamp;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "User")
+@Table(name = "PlaceVisit")
 @Getter
-@Setter
-public class User {
+public class PlaceVisit {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
-    private Long userId;
+    private Long id;
 
-    @Column(name = "userEmail")
-    private String userEmail;
+    @Column(name = "placeId", nullable = false)
+    private Long placeId;
 
-    @Column(name = "userName")
-    private String userName;
+    @Column(name = "visit", nullable = false)
+    private Integer visit;
 
-    @Column(name = "socialId")
-    private Long socialId;
+    @Column(name = "age", nullable = false, columnDefinition = "FLOAT DEFAULT 0")
+    private Float age;
 
-    @Column(name = "profileImageId")
-    private Long profileImageId;
-
-    @Column(name = "age", nullable = false, columnDefinition = "INTEGER DEFAULT 0")
-    private Integer age;
+    @ManyToOne
+    @JoinColumn(name = "placeId", insertable = false, updatable = false)
+    private Place place;
 
     @CreationTimestamp
     @Column(name = "createdAt", updatable = false)

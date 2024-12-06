@@ -124,4 +124,16 @@ public class ValidationUtils {
             throw new CustomException(HttpStatus.BAD_REQUEST, ErrorCode.MISSING_PARAMETER);
         }
     }
+
+    public static void validateListString(List<String> list) {
+        if (list == null || list.isEmpty()) {
+            throw new CustomException(HttpStatus.BAD_REQUEST, ErrorCode.MISSING_PARAMETER);
+        }
+    }
+
+    public static void validateAge(Integer age) {
+        if (age == null || age <= 0) {
+            throw new CustomException(HttpStatus.BAD_REQUEST, ErrorCode.INVALID_PARAMETER);
+        }
+    }
 }

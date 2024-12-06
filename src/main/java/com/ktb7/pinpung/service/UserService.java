@@ -1,6 +1,7 @@
 package com.ktb7.pinpung.service;
 
 import com.ktb7.pinpung.dto.Profile.*;
+import com.ktb7.pinpung.dto.User.TasteRequestDto;
 import com.ktb7.pinpung.entity.Review;
 import com.ktb7.pinpung.entity.User;
 import com.ktb7.pinpung.exception.common.CustomException;
@@ -96,5 +97,13 @@ public class UserService {
                 followers.size(),
                 followings.size()
         );
+    }
+
+    public void setTaste(TasteRequestDto tasteRequestDto) {
+
+        Integer age = tasteRequestDto.getAge();
+        List<String> activities = tasteRequestDto.getActivities();
+        List<String> menus = tasteRequestDto.getMenus();
+
     }
 }

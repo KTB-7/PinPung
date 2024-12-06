@@ -3,6 +3,8 @@ package com.ktb7.pinpung.controller;
 import com.ktb7.pinpung.dto.Follow.FollowsResponseDto;
 import com.ktb7.pinpung.dto.Profile.ProfileWithPungResponseDto;
 import com.ktb7.pinpung.dto.Profile.ProfileWithReviewResponseDto;
+import com.ktb7.pinpung.dto.Review.MessageResponseDto;
+import com.ktb7.pinpung.dto.User.TasteRequestDto;
 import com.ktb7.pinpung.service.FollowService;
 import com.ktb7.pinpung.service.UserService;
 import com.ktb7.pinpung.util.ValidationUtils;
@@ -13,6 +15,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/{userId}")
@@ -92,4 +96,22 @@ public class UserController {
         return ResponseEntity.ok(response);
     }
 
+
+    @PostMapping("/taste")
+    public void getTaste(@RequestBody TasteRequestDto tasteRequestDto) {
+        log.info("Received request to /taste");
+
+        Integer age = tasteRequestDto.getAge();
+        List<String> activities = tasteRequestDto.getActivities();
+        List<String> menus = tasteRequestDto.getMenus();
+
+        // 유효성 검증
+        ValidationUtils.validateAge(age);
+        ValidationUtils.validateListString(activities);
+        ValidationUtils.validateListString(menus);
+
+        userService.setTaste(tasteRequestDto);
+
+
+    }
 }
