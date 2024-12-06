@@ -28,7 +28,7 @@ public class AiService {
     private final PlaceService placeService;
 
     public AiService(WebClient.Builder webClientBuilder, @Value("${fastapi.server.url}") String fastApiUrl, PlaceRepository placeRepository, PlaceService placeService) {
-        this.webClient = webClientBuilder.baseUrl(fastApiUrl).build(); // FastAPI 서버 URL 설정
+        this.webClient = webClientBuilder.baseUrl(fastApiUrl).build();
         this.placeRepository = placeRepository;
         this.placeService = placeService;
     }
