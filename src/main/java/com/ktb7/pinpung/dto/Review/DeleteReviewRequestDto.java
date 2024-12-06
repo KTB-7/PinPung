@@ -8,7 +8,6 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 public class DeleteReviewRequestDto {
-    private Long userId;
     private Long reviewId;
     private Long placeId;
 }

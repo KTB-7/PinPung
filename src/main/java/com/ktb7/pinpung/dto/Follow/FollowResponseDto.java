@@ -2,8 +2,9 @@ package com.ktb7.pinpung.dto.Follow;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.Getter;
 
-@Data
+@Getter
 @AllArgsConstructor
 public class FollowResponseDto {
     private Long userId;       // 팔로우 요청한 유저 ID

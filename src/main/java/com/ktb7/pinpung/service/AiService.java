@@ -2,9 +2,7 @@ package com.ktb7.pinpung.service;
 
 import com.ktb7.pinpung.dto.AI.*;
 import com.ktb7.pinpung.dto.Place.PlaceNearbyDto;
-import com.ktb7.pinpung.entity.Place;
 import com.ktb7.pinpung.exception.common.CustomException;
-import com.ktb7.pinpung.exception.common.ErrorCode;
 import com.ktb7.pinpung.repository.PlaceRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -30,7 +28,7 @@ public class AiService {
     private final PlaceService placeService;
 
     public AiService(WebClient.Builder webClientBuilder, @Value("${fastapi.server.url}") String fastApiUrl, PlaceRepository placeRepository, PlaceService placeService) {
-        this.webClient = webClientBuilder.baseUrl(fastApiUrl).build(); // FastAPI 서버 URL 설정
+        this.webClient = webClientBuilder.baseUrl(fastApiUrl).build();
         this.placeRepository = placeRepository;
         this.placeService = placeService;
     }
@@ -72,7 +70,7 @@ public class AiService {
 
         } catch (Exception e) {
             log.error("추천 태그 요청 중 오류 발생", e);
-            throw new CustomException(HttpStatus.INTERNAL_SERVER_ERROR, RECOMMEND_TAGS_REQUEST_FAILED, "추천 태그 요청 중 오류가 발생했습니다.");
+            throw new CustomException(HttpStatus.INTERNAL_SERVER_ERROR, RECOMMEND_TAGS_REQUEST_FAILED);
         }
     }
 
@@ -90,7 +88,7 @@ public class AiService {
 
         } catch (Exception e) {
             log.error("추천 태그 요청 중 오류 발생", e);
-            throw new CustomException(HttpStatus.INTERNAL_SERVER_ERROR, RECOMMEND_TAGS_REQUEST_FAILED, "추천 태그 요청 중 오류가 발생했습니다.");
+            throw new CustomException(HttpStatus.INTERNAL_SERVER_ERROR, RECOMMEND_TAGS_REQUEST_FAILED);
         }
     }
 
