@@ -4,6 +4,7 @@ import com.ktb7.pinpung.dto.Review.UploadReviewRequestDto;
 import com.ktb7.pinpung.dto.Review.ModifyReviewRequestDto;
 import com.ktb7.pinpung.dto.Review.DeleteReviewRequestDto;
 import com.ktb7.pinpung.dto.Review.MessageResponseDto;
+import com.ktb7.pinpung.oauth2.service.TokenService;
 import com.ktb7.pinpung.service.ReviewService;
 import com.ktb7.pinpung.util.ValidationUtils;
 import lombok.AllArgsConstructor;
@@ -23,6 +24,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 public class ReviewController {
 
     private final ReviewService reviewService;
+    private final TokenService tokenService;
 
     @PostMapping
     @Operation(
@@ -32,13 +34,15 @@ public class ReviewController {
                     @Parameter(name = "uploadReviewRequest", description = "리뷰 업로드 요청 데이터 (userId, placeId, text, 이미지)", required = true)
             }
     )
-    public ResponseEntity<MessageResponseDto> uploadReview(@ModelAttribute UploadReviewRequestDto uploadReviewRequest) {
-        log.info("{}", uploadReviewRequest);
-        log.info("uploadReview: {} {} {}", uploadReviewRequest.getUserId(), uploadReviewRequest.getPlaceId(), uploadReviewRequest.getText());
+    public ResponseEntity<MessageResponseDto> uploadReview(@RequestHeader("Authorization") String authorizationHeader, @ModelAttribute UploadReviewRequestDto uploadReviewRequest) {
+        log.info("uploadReview: {} {}", uploadReviewRequest.getPlaceId(), uploadReviewRequest.getText());
 
-        ValidationUtils.validateUserAndPlaceId(uploadReviewRequest.getUserId(), uploadReviewRequest.getPlaceId());
+        String token = tokenService.extractBearerToken(authorizationHeader);
+        Long userId = tokenService.getUserFromToken(token);
 
-        MessageResponseDto response = reviewService.uploadReview(uploadReviewRequest);
+        ValidationUtils.validateUserAndPlaceId(userId, uploadReviewRequest.getPlaceId());
+
+        MessageResponseDto response = reviewService.uploadReview(userId, uploadReviewRequest);
         return ResponseEntity.ok(response);
     }
 
@@ -50,12 +54,15 @@ public class ReviewController {
                     @Parameter(name = "modifyReviewRequest", description = "리뷰 수정 요청 데이터 (userId, placeId, text, 이미지)", required = true)
             }
     )
-    public ResponseEntity<MessageResponseDto> modifyReview(@ModelAttribute ModifyReviewRequestDto modifyReviewRequest) {
-        log.info("modifyReview: {} {} {}", modifyReviewRequest.getUserId(), modifyReviewRequest.getPlaceId(), modifyReviewRequest.getText());
+    public ResponseEntity<MessageResponseDto> modifyReview(@RequestHeader("Authorization") String authorizationHeader, @ModelAttribute ModifyReviewRequestDto modifyReviewRequest) {
+        log.info("modifyReview: {} {}", modifyReviewRequest.getPlaceId(), modifyReviewRequest.getText());
 
-        ValidationUtils.validateUserAndPlaceId(modifyReviewRequest.getUserId(), modifyReviewRequest.getPlaceId());
+        String token = tokenService.extractBearerToken(authorizationHeader);
+        Long userId = tokenService.getUserFromToken(token);
 
-        MessageResponseDto response = reviewService.modifyReview(modifyReviewRequest);
+        ValidationUtils.validateUserAndPlaceId(userId, modifyReviewRequest.getPlaceId());
+
+        MessageResponseDto response = reviewService.modifyReview(userId, modifyReviewRequest);
         return ResponseEntity.ok(response);
     }
 
@@ -67,12 +74,15 @@ public class ReviewController {
                     @Parameter(name = "deleteReviewRequest", description = "리뷰 삭제 요청 데이터 (userId, placeId, reviewId)", required = true)
             }
     )
-    public ResponseEntity<MessageResponseDto> deleteReview(@ModelAttribute DeleteReviewRequestDto deleteReviewRequest) {
-        log.info("deleteReview: {} {} {}", deleteReviewRequest.getUserId(), deleteReviewRequest.getPlaceId(), deleteReviewRequest.getReviewId());
+    public ResponseEntity<MessageResponseDto> deleteReview(@RequestHeader("Authorization") String authorizationHeader, @ModelAttribute DeleteReviewRequestDto deleteReviewRequest) {
+        log.info("deleteReview: {} {}", deleteReviewRequest.getPlaceId(), deleteReviewRequest.getReviewId());
 
-        ValidationUtils.validateUserAndPlaceId(deleteReviewRequest.getUserId(), deleteReviewRequest.getPlaceId());
+        String token = tokenService.extractBearerToken(authorizationHeader);
+        Long userId = tokenService.getUserFromToken(token);
 
-        MessageResponseDto response = reviewService.deleteReview(deleteReviewRequest);
+        ValidationUtils.validateUserAndPlaceId(userId, deleteReviewRequest.getPlaceId());
+
+        MessageResponseDto response = reviewService.deleteReview(userId, deleteReviewRequest);
         return ResponseEntity.ok(response);
     }
 }

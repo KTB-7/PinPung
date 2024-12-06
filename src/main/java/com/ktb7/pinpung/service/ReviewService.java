@@ -32,8 +32,7 @@ public class ReviewService {
     private final AiService aiService;
 
     @Transactional
-    public MessageResponseDto uploadReview(UploadReviewRequestDto uploadReviewRequest) {
-        Long userId = uploadReviewRequest.getUserId();
+    public MessageResponseDto uploadReview(Long userId, UploadReviewRequestDto uploadReviewRequest) {
         Long placeId = uploadReviewRequest.getPlaceId();
         String text = uploadReviewRequest.getText();
         MultipartFile reviewImage = uploadReviewRequest.getReviewImage();
@@ -78,8 +77,7 @@ public class ReviewService {
     }
 
     @Transactional
-    public MessageResponseDto modifyReview(ModifyReviewRequestDto modifyReviewRequest) {
-        Long userId = modifyReviewRequest.getUserId();
+    public MessageResponseDto modifyReview(Long userId, ModifyReviewRequestDto modifyReviewRequest) {
         Long reviewId = modifyReviewRequest.getReviewId();
         Long placeId = modifyReviewRequest.getPlaceId();
         String text = modifyReviewRequest.getText();
@@ -109,8 +107,7 @@ public class ReviewService {
     }
 
     @Transactional
-    public MessageResponseDto deleteReview(DeleteReviewRequestDto deleteReviewRequest) {
-        Long userId = deleteReviewRequest.getUserId();
+    public MessageResponseDto deleteReview(Long userId, DeleteReviewRequestDto deleteReviewRequest) {
         Long reviewId = deleteReviewRequest.getReviewId();
         Long placeId = deleteReviewRequest.getPlaceId();
 

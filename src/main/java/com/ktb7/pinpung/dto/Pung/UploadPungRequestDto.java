@@ -7,7 +7,6 @@ import org.springframework.web.multipart.MultipartFile;
 @Getter
 @Setter
 public class UploadPungRequestDto {
-    private Long userId;
     private Long placeId;
     private MultipartFile imageWithText;
     private MultipartFile pureImage;

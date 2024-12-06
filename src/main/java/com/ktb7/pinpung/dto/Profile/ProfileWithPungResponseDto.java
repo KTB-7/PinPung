@@ -10,8 +10,6 @@ import java.util.List;
 public class ProfileWithPungResponseDto {
 
     private DefaultProfileDto defaultProfile;
-    private Long pungCount;
-    private Long reviewCount;
     private List<SimplePung> pungs;
 
 }

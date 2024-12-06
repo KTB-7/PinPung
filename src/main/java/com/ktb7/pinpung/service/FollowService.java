@@ -25,8 +25,7 @@ public class FollowService {
     private final FollowRepository followRepository;
     private final RepositoryHelper repositoryHelper;
 
-    public FollowResponseDto followUser(FollowRequestDto followRequestDto) {
-        Long userId = followRequestDto.getUserId();
+    public FollowResponseDto followUser(Long userId, FollowRequestDto followRequestDto) {
         Long wantsToFollowId = followRequestDto.getWantsToFollowId();
 
         // db에 두 아이디가 존재하는지 확인하고 유저 불러오기
@@ -50,8 +49,7 @@ public class FollowService {
         return new FollowResponseDto(userId, wantsToFollowId);
     }
 
-    public UnfollowResponseDto unfollowUser(UnfollowRequestDto unfollowRequestDto) {
-        Long userId = unfollowRequestDto.getUserId();
+    public UnfollowResponseDto unfollowUser(Long userId, UnfollowRequestDto unfollowRequestDto) {
         Long wantsToUnfollowId = unfollowRequestDto.getWantsToUnfollowId();
 
         // 두 아이디가 존재하는지 확인하고 유저 불러오기

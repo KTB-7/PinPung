@@ -3,6 +3,7 @@ package com.ktb7.pinpung.controller;
 import com.ktb7.pinpung.dto.Place.*;
 import com.ktb7.pinpung.exception.common.CustomException;
 import com.ktb7.pinpung.exception.common.ErrorCode;
+import com.ktb7.pinpung.oauth2.service.TokenService;
 import com.ktb7.pinpung.service.PlaceService;
 import com.ktb7.pinpung.util.ValidationUtils;
 import io.swagger.v3.oas.annotations.Operation;
@@ -22,6 +23,7 @@ import java.util.List;
 @AllArgsConstructor
 public class PlaceController {
     private final PlaceService placeService;
+    private final TokenService tokenService;
 
     @GetMapping("/nearby")
     @Operation(
@@ -29,13 +31,16 @@ public class PlaceController {
             description = "주어진 좌표(SW, NE) 범위를 기준으로 주변 장소를 검색합니다."
     )
     public ResponseEntity<PlaceNearbyResponseDto> getPlacesWithRepresentativeImage(
-            @RequestParam Long userId,
+            @RequestHeader("Authorization") String authorizationHeader,
             @RequestParam String swLng,
             @RequestParam String swLat,
             @RequestParam String neLng,
             @RequestParam String neLat) {
 
         log.info("Received request to /nearby with SW({},{}) and NE({},{})", swLng, swLat, neLng, neLat);
+
+        String token = tokenService.extractBearerToken(authorizationHeader);
+        Long userId = tokenService.getUserFromToken(token);
 
         // 유효성 검증
         ValidationUtils.validateRect(swLng, swLat, neLng, neLat);

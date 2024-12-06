@@ -59,15 +59,14 @@ public class PungService {
 
         int pungCount = (int) pungDtoPage.getTotalElements();
         int currentPage = pungDtoPage.getNumber();
-        log.info("pungs/{userId} pungCount, currentPage: {} {}", pungCount, currentPage);
+        log.info("pungs pungCount, currentPage: {} {}", pungCount, currentPage);
 
         return new PungsResponseDto(pungCount, currentPage, pungDtoPage.getContent());
     }
 
 
     @Transactional
-    public MessageResponseDto uploadPung(UploadPungRequestDto uploadPungRequestDto) {
-        Long userId = uploadPungRequestDto.getUserId();
+    public MessageResponseDto uploadPung(Long userId, UploadPungRequestDto uploadPungRequestDto) {
         Long placeId = uploadPungRequestDto.getPlaceId();
         MultipartFile imageWithText = uploadPungRequestDto.getImageWithText();
         MultipartFile pureImage = uploadPungRequestDto.getPureImage();
