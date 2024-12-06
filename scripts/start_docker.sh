@@ -14,6 +14,7 @@ REDIRECT_URI=$(aws ssm get-parameter --name "/pinpung/REDIRECT_URI" --query "Par
 S3_BUCKET_NAME=$(aws ssm get-parameter --name "/pinpung/S3_BUCKET_NAME" --query "Parameter.Value" --output text --region ap-northeast-2)
 LOGOUT_REDIRECT_URI=$(aws ssm get-parameter --name "/pinpung/LOGOUT_REDIRECT_URI" --query "Parameter.Value" --output text --region ap-northeast-2)
 OPENAI_KEY=$(aws ssm get-parameter --name "/pinpung/OPENAI_KEY" --with-decryption --query "Parameter.Value" --output text --region ap-northeast-2)
+FASTAPI_URL=$(aws ssm get-parameter --name "/pinpung/FASTAPI_URL" --with-decryption --query "Parameter.Value" --output text --region ap-northeast-2)
 
 # 최신 이미지 가져오기
 docker pull ${ECR_REPO}:latest || { echo "Docker pull failed"; exit 1; }
@@ -36,4 +37,5 @@ docker run -d --name pinpung-develop-backend \
     -e S3_BUCKET_NAME=$S3_BUCKET_NAME \
     -e LOGOUT_REDIRECT_URI=$LOGOUT_REDIRECT_URI \
     -e OPENAI_KEY=$OPENAI_KEY \
+    -e FASTAPI_URL=$FASTAPI_URL \
     -p 8080:8080 ${ECR_REPO}:latest
