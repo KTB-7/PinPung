@@ -24,7 +24,7 @@ import java.util.List;
 @Configuration
 @AllArgsConstructor
 @Slf4j
-@EnableWebSecurity(debug = true)
+@EnableWebSecurity(debug = false)
 public class SecurityConfig {
 
     private final CustomOAuth2UserService customOAuth2UserService;
@@ -95,8 +95,7 @@ public class SecurityConfig {
                                 "/logout",
                                 "/api/pungs",
                                 "/api/search/**",
-                                "/api/{userId}",
-                                "/api/{userId}/**",
+                                "/api/my",
                                 "/api/places/**",
                                 "/api/pungs/byUser/**",
                                 "/api/pungs/byPlace/**",

@@ -13,6 +13,7 @@ import com.ktb7.pinpung.repository.PungRepository;
 import com.ktb7.pinpung.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -26,7 +27,7 @@ import java.util.Map;
 
 @Slf4j
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class PungService {
     private final PungRepository pungRepository;
     private final ImageRepository imageRepository;
@@ -59,15 +60,14 @@ public class PungService {
 
         int pungCount = (int) pungDtoPage.getTotalElements();
         int currentPage = pungDtoPage.getNumber();
-        log.info("pungs/{userId} pungCount, currentPage: {} {}", pungCount, currentPage);
+        log.info("pungs pungCount, currentPage: {} {}", pungCount, currentPage);
 
         return new PungsResponseDto(pungCount, currentPage, pungDtoPage.getContent());
     }
 
 
     @Transactional
-    public MessageResponseDto uploadPung(UploadPungRequestDto uploadPungRequestDto) {
-        Long userId = uploadPungRequestDto.getUserId();
+    public MessageResponseDto uploadPung(Long userId, UploadPungRequestDto uploadPungRequestDto) {
         Long placeId = uploadPungRequestDto.getPlaceId();
         MultipartFile imageWithText = uploadPungRequestDto.getImageWithText();
         MultipartFile pureImage = uploadPungRequestDto.getPureImage();

@@ -12,6 +12,7 @@ import java.time.LocalDateTime;
 @Table(name = "UserActivity")
 @Getter
 @Setter
+@IdClass(UserActivityId.class)
 public class UserActivity {
 
     @Id

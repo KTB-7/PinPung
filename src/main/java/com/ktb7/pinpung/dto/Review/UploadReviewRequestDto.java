@@ -11,7 +11,6 @@ import org.springframework.web.multipart.MultipartFile;
 @NoArgsConstructor
 @AllArgsConstructor
 public class UploadReviewRequestDto {
-    private Long userId;
     private Long placeId;
     private MultipartFile reviewImage;
     private String text;

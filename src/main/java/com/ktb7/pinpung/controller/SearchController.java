@@ -4,6 +4,7 @@ import com.ktb7.pinpung.dto.Place.PlaceNearbyDto;
 import com.ktb7.pinpung.dto.Place.PlaceNearbyResponseDto;
 import com.ktb7.pinpung.dto.Search.SearchResponseDto;
 import com.ktb7.pinpung.dto.Search.SearchTagReviewDto;
+import com.ktb7.pinpung.oauth2.service.TokenService;
 import com.ktb7.pinpung.service.PlaceService;
 import com.ktb7.pinpung.service.SearchService;
 import com.ktb7.pinpung.util.ValidationUtils;
@@ -13,10 +14,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -29,13 +27,13 @@ public class SearchController {
 
     private final SearchService searchService;
     private final PlaceService placeService;
+    private final TokenService tokenService;
 
     @GetMapping("/map")
     @Operation(
             summary = "지도 기반 카페 검색",
             description = "키워드와 지도 영역을 기반으로 카페를 검색합니다.",
             parameters = {
-                    @Parameter(name = "userId", description = "사용자 ID", required = true, example = "1"),
                     @Parameter(name = "keyword", description = "검색 키워드", required = true, example = "카페"),
                     @Parameter(name = "swLng", description = "좌표 범위의 남서쪽 경도", required = true, example = "127.09903516290044"),
                     @Parameter(name = "swLat", description = "좌표 범위의 남서쪽 위도", required = true, example = "37.39051118703115"),
@@ -44,7 +42,7 @@ public class SearchController {
             }
     )
     public ResponseEntity<PlaceNearbyResponseDto> searchInMap(
-            @RequestParam Long userId,
+            @RequestHeader("Authorization") String authorizationHeader,
             @RequestParam String keyword,
             @RequestParam String swLng,
             @RequestParam String swLat,
@@ -52,6 +50,9 @@ public class SearchController {
             @RequestParam String neLat
     ) {
         log.info("Received request to /search/map with keyword {}, SW({},{}) and NE({},{})", keyword, swLng, swLat, neLng, neLat);
+
+        String token = tokenService.extractBearerToken(authorizationHeader);
+        Long userId = tokenService.getUserFromToken(token);
 
         // 유효성 검증
         ValidationUtils.validateUserId(userId);
@@ -78,7 +79,6 @@ public class SearchController {
             summary = "키워드로 정확도 기반 검색",
             description = "키워드와 좌표 영역을 기반으로 정확도에 따라 정렬된 카페 리스트를 검색합니다.",
             parameters = {
-                    @Parameter(name = "userId", description = "사용자 ID", required = true, example = "1"),
                     @Parameter(name = "keyword", description = "검색 키워드", required = true, example = "카페"),
                     @Parameter(name = "swLng", description = "좌표 범위의 남서쪽 경도", required = true, example = "127.09903516290044"),
                     @Parameter(name = "swLat", description = "좌표 범위의 남서쪽 위도", required = true, example = "37.39051118703115"),
@@ -87,7 +87,7 @@ public class SearchController {
             }
     )
     public ResponseEntity<SearchResponseDto> searchWithAccuracy(
-            @RequestParam Long userId,
+            @RequestHeader("Authorization") String authorizationHeader,
             @RequestParam String keyword,
             @RequestParam String swLng,
             @RequestParam String swLat,
@@ -95,6 +95,9 @@ public class SearchController {
             @RequestParam String neLat
     ) {
         log.info("Received request to /search/accuracy with keyword {}, SW({},{}) and NE({},{})", keyword, swLng, swLat, neLng, neLat);
+
+        String token = tokenService.extractBearerToken(authorizationHeader);
+        Long userId = tokenService.getUserFromToken(token);
 
         // 유효성 검증
         ValidationUtils.validateUserId(userId);
@@ -127,7 +130,6 @@ public class SearchController {
             summary = "키워드로 거리 기반 검색",
             description = "키워드와 좌표 영역을 기반으로 거리순으로 정렬된 카페 리스트를 검색합니다.",
             parameters = {
-                    @Parameter(name = "userId", description = "사용자 ID", required = true, example = "1"),
                     @Parameter(name = "keyword", description = "검색 키워드", required = true, example = "카페"),
                     @Parameter(name = "swLng", description = "좌표 범위의 남서쪽 경도", required = true, example = "127.09903516290044"),
                     @Parameter(name = "swLat", description = "좌표 범위의 남서쪽 위도", required = true, example = "37.39051118703115"),
@@ -138,7 +140,7 @@ public class SearchController {
             }
     )
     public ResponseEntity<SearchResponseDto> searchWithDistance(
-            @RequestParam Long userId,
+            @RequestHeader("Authorization") String authorizationHeader,
             @RequestParam String keyword,
             @RequestParam String swLng,
             @RequestParam String swLat,
@@ -148,6 +150,9 @@ public class SearchController {
             @RequestParam String y
     ) {
         log.info("Received request to /search/distance with keyword {}, SW({},{}) and NE({},{})", keyword, swLng, swLat, neLng, neLat);
+
+        String token = tokenService.extractBearerToken(authorizationHeader);
+        Long userId = tokenService.getUserFromToken(token);
 
         // 유효성 검증
         ValidationUtils.validateUserId(userId);

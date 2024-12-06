@@ -3,9 +3,10 @@ package com.ktb7.pinpung.controller;
 import com.ktb7.pinpung.dto.Pung.PungsResponseDto;
 import com.ktb7.pinpung.dto.Pung.UploadPungRequestDto;
 import com.ktb7.pinpung.dto.Review.MessageResponseDto;
+import com.ktb7.pinpung.oauth2.service.TokenService;
 import com.ktb7.pinpung.service.PungService;
 import com.ktb7.pinpung.util.ValidationUtils;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -21,11 +22,12 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @RestController
 @Slf4j
 @RequestMapping("/api/pungs")
-@AllArgsConstructor
+@RequiredArgsConstructor
 @Tag(name = "Pung API", description = "펑(Pung) 관련 API")
 public class PungController {
 
     private final PungService pungService;
+    private final TokenService tokenService;
 
     @GetMapping("/byPlace/{placeId}")
     @Operation(
@@ -59,33 +61,40 @@ public class PungController {
                     @Parameter(name = "uploadPungRequest", description = "펑 업로드 요청 데이터 (userId, placeId, text, 이미지 파일 두가지)", required = true)
             }
     )
-    public ResponseEntity<MessageResponseDto> uploadPungs(@ModelAttribute UploadPungRequestDto uploadPungRequest) {
-        log.info("uploadPungs: {} {} {}", uploadPungRequest.getUserId(), uploadPungRequest.getPlaceId(), uploadPungRequest.getText());
+    public ResponseEntity<MessageResponseDto> uploadPungs(@RequestHeader("Authorization") String authorizationHeader, @ModelAttribute UploadPungRequestDto uploadPungRequest) {
+        log.info("uploadPungs: {} {}", uploadPungRequest.getPlaceId(), uploadPungRequest.getText());
+
+        String token = tokenService.extractBearerToken(authorizationHeader);
+        Long userId = tokenService.getUserFromToken(token);
 
         // 유효성 검증
-        ValidationUtils.validateUserAndPlaceId(uploadPungRequest.getUserId(), uploadPungRequest.getPlaceId());
+        ValidationUtils.validateUserAndPlaceId(userId, uploadPungRequest.getPlaceId());
         ValidationUtils.validateFile(uploadPungRequest.getImageWithText(), "imageWithText");
         ValidationUtils.validateFile(uploadPungRequest.getPureImage(), "pureImage");
 
-        MessageResponseDto response = pungService.uploadPung(uploadPungRequest);
+        MessageResponseDto response = pungService.uploadPung(userId, uploadPungRequest);
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/byUser/{userId}")
+    @GetMapping("/byUser")
     @Operation(
             summary = "특정 유저의 펑 목록 조회",
             description = "주어진 유저 ID에 대한 펑을 페이징 처리하여 반환합니다.",
             parameters = {
-                    @Parameter(name = "userId", description = "조회할 유저의 ID", required = true, example = "123"),
                     @Parameter(name = "page", description = "페이지 번호 (0부터 시작)", example = "0"),
                     @Parameter(name = "size", description = "한 페이지에 포함될 데이터 수", example = "3")
             }
     )
     public ResponseEntity<PungsResponseDto> getPungsByUser(
-            @PathVariable Long userId,
+            @RequestHeader("Authorization") String authorizationHeader,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "5") int size
     ) {
+        log.info("getPungsByUser");
+
+        String token = tokenService.extractBearerToken(authorizationHeader);
+        Long userId = tokenService.getUserFromToken(token);
+
         // 유효성 검증
         ValidationUtils.validateUserId(userId);
         ValidationUtils.validatePagination(page, size);
