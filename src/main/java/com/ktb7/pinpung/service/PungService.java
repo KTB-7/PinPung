@@ -13,6 +13,7 @@ import com.ktb7.pinpung.repository.PungRepository;
 import com.ktb7.pinpung.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -26,7 +27,7 @@ import java.util.Map;
 
 @Slf4j
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class PungService {
     private final PungRepository pungRepository;
     private final ImageRepository imageRepository;

@@ -7,7 +7,7 @@ import com.ktb7.pinpung.dto.Review.MessageResponseDto;
 import com.ktb7.pinpung.oauth2.service.TokenService;
 import com.ktb7.pinpung.service.ReviewService;
 import com.ktb7.pinpung.util.ValidationUtils;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -19,7 +19,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @RestController
 @Slf4j
 @RequestMapping("/api/reviews")
-@AllArgsConstructor
+@RequiredArgsConstructor
 @Tag(name = "Review API", description = "리뷰 관련 API")
 public class ReviewController {
 

@@ -6,7 +6,7 @@ import com.ktb7.pinpung.dto.Review.MessageResponseDto;
 import com.ktb7.pinpung.oauth2.service.TokenService;
 import com.ktb7.pinpung.service.PungService;
 import com.ktb7.pinpung.util.ValidationUtils;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -22,7 +22,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @RestController
 @Slf4j
 @RequestMapping("/api/pungs")
-@AllArgsConstructor
+@RequiredArgsConstructor
 @Tag(name = "Pung API", description = "펑(Pung) 관련 API")
 public class PungController {
 

@@ -8,7 +8,7 @@ import com.ktb7.pinpung.service.PlaceService;
 import com.ktb7.pinpung.util.ValidationUtils;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,7 +20,7 @@ import java.util.List;
 @Slf4j
 @RequestMapping("/api/places")
 @Tag(name = "Places API", description = "장소 관련 API")
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class PlaceController {
     private final PlaceService placeService;
     private final TokenService tokenService;
