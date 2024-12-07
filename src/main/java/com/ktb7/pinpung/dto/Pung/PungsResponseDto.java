@@ -1,6 +1,5 @@
 package com.ktb7.pinpung.dto.Pung;
 
-import com.ktb7.pinpung.entity.Pung;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 

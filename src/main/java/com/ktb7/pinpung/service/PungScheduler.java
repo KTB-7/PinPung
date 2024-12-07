@@ -3,7 +3,6 @@ package com.ktb7.pinpung.service;
 import com.ktb7.pinpung.entity.Pung;
 import com.ktb7.pinpung.repository.PungRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.context.annotation.ComponentScan;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 

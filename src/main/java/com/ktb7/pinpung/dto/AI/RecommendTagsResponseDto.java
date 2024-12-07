@@ -1,15 +1,14 @@
 package com.ktb7.pinpung.dto.AI;
 
+import com.ktb7.pinpung.dto.Place.SimplePlaceDto;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.Setter;
 
 import java.util.List;
 
-@AllArgsConstructor
 @Getter
-@Setter
+@AllArgsConstructor
 public class RecommendTagsResponseDto {
     private Integer count;
-    private List<PlacesPerTagDto> placesPerTags;
+    private List<SimplePlaceDto> places;
 }

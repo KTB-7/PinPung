@@ -1,6 +1,9 @@
 package com.ktb7.pinpung.controller;
 
-import com.ktb7.pinpung.dto.Follow.*;
+import com.ktb7.pinpung.dto.Follow.FollowRequestDto;
+import com.ktb7.pinpung.dto.Follow.FollowResponseDto;
+import com.ktb7.pinpung.dto.Follow.UnfollowRequestDto;
+import com.ktb7.pinpung.dto.Follow.UnfollowResponseDto;
 import com.ktb7.pinpung.oauth2.service.TokenService;
 import com.ktb7.pinpung.service.FollowService;
 import com.ktb7.pinpung.util.ValidationUtils;
