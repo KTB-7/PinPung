@@ -1,8 +1,8 @@
 package com.ktb7.pinpung.exception.common;
 
 import lombok.AllArgsConstructor;
-import org.springframework.http.HttpStatus;
 import lombok.Getter;
+import org.springframework.http.HttpStatus;
 
 @Getter
 @AllArgsConstructor

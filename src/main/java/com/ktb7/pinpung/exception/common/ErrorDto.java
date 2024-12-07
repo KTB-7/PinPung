@@ -1,9 +1,7 @@
 package com.ktb7.pinpung.exception.common;
 
 import lombok.Builder;
-import lombok.Data;
 import lombok.Getter;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 @Getter

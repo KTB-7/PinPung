@@ -1,6 +1,5 @@
 package com.ktb7.pinpung.dto.Review;
 
-import com.ktb7.pinpung.entity.Review;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 

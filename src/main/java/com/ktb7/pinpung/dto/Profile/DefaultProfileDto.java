@@ -2,7 +2,6 @@ package com.ktb7.pinpung.dto.Profile;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 
 @AllArgsConstructor
 @Getter

@@ -1,6 +1,5 @@
 package com.ktb7.pinpung.repository;
 
-import com.ktb7.pinpung.entity.Token;
 import com.ktb7.pinpung.entity.UserMenu;
 import com.ktb7.pinpung.entity.UserMenuId;
 import org.springframework.data.jpa.repository.JpaRepository;

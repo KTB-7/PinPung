@@ -1,7 +1,6 @@
 package com.ktb7.pinpung.service;
 
 import com.ktb7.pinpung.dto.AI.*;
-import com.ktb7.pinpung.dto.Place.PlaceNearbyDto;
 import com.ktb7.pinpung.dto.Place.SimplePlaceDto;
 import com.ktb7.pinpung.entity.Place;
 import com.ktb7.pinpung.exception.common.CustomException;
@@ -18,7 +17,6 @@ import reactor.core.publisher.Mono;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static com.ktb7.pinpung.exception.common.ErrorCode.RECOMMEND_TAGS_REQUEST_FAILED;
 

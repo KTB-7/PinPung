@@ -1,6 +1,5 @@
 package com.ktb7.pinpung.dto.AI;
 
-import com.ktb7.pinpung.dto.Place.PlaceNearbyDto;
 import com.ktb7.pinpung.dto.Place.SimplePlaceDto;
 import lombok.AllArgsConstructor;
 import lombok.Getter;

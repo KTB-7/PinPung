@@ -1,7 +1,5 @@
 package com.ktb7.pinpung.oauth2;
 
-import com.ktb7.pinpung.exception.common.CustomException;
-import com.ktb7.pinpung.exception.common.ErrorCode;
 import com.ktb7.pinpung.exception.common.LogoutFailureException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -10,8 +8,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.logout.LogoutHandler;
 import org.springframework.stereotype.Component;
-
-import java.io.IOException;
 
 @Component
 public class OAuth2LogoutCustomHandler implements LogoutHandler {
