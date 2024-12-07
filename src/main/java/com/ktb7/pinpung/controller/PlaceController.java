@@ -1,6 +1,8 @@
 package com.ktb7.pinpung.controller;
 
-import com.ktb7.pinpung.dto.Place.*;
+import com.ktb7.pinpung.dto.Place.PlaceInfoResponseDto;
+import com.ktb7.pinpung.dto.Place.PlaceNearbyDto;
+import com.ktb7.pinpung.dto.Place.PlaceNearbyResponseDto;
 import com.ktb7.pinpung.exception.common.CustomException;
 import com.ktb7.pinpung.exception.common.ErrorCode;
 import com.ktb7.pinpung.oauth2.service.TokenService;

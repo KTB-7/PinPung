@@ -2,7 +2,10 @@ package com.ktb7.pinpung.service;
 
 import com.ktb7.pinpung.dto.AI.*;
 import com.ktb7.pinpung.dto.Place.PlaceNearbyDto;
+import com.ktb7.pinpung.dto.Place.SimplePlaceDto;
+import com.ktb7.pinpung.entity.Place;
 import com.ktb7.pinpung.exception.common.CustomException;
+import com.ktb7.pinpung.exception.common.ErrorCode;
 import com.ktb7.pinpung.repository.PlaceRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -74,7 +77,7 @@ public class AiService {
         }
     }
 
-    public RecommendTagsAIResponseDto getTrending(Long userId, List<Long> placeIdList) {
+    public TrendingTagsAIResponseDto getTrending(Long userId, List<Long> placeIdList) {
 
         try {
             return webClient.post()
@@ -83,7 +86,7 @@ public class AiService {
                     .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
                     .body(Mono.just(buildRecommendRequestBody(userId, placeIdList)), String.class)
                     .retrieve()
-                    .bodyToMono(RecommendTagsAIResponseDto.class)
+                    .bodyToMono(TrendingTagsAIResponseDto.class)
                     .block();
 
         } catch (Exception e) {
@@ -97,26 +100,35 @@ public class AiService {
                 userId, placeIdList.toString());
     }
 
-    public RecommendTagsResponseDto changeFormat(Long userId, RecommendTagsAIResponseDto recommendTagsAIResponse) {
+    public TrendingTagsResponseDto changeFormat2Trending(Long userId, TrendingTagsAIResponseDto trendingTagsAIResponse) {
 
-        List<String> hashtags = recommendTagsAIResponse.getHashtags();
-        List<List<String>> cafeList = recommendTagsAIResponse.getCafe_list();
+        List<String> hashtags = trendingTagsAIResponse.getHashtags();
+        List<List<Long>> cafeList = trendingTagsAIResponse.getCafe_list();
 
         // PlacesPerTagDto 리스트 생성
         List<PlacesPerTagDto> placesPerTags = new ArrayList<>();
         for (int i = 0; i < hashtags.size(); i++) {
             String tagName = hashtags.get(i);
-            List<String> placeIdList = cafeList.get(i);
+            List<Long> placeIdList = cafeList.get(i);
 
-            List<Long> placeIdLongList = placeIdList.stream()
-                    .map(Long::parseLong)
-                    .collect(Collectors.toList());
-
-            List<PlaceNearbyDto> places = placeService.getPlacesWithRepresentativeImage(userId, placeIdLongList);
+            List<SimplePlaceDto> places = changeFormat2Recommend(new RecommendTagsAIResponseDto(placeIdList));
 
             placesPerTags.add(new PlacesPerTagDto(tagName, places.size(), places));
         }
 
-        return new RecommendTagsResponseDto(placesPerTags.size(), placesPerTags);
+        return new TrendingTagsResponseDto(placesPerTags.size(), placesPerTags);
+    }
+
+    public List<SimplePlaceDto> changeFormat2Recommend(RecommendTagsAIResponseDto recommendTagsAIResponse) {
+
+        List<SimplePlaceDto> places = new ArrayList<>();
+        for (int i = 0; i < recommendTagsAIResponse.getCafe_list().size(); i++) {
+            Long placeId = recommendTagsAIResponse.getCafe_list().get(i);
+            Place place = placeRepository.findById(placeId).orElseThrow(()->new CustomException(HttpStatus.NOT_FOUND, ErrorCode.PLACE_NOT_FOUND));
+
+            places.add(new SimplePlaceDto(placeId, place.getPlaceName(), place.getX(), place.getY()));
+        }
+
+        return places;
     }
 }
