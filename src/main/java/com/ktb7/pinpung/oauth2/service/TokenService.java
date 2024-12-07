@@ -10,7 +10,6 @@ import com.ktb7.pinpung.oauth2.dto.TokenResponseDto;
 import com.ktb7.pinpung.repository.TokenRepository;
 import com.ktb7.pinpung.repository.UserRepository;
 import com.ktb7.pinpung.util.ValidationUtils;
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;

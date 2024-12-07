@@ -2,6 +2,9 @@ package com.ktb7.pinpung.controller;
 
 import com.ktb7.pinpung.dto.AI.RecommendTagsAIResponseDto;
 import com.ktb7.pinpung.dto.AI.RecommendTagsResponseDto;
+import com.ktb7.pinpung.dto.AI.TrendingTagsAIResponseDto;
+import com.ktb7.pinpung.dto.AI.TrendingTagsResponseDto;
+import com.ktb7.pinpung.dto.Place.SimplePlaceDto;
 import com.ktb7.pinpung.oauth2.service.TokenService;
 import com.ktb7.pinpung.service.AiService;
 import com.ktb7.pinpung.service.PlaceService;
@@ -60,9 +63,9 @@ public class AiController {
         List<Long> placeIdList = placeService.categorySearch("카페", swLng, swLat, neLng, neLat, x, y, "distance");
         RecommendTagsAIResponseDto recommendTagsAIResponse = aiService.recommend(userId, placeIdList);
 
-        RecommendTagsResponseDto response = aiService.changeFormat(userId, recommendTagsAIResponse);
+        List<SimplePlaceDto> places = aiService.changeFormat2Recommend(recommendTagsAIResponse);
 
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(new RecommendTagsResponseDto(places.size(), places));
     }
 
     @GetMapping("/trending")
@@ -78,7 +81,7 @@ public class AiController {
                     @Parameter(name = "y", description = "중심 위도", required = true, example = "37.398342123")
             }
     )
-    public ResponseEntity<RecommendTagsResponseDto> trending(
+    public ResponseEntity<TrendingTagsResponseDto> trending(
             @RequestHeader("Authorization") String authorizationHeader,
             @RequestParam String swLng,
             @RequestParam String swLat,
@@ -96,9 +99,9 @@ public class AiController {
         ValidationUtils.validateRect(swLng, swLat, neLng, neLat);
 
         List<Long> placeIdList = placeService.categorySearch("카페", swLng, swLat, neLng, neLat, x, y, "distance");
-        RecommendTagsAIResponseDto recommendTagsAIResponse = aiService.getTrending(userId, placeIdList);
+        TrendingTagsAIResponseDto trendingTagsAIResponse = aiService.getTrending(userId, placeIdList);
 
-        RecommendTagsResponseDto response = aiService.changeFormat(userId, recommendTagsAIResponse);
+        TrendingTagsResponseDto response = aiService.changeFormat2Trending(userId, trendingTagsAIResponse);
 
         return ResponseEntity.ok(response);
     }

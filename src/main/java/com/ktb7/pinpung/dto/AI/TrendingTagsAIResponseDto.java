@@ -7,6 +7,8 @@ import java.util.List;
 
 @AllArgsConstructor
 @Getter
-public class RecommendTagsAIResponseDto {
-    private List<Long> cafe_list;
+public class TrendingTagsAIResponseDto {
+    private List<String> hashtags;
+    private List<List<Long>> cafe_list;
 }
+
