@@ -10,6 +10,7 @@ import java.util.List;
 public class SearchPlaceInfoDto {
     private Long placeId;
     private String placeName;
+    private String address;
     private Boolean hasPung;
     private Boolean byFriend;
     private Long imageId;
