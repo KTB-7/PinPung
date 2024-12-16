@@ -14,7 +14,7 @@ public interface PlaceRepository extends JpaRepository<Place, Long> {
     Optional<Place> findByKakaoPlaceId(String kakaoPlaceId);
 
     @Query("SELECT p.address FROM Place p WHERE p.placeId = :placeId")
-    String findAddressByPlaceId(@Param("placeId") Long placeId);
+    Optional<String> findAddressByPlaceId(@Param("placeId") Long placeId);
 
     @Query("SELECT p.placeId, p.placeName FROM Place p WHERE p.placeId IN :placeIds")
     List<Object[]> findPlaceNamesByPlaceIds(@Param("placeIds") List<Long> placeIds);
