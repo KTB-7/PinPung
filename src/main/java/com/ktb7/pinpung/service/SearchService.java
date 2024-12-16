@@ -138,7 +138,9 @@ public class SearchService {
                             .findFirst()
                             .orElse(null);
 
-                    String address = placeRepository.findAddressByPlaceId(place.getPlaceId());
+                    String address = placeRepository.findAddressByPlaceId(place.getPlaceId())
+                            .orElseThrow(() -> new CustomException(HttpStatus.INTERNAL_SERVER_ERROR, ErrorCode.ADDRESS_NOT_FOUND));
+
 
                     // SearchPlaceInfoDto 생성
                     return new SearchPlaceInfoDto(

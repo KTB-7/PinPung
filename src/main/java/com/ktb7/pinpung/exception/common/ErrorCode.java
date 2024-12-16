@@ -29,7 +29,7 @@ public enum ErrorCode {
     REVIEW_NOT_FOUND("404_REVIEW_NOT_FOUND", "등록되지 않은 리뷰 정보입니다."),
     TAG_NOT_FOUND("404_TAG_NOT_FOUND", "해당 태그를 찾을 수 없습니다."),
     FOLLOW_RELATION_NOT_FOUND("404_FOLLOW_RELATION_NOT_FOUND", "팔로우 관계를 찾을 수 없습니다."),
-    KAKAO_API_CALL_FAILED("500_KAKAO_API_CALL_FAILED", "카카오 API 호출에 실패했습니다."),
+    ADDRESS_NOT_FOUND("404_ADDRESS_NOT_FOUND", "주소를 찾을 수 없습니다."),
 
     // 500 Internal Server Error
     INTERNAL_SERVER_ERROR("500_INTERNAL_SERVER_ERROR", "서버 내부 오류가 발생했습니다."),
@@ -40,6 +40,7 @@ public enum ErrorCode {
     FILE_UPLOAD_FAILED("500_FILE_UPLOAD_FAILED", "파일 업로드에 실패했습니다."),
     UNEXPECTED_ERROR("500_UNEXPECTED_ERROR", "예상치 못한 오류가 발생했습니다."),
     API_CALL_FAILED("500_API_CALL_FAILED", "API CALL에 실패했습니다."),
+    KAKAO_API_CALL_FAILED("500_KAKAO_API_CALL_FAILED", "카카오 API 호출에 실패했습니다."),
 
     RECOMMEND_TAGS_REQUEST_FAILED("500_RECOMMEND_TAGS_REQUEST_FAILED", "추천 태그 요청 중 오류가 발생했습니다."),
     RECOMMEND_TAGS_RESPONSE_INVALID("500_RECOMMEND_TAGS_RESPONSE_INVALID", "추천 태그 API 응답이 유효하지 않습니다."),
