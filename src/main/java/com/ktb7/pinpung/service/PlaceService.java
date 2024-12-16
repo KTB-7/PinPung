@@ -60,6 +60,7 @@ public class PlaceService {
         while (page <= maxPage) {
             StringBuilder requestUrl = new StringBuilder(KAKAO_LOCAL_API_URL)
                     .append("?query=").append(keyword)
+                    .append("&category_group_code=CE7")
                     .append("&page=").append(page)
                     .append("&size=").append(size);
 

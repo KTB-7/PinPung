@@ -6,6 +6,7 @@ import com.ktb7.pinpung.dto.Search.SearchResponseDto;
 import com.ktb7.pinpung.dto.Search.SearchTagReviewDto;
 import com.ktb7.pinpung.exception.common.CustomException;
 import com.ktb7.pinpung.exception.common.ErrorCode;
+import com.ktb7.pinpung.repository.PlaceRepository;
 import com.ktb7.pinpung.repository.ReviewRepository;
 import com.ktb7.pinpung.repository.TagRepository;
 import lombok.RequiredArgsConstructor;
@@ -24,6 +25,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class SearchService {
 
+    private final PlaceRepository placeRepository;
     @Value("${spring.ai.openai.api-key}")
     private String openaiKey;
 
@@ -136,10 +138,13 @@ public class SearchService {
                             .findFirst()
                             .orElse(null);
 
+                    String address = placeRepository.findAddressByPlaceId(place.getPlaceId());
+
                     // SearchPlaceInfoDto 생성
                     return new SearchPlaceInfoDto(
                             place.getPlaceId(),
                             place.getPlaceName(),
+                            address,
                             place.getHasPung(),
                             place.getByFriend(),
                             place.getImageId(),
