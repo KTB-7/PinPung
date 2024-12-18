@@ -20,8 +20,8 @@ FASTAPI_URL=$(aws ssm get-parameter --name "/pinpung/FASTAPI_URL" --with-decrypt
 docker pull ${ECR_REPO}:latest || { echo "Docker pull failed"; exit 1; }
 
 # Docker 컨테이너 실행 시 환경 변수로 전달 및 CloudWatch 로그 드라이버 설정
-docker stop pinpung-backend || true
-docker rm pinpung-backend || true
+# docker stop pinpung-backend || true
+# docker rm pinpung-backend || true
 docker run -d --name pinpung-backend \
     --log-driver=awslogs \
     --log-opt awslogs-region=$AWS_REGION \
