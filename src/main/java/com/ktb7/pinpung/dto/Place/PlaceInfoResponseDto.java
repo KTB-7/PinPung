@@ -13,6 +13,8 @@ public class PlaceInfoResponseDto {
     private Long placeId;
     private String placeName;
     private String address;
+    private String x;
+    private String y;
     private List<String> tags;
     private ReviewsDto reviews;
     private PungDto representativePung;

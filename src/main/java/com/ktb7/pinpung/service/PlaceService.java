@@ -231,6 +231,8 @@ public class PlaceService {
                 place.getPlaceId(),
                 place.getPlaceName(),
                 place.getAddress(),
+                place.getX(),
+                place.getY(),
                 tags,
                 reviews,
                 pungDto
