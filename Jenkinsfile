@@ -18,8 +18,8 @@ pipeline {
             steps {
                 script {
                     sh """
-                    docker build --no-cache -t pinpung-develop-backend:latest .
-                    docker tag pinpung-develop-backend:latest ${ECR_REPO}:latest
+                    docker build --no-cache -t pinpung-backend:latest .
+                    docker tag pinpung-backend:latest ${ECR_REPO}:latest
                     """
                 }
             }
