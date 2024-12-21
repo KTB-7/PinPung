@@ -4,6 +4,7 @@ aws ecr get-login-password --region ap-northeast-2 | docker login --username AWS
 AWS_REGION="ap-northeast-2"
 
 # Parameter Store에서 환경 변수 가져오기
+APP_NAME=$(aws ssm get-parameter --name "/pinpung/APP_NAME" --query "Parameter.Value" --output text --region ap-northeast-2)
 DB_HOST=$(aws ssm get-parameter --name "/pinpung/DB_HOST" --query "Parameter.Value" --output text --region ap-northeast-2)
 DB_NAME=$(aws ssm get-parameter --name "/pinpung/DB_NAME" --query "Parameter.Value" --output text --region ap-northeast-2)
 DB_PASSWORD=$(aws ssm get-parameter --name "/pinpung/DB_PASSWORD" --with-decryption --query "Parameter.Value" --output text --region ap-northeast-2)
@@ -20,8 +21,8 @@ FASTAPI_URL=$(aws ssm get-parameter --name "/pinpung/FASTAPI_URL" --with-decrypt
 docker pull ${ECR_REPO}:latest || { echo "Docker pull failed"; exit 1; }
 
 # Docker 컨테이너 실행 시 환경 변수로 전달 및 CloudWatch 로그 드라이버 설정
-docker stop pinpung-develop-backend || true && docker rm pinpung-develop-backend || true
-docker run -d --name pinpung-develop-backend \
+docker stop pinpung-backend || true && docker rm pinpung-backend || true
+docker run -d --name pinpung-backend \
     --log-driver=awslogs \
     --log-opt awslogs-region=$AWS_REGION \
     --log-opt awslogs-group=pinpung-backend-ec2-logs \
@@ -38,4 +39,5 @@ docker run -d --name pinpung-develop-backend \
     -e LOGOUT_REDIRECT_URI=$LOGOUT_REDIRECT_URI \
     -e OPENAI_KEY=$OPENAI_KEY \
     -e FASTAPI_URL=$FASTAPI_URL \
+    -e APP_NAME=$APP_NAME \
     -p 8080:8080 ${ECR_REPO}:latest
