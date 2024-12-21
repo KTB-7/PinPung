@@ -20,6 +20,9 @@ FASTAPI_URL=$(aws ssm get-parameter --name "/pinpung/FASTAPI_URL" --with-decrypt
 # 최신 이미지 가져오기
 docker pull ${ECR_REPO}:latest || { echo "Docker pull failed"; exit 1; }
 
+# 이미지 태그 변경
+docker tag ${ECR_REPO}:latest pinpung-backend:latest
+
 # Docker 컨테이너 실행 시 환경 변수로 전달 및 CloudWatch 로그 드라이버 설정
 docker stop pinpung-backend || true && docker rm pinpung-backend || true
 docker run -d --name pinpung-backend \
