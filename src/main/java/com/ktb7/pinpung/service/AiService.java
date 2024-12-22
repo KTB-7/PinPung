@@ -3,9 +3,12 @@ package com.ktb7.pinpung.service;
 import com.ktb7.pinpung.dto.AI.*;
 import com.ktb7.pinpung.dto.Place.SimplePlaceDto;
 import com.ktb7.pinpung.entity.Place;
+import com.ktb7.pinpung.entity.Review;
 import com.ktb7.pinpung.exception.common.CustomException;
 import com.ktb7.pinpung.exception.common.ErrorCode;
 import com.ktb7.pinpung.repository.PlaceRepository;
+import com.ktb7.pinpung.repository.ReviewRepository;
+import com.ktb7.pinpung.repository.TagRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
@@ -17,6 +20,7 @@ import reactor.core.publisher.Mono;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import static com.ktb7.pinpung.exception.common.ErrorCode.RECOMMEND_TAGS_REQUEST_FAILED;
 
@@ -27,11 +31,15 @@ public class AiService {
     private final WebClient webClient;
     private final PlaceRepository placeRepository;
     private final PlaceService placeService;
+    private final TagRepository tagRepository;
+    private final ReviewRepository reviewRepository;
 
-    public AiService(WebClient.Builder webClientBuilder, @Value("${fastapi.server.url}") String fastApiUrl, PlaceRepository placeRepository, PlaceService placeService) {
-        this.webClient = webClientBuilder.baseUrl("http://"+fastApiUrl+":8000").build();
+    public AiService(WebClient.Builder webClientBuilder, @Value("${fastapi.server.url}") String fastApiUrl, PlaceRepository placeRepository, PlaceService placeService, TagRepository tagRepository, ReviewRepository reviewRepository) {
+        this.webClient = webClientBuilder.baseUrl(fastApiUrl).build();
         this.placeRepository = placeRepository;
         this.placeService = placeService;
+        this.tagRepository = tagRepository;
+        this.reviewRepository = reviewRepository;
     }
 
     public Boolean genTags(Long placeId, String reviewText, String reviewImageUrl, Long userId) {
@@ -122,9 +130,24 @@ public class AiService {
         List<SimplePlaceDto> places = new ArrayList<>();
         for (int i = 0; i < recommendTagsAIResponse.getCafe_list().size(); i++) {
             Long placeId = recommendTagsAIResponse.getCafe_list().get(i);
-            Place place = placeRepository.findById(placeId).orElseThrow(()->new CustomException(HttpStatus.NOT_FOUND, ErrorCode.PLACE_NOT_FOUND));
+            // placeId를 이용해 Place 엔티티 조회 (없을 경우 예외 처리)
+            Place place = placeRepository.findById(placeId)
+                    .orElseThrow(() -> new CustomException(HttpStatus.NOT_FOUND, ErrorCode.PLACE_NOT_FOUND));
 
-            places.add(new SimplePlaceDto(placeId, place.getPlaceName(), place.getX(), place.getY()));
+            // placeId로 가장 최근 리뷰 조회 (리뷰가 없는 경우 Optional.empty())
+            Optional<Review> recentReviewOpt = reviewRepository.findTopByPlaceIdOrderByCreatedAtDesc(placeId);
+
+            // 가장 최근 리뷰에서 이미지가 있을 경우 imageId를 가져오고, 없으면 null 설정
+            Long recentImageId = recentReviewOpt
+                    .map(Review::getImageId)
+                    .orElse(null);
+
+            // placeId로 관련 태그 목록 조회
+            List<String> tagNames = tagRepository.findTagNamesByPlaceId(placeId);
+
+            // SimplePlaceDto 객체 생성 및 추가
+            places.add(new SimplePlaceDto(placeId, place.getPlaceName(), place.getAddress(), tagNames, recentImageId,
+                    place.getX(), place.getY()));
         }
 
         return places;

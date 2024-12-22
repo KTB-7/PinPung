@@ -15,4 +15,6 @@ public interface TagRepository extends JpaRepository<Tag, Long> {
             "JOIN Place p ON pt.placeId = p.placeId " +
             "WHERE p.placeId IN :placeIds AND pt.isRepresentative = true")
     List<Object[]> findTagsByPlaceIds(@Param("placeIds") List<Long> placeIds);
+
+    List<String> findTagNamesByPlaceId(Long placeId);
 }
