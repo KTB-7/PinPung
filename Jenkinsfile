@@ -2,11 +2,10 @@ pipeline {
     agent any
     environment {
         AWS_REGION = 'ap-northeast-2'
-        AWS_ACCOUNT_ID = '528938155874'
-        S3_BUCKET = 'pinpung-develop-codedeploy-configs'
-        ECR_REPO = "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/pinpung/develop/backend"
-        CODE_DEPLOY_APP_NAME = 'pinpung-develop-backend'
-        CODE_DEPLOY_GROUP = 'pinpung-develop-backend-deploy-group'
+        TARGET_EC2 = 'ec2-user@ip-10.0.9.198.ap-northeast-2.compute.internal'
+        ECR_REPO = '528938155874.dkr.ecr.ap-northeast-2.amazonaws.com/pinpung/develop/backend'
+        DOCKER_IMAGE_TAG = 'latest'
+        APP_DIR = '/home/ec2-user/app'
     }
     stages {
         stage('Checkout') {
@@ -18,8 +17,8 @@ pipeline {
             steps {
                 script {
                     sh """
-                    docker build --no-cache -t pinpung-backend:latest .
-                    docker tag pinpung-backend:latest ${ECR_REPO}:latest
+                    docker build --no-cache -t pinpung-backend:${DOCKER_IMAGE_TAG} .
+                    docker tag pinpung-backend:${DOCKER_IMAGE_TAG} ${ECR_REPO}:${DOCKER_IMAGE_TAG}
                     """
                 }
             }
@@ -29,40 +28,60 @@ pipeline {
                 script {
                     sh """
                     aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${ECR_REPO}
-                    docker push ${ECR_REPO}:latest
+                    docker push ${ECR_REPO}:${DOCKER_IMAGE_TAG}
                     """
                 }
             }
         }
-        stage('Prepare Deployment Bundle') {
+        stage('Deploy to backend EC2') {
             steps {
-                script {
-                    sh """
-                    zip -r deploy_bundle.zip appspec.yml scripts/
-                    """
-                }
-            }
-        }
-        stage('Upload Deployment Bundle to S3') {
-            steps {
-                script {
-                    sh """
-                    aws s3 cp deploy_bundle.zip s3://${S3_BUCKET}/deploy_bundle.zip --region ${AWS_REGION}
-                    """
-                }
-            }
-        }
-        stage('Trigger CodeDeploy') {
-            steps {
-                script {
-                    // CodeDeploy 트리거
-                    sh """
-                    aws deploy create-deployment \
-                        --application-name ${CODE_DEPLOY_APP_NAME} \
-                        --deployment-group-name ${CODE_DEPLOY_GROUP} \
-                        --s3-location bucket=${S3_BUCKET},key=deploy_bundle.zip,bundleType=zip \
-                        --region ${AWS_REGION}
-                    """
+                sshagent(['ec2-ssh-key']) {
+                    script {
+                // 환경 변수 가져오기
+                        def dbHost = sh(script: "aws ssm get-parameter --name /pinpung/DB_HOST --query Parameter.Value --output text --region ${AWS_REGION}", returnStdout: true).trim()
+                        def dbPort = sh(script: "aws ssm get-parameter --name /pinpung/DB_PORT --query Parameter.Value --output text --region ${AWS_REGION}", returnStdout: true).trim()
+                        def dbName = sh(script: "aws ssm get-parameter --name /pinpung/DB_NAME --query Parameter.Value --output text --region ${AWS_REGION}", returnStdout: true).trim()
+                        def dbPassword = sh(script: "aws ssm get-parameter --name /pinpung/DB_PASSWORD --query Parameter.Value --output text --with-decryption --region ${AWS_REGION}", returnStdout: true).trim()
+                        def openaiKey = sh(script: "aws ssm get-parameter --name /pinpung/OPENAI_KEY --query Parameter.Value --output text --with-decryption --region ${AWS_REGION}", returnStdout: true).trim()
+                        def kakaoClientId = sh(script: "aws ssm get-parameter --name /pinpung/KAKAO_CLIENT_ID --query Parameter.Value --output text --with-decryption --region ${AWS_REGION}", returnStdout: true).trim()
+                        def redirectUri = sh(script: "aws ssm get-parameter --name /pinpung/REDIRECT_URI --query Parameter.Value --output text --region ${AWS_REGION}", returnStdout: true).trim()
+                        def s3BucketName = sh(script: "aws ssm get-parameter --name /pinpung/S3_BUCKET_NAME --query Parameter.Value --output text --region ${AWS_REGION}", returnStdout: true).trim()
+                        def logoutRedirectUri = sh(script: "aws ssm get-parameter --name /pinpung/LOGOUT_REDIRECT_URI --query Parameter.Value --output text --region ${AWS_REGION}", returnStdout: true).trim()
+                        def fastApiUrl = sh(script: "aws ssm get-parameter --name /pinpung/FASTAPI_URL --query Parameter.Value --output text --region ${AWS_REGION}", returnStdout: true).trim()
+                        def appName = sh(script: "aws ssm get-parameter --name /pinpung/APP_NAME --query Parameter.Value --output text --region ${AWS_REGION}", returnStdout: true).trim()
+                // EC2에서 Docker 컨테이너 실행
+                sh """
+                timeout 300 ssh -t -o StrictHostKeyChecking=no ${TARGET_EC2} <<EOF
+# ECR 인증
+aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${ECR_REPO}
+# 기존 컨테이너 삭제
+docker stop pinpung-backend || true
+docker rm pinpung-backend || true
+docker pull ${ECR_REPO}:${DOCKER_IMAGE_TAG}
+                    echo "Running new container..."
+                    docker run -d -p 8080:8080 \
+                        --log-driver=awslogs \
+                        --log-opt awslogs-region=${AWS_REGION} \
+                        --log-opt awslogs-group=pinpung-backend-ec2-logs \
+                        --log-opt awslogs-stream=\$(curl -s http://169.254.169.254/latest/meta-data/instance-id) \
+                        -e AWS_REGION=${AWS_REGION} \
+                        -e DB_HOST=${dbHost} \
+                        -e DB_NAME=${dbName} \
+                        -e DB_PASSWORD=${dbPassword} \
+                        -e DB_PORT=${dbPort} \
+                        -e DB_USERNAME=${dbUser} \
+                        -e OPENAI_KEY=${openaiKey} \
+                        -e KAKAO_CLIENT_ID=${kakaoClientId}
+                        -e REDIRECT_URI=${redirectUri}
+                        -e S3_BUCKET_NAME=${s3BucketName}
+                        -e LOGOUT_REDIRECT_URI=${logoutRedirectUri}
+                        -e FASTAPI_URL=${fastApiUrl}
+                        -e APP_NAME=${appName}
+                        --name pinpung-backend ${ECR_REPO}:${DOCKER_IMAGE_TAG}
+echo "Deployment completed successfully."
+EOF
+                        """
+                    }
                 }
             }
         }
@@ -76,7 +95,6 @@ pipeline {
         }
         always {
             script {
-                // 빌드 후 Docker 리소스 완전 정리
                 sh "docker system prune -af --volumes"
             }
         }
