@@ -2,7 +2,7 @@ pipeline {
     agent any
     environment {
         AWS_REGION = 'ap-northeast-2'
-        TARGET_EC2 = 'ec2-user@ip-10.0.9.198.ap-northeast-2.compute.internal'
+        TARGET_EC2 = 'ec2-user@15.165.241.239'
         ECR_REPO = '528938155874.dkr.ecr.ap-northeast-2.amazonaws.com/pinpung/develop/backend'
         DOCKER_IMAGE_TAG = 'latest'
         APP_DIR = '/home/ec2-user/app'
