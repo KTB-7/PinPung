@@ -39,6 +39,7 @@ pipeline {
                     script {
                 // 환경 변수 가져오기
                         def dbHost = sh(script: "aws ssm get-parameter --name /pinpung/DB_HOST --query Parameter.Value --output text --region ${AWS_REGION}", returnStdout: true).trim()
+                        def dbUser = sh(script: "aws ssm get-parameter --name /pinpung/DB_USERNAME --query Parameter.Value --output text --region ${AWS_REGION}", returnStdout: true).trim()
                         def dbPort = sh(script: "aws ssm get-parameter --name /pinpung/DB_PORT --query Parameter.Value --output text --region ${AWS_REGION}", returnStdout: true).trim()
                         def dbName = sh(script: "aws ssm get-parameter --name /pinpung/DB_NAME --query Parameter.Value --output text --region ${AWS_REGION}", returnStdout: true).trim()
                         def dbPassword = sh(script: "aws ssm get-parameter --name /pinpung/DB_PASSWORD --query Parameter.Value --output text --with-decryption --region ${AWS_REGION}", returnStdout: true).trim()
