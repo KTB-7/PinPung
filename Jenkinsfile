@@ -66,7 +66,7 @@ docker run -d -p 8080:8080 \
     --log-driver=awslogs \
     --log-opt awslogs-region=${AWS_REGION} \
     --log-opt awslogs-group=pinpung-backend-ec2-logs \
-    --log-opt awslogs-stream=\$(curl -s http://169.254.169.254/latest/meta-data/instance-id) \
+    --log-opt awslogs-stream=pinpung-backend-instance \
     -e AWS_REGION=${AWS_REGION} \
     -e DB_HOST=${dbHost} \
     -e DB_NAME=${dbName} \
