@@ -74,12 +74,12 @@ docker run -d -p 8080:8080 \
     -e DB_PORT=${dbPort} \
     -e DB_USERNAME=${dbUser} \
     -e OPENAI_KEY=${openaiKey} \
-    -e KAKAO_CLIENT_ID=${kakaoClientId}
-    -e REDIRECT_URI=${redirectUri}
-    -e S3_BUCKET_NAME=${s3BucketName}
-    -e LOGOUT_REDIRECT_URI=${logoutRedirectUri}
-    -e FASTAPI_URL=${fastApiUrl}
-    -e APP_NAME=${appName}
+    -e KAKAO_CLIENT_ID=${kakaoClientId} \
+    -e REDIRECT_URI=${redirectUri} \
+    -e S3_BUCKET_NAME=${s3BucketName} \
+    -e LOGOUT_REDIRECT_URI=${logoutRedirectUri} \
+    -e FASTAPI_URL=${fastApiUrl} \
+    -e APP_NAME=${appName} \
     --name pinpung-backend ${ECR_REPO}:${DOCKER_IMAGE_TAG}
 echo "Deployment completed successfully."
 EOF
