@@ -35,7 +35,7 @@ pipeline {
         }
         stage('Deploy to backend EC2') {
             steps {
-                sshagent(['backend-jenkins-key']) {
+                sshagent(['backend-deploy-key']) {
                     script {
                 // 환경 변수 가져오기
                         def dbHost = sh(script: "aws ssm get-parameter --name /pinpung/DB_HOST --query Parameter.Value --output text --region ${AWS_REGION}", returnStdout: true).trim()
