@@ -58,26 +58,28 @@ aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS 
 docker stop pinpung-backend || true
 docker rm pinpung-backend || true
 docker pull ${ECR_REPO}:${DOCKER_IMAGE_TAG}
-                    echo "Running new container..."
-                    docker run -d -p 8080:8080 \
-                        --log-driver=awslogs \
-                        --log-opt awslogs-region=${AWS_REGION} \
-                        --log-opt awslogs-group=pinpung-backend-ec2-logs \
-                        --log-opt awslogs-stream=\$(curl -s http://169.254.169.254/latest/meta-data/instance-id) \
-                        -e AWS_REGION=${AWS_REGION} \
-                        -e DB_HOST=${dbHost} \
-                        -e DB_NAME=${dbName} \
-                        -e DB_PASSWORD=${dbPassword} \
-                        -e DB_PORT=${dbPort} \
-                        -e DB_USERNAME=${dbUser} \
-                        -e OPENAI_KEY=${openaiKey} \
-                        -e KAKAO_CLIENT_ID=${kakaoClientId}
-                        -e REDIRECT_URI=${redirectUri}
-                        -e S3_BUCKET_NAME=${s3BucketName}
-                        -e LOGOUT_REDIRECT_URI=${logoutRedirectUri}
-                        -e FASTAPI_URL=${fastApiUrl}
-                        -e APP_NAME=${appName}
-                        --name pinpung-backend ${ECR_REPO}:${DOCKER_IMAGE_TAG}
+echo "Running new container..."
+docker run -d -p 8080:8080 \
+    --memory="512m" \
+    --memory-swap="2g" \
+    --log-driver=awslogs \
+    --log-opt awslogs-region=${AWS_REGION} \
+    --log-opt awslogs-group=pinpung-backend-ec2-logs \
+    --log-opt awslogs-stream=\$(curl -s http://169.254.169.254/latest/meta-data/instance-id) \
+    -e AWS_REGION=${AWS_REGION} \
+    -e DB_HOST=${dbHost} \
+    -e DB_NAME=${dbName} \
+    -e DB_PASSWORD=${dbPassword} \
+    -e DB_PORT=${dbPort} \
+    -e DB_USERNAME=${dbUser} \
+    -e OPENAI_KEY=${openaiKey} \
+    -e KAKAO_CLIENT_ID=${kakaoClientId}
+    -e REDIRECT_URI=${redirectUri}
+    -e S3_BUCKET_NAME=${s3BucketName}
+    -e LOGOUT_REDIRECT_URI=${logoutRedirectUri}
+    -e FASTAPI_URL=${fastApiUrl}
+    -e APP_NAME=${appName}
+    --name pinpung-backend ${ECR_REPO}:${DOCKER_IMAGE_TAG}
 echo "Deployment completed successfully."
 EOF
                         """
