@@ -61,7 +61,8 @@ public class SecurityConfig {
                         "/api/test",
                         "/actuator/health",
                         "/favicon.ico",
-                        "/cdn-cgi/**"
+                        "/cdn-cgi/**",
+                        "/"
 //                        "/oauth2/**"
                 )
                 .csrf(csrf -> csrf.disable())
