@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/my")
+@RequestMapping("/api/profile")
 @Tag(name = "User API", description = "유저/마이페이지 관련 API")
 @RequiredArgsConstructor
 @Slf4j
@@ -29,16 +29,16 @@ public class UserController {
     private final FollowService followService;
     private final TokenService tokenService;
 
-    @GetMapping
+    @GetMapping("/{userId}")
     @Operation(
             summary = "마이페이지 조회",
             description = "주어진 유저 ID에 대한 팔로잉, 팔로워, 펑을 전부 조회합니다"
     )
-    public ResponseEntity<ProfileWithPungResponseDto> myProfile(@RequestHeader("Authorization") String authorizationHeader) {
+    public ResponseEntity<ProfileWithPungResponseDto> myProfile(@RequestHeader("Authorization") String authorizationHeader, @PathVariable Long userId) {
         log.info("Received request to /my");
 
         String token = tokenService.extractBearerToken(authorizationHeader);
-        Long userId = tokenService.getUserFromToken(token);
+//        Long userId = tokenService.getUserFromToken(token);
 
         // 유효성 검증
         ValidationUtils.validateUserId(userId);
@@ -48,15 +48,15 @@ public class UserController {
         return ResponseEntity.ok(profile);
     }
 
-    @GetMapping("/view-reviews")
+    @GetMapping("/{userId}/view-reviews")
     @Operation(
             summary = "마이페이지 조회(리뷰 기준)",
             description = "주어진 유저 ID에 대한 팔로잉, 팔로워, 리뷰를 전부 조회합니다"
     )
-    public ResponseEntity<ProfileWithReviewResponseDto> myProfileWithReview(@RequestHeader("Authorization") String authorizationHeader) {
+    public ResponseEntity<ProfileWithReviewResponseDto> myProfileWithReview(@RequestHeader("Authorization") String authorizationHeader, @PathVariable Long userId) {
 
         String token = tokenService.extractBearerToken(authorizationHeader);
-        Long userId = tokenService.getUserFromToken(token);
+//        Long userId = tokenService.getUserFromToken(token);
 
         // 유효성 검증
         ValidationUtils.validateUserId(userId);
@@ -66,17 +66,17 @@ public class UserController {
         return ResponseEntity.ok(profile);
     }
 
-    @GetMapping(value = "/followers", produces = "application/json")
+    @GetMapping(value = "/{userId}/followers", produces = "application/json")
 
     @Operation(
             summary = "팔로워 목록 조회",
             description = "특정 사용자의 팔로워 목록을 조회합니다."
     )
-    public ResponseEntity<FollowsResponseDto> getFollowers(@RequestHeader("Authorization") String authorizationHeader) {
+    public ResponseEntity<FollowsResponseDto> getFollowers(@RequestHeader("Authorization") String authorizationHeader, @PathVariable Long userId) {
         log.info("Received request to /followers");
 
         String token = tokenService.extractBearerToken(authorizationHeader);
-        Long userId = tokenService.getUserFromToken(token);
+//        Long userId = tokenService.getUserFromToken(token);
 
         // 유효성 검증: id 검증
         ValidationUtils.validateUserId(userId);
@@ -86,16 +86,16 @@ public class UserController {
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping(value = "/followings", produces = "application/json")
+    @GetMapping(value = "/{userId}/followings", produces = "application/json")
     @Operation(
             summary = "팔로잉 목록 조회",
             description = "특정 사용자가 팔로잉한 사용자의 목록을 조회합니다."
     )
-    public ResponseEntity<FollowsResponseDto> getFollowings(@RequestHeader("Authorization") String authorizationHeader) {
+    public ResponseEntity<FollowsResponseDto> getFollowings(@RequestHeader("Authorization") String authorizationHeader, @PathVariable Long userId) {
         log.info("Received request to /followings");
 
         String token = tokenService.extractBearerToken(authorizationHeader);
-        Long userId = tokenService.getUserFromToken(token);
+//        Long userId = tokenService.getUserFromToken(token);
 
         // 유효성 검증: id 검증
         ValidationUtils.validateUserId(userId);
