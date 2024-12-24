@@ -23,7 +23,7 @@ import java.util.List;
 @Configuration
 @AllArgsConstructor
 @Slf4j
-@EnableWebSecurity(debug = false)
+@EnableWebSecurity(debug = true)
 public class SecurityConfig {
 
     private final CustomOAuth2UserService customOAuth2UserService;
