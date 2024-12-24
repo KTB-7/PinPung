@@ -61,7 +61,8 @@ public class SecurityConfig {
                         "/api/test",
                         "/actuator/health",
                         "/favicon.ico",
-                        "/cdn-cgi/**"
+                        "/cdn-cgi/**",
+                        "/oauth2/**"
                 )
                 .csrf(csrf -> csrf.disable())
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
@@ -99,7 +100,9 @@ public class SecurityConfig {
                                 "/api/pungs/byUser/**",
                                 "/api/pungs/byPlace/**",
                                 "/api/token/refresh",
-                                "/login/oauth2/code/**"
+                                "/login/oauth2/code/**",
+                                "/api/ai",
+                                "/api/ai/**"
                         ).authenticated()
                         .anyRequest().authenticated()
                 )
