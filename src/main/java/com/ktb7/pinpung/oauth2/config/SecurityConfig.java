@@ -61,8 +61,8 @@ public class SecurityConfig {
                         "/api/test",
                         "/actuator/health",
                         "/favicon.ico",
-                        "/cdn-cgi/**",
-                        "/oauth2/**"
+                        "/cdn-cgi/**"
+//                        "/oauth2/**"
                 )
                 .csrf(csrf -> csrf.disable())
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
