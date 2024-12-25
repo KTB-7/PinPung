@@ -9,5 +9,5 @@ public class GenerateTagsAIRequestDto {
     private Long place_id;
     private String review_text;
     private String review_image_url;
-    private Long userId;
+    private Long user_id;
 }
