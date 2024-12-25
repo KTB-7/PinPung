@@ -1,5 +1,6 @@
 package com.ktb7.pinpung.service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ktb7.pinpung.dto.AI.*;
 import com.ktb7.pinpung.dto.Place.SimplePlaceDto;
 import com.ktb7.pinpung.entity.Place;
@@ -44,25 +45,38 @@ public class AiService {
 
     public Boolean genTags(Long placeId, String reviewText, String reviewImageUrl, Long userId) {
         log.info("start generating tags");
-        log.info("{}{}{}", placeId, reviewText, reviewImageUrl, userId);
+        log.info("Request Data: placeId={}, reviewText={}, reviewImageUrl={}, userId={}", placeId, reviewText, reviewImageUrl, userId);
 
-        GenerateTagsAIResponseDto response = webClient.post()
-                .uri("/gen_tags/")
-                .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
-                .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-                .body(Mono.just(buildRequestBody(placeId, reviewText, reviewImageUrl, userId)), String.class)
-                .retrieve()
-                .bodyToMono(GenerateTagsAIResponseDto.class)
-                .block();
+        GenerateTagsAIResponseDto response;
+        try {
+            String rawResponse = webClient.post()
+                    .uri("/gen_tags/")
+                    .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
+                    .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+                    .body(Mono.just(buildRequestBody(placeId, reviewText, reviewImageUrl, userId)), String.class)
+                    .retrieve()
+                    .bodyToMono(String.class)
+                    .block();
 
-        Boolean isGened = response != null ? response.getIsGened() : false;
+            log.info("Raw response from AI server: {}", rawResponse);
+
+            // JSON 파싱, 매핑..
+            ObjectMapper mapper = new ObjectMapper();
+            response = mapper.readValue(rawResponse, GenerateTagsAIResponseDto.class);
+
+        } catch (Exception e) {
+            log.error("Failed to call AI server", e);
+            response = new GenerateTagsAIResponseDto(false); // 기본값 반환
+        }
+
+        Boolean isGened = response != null && response.getIsGened() != null ? response.getIsGened() : false;
         log.info("genTags 응답 isGened: {}", isGened);
         return isGened;
     }
 
     private String buildRequestBody(Long placeId, String reviewText, String reviewImageUrl, Long userId) {
-        return String.format("{\"place_id\": %d, \"review_text\": \"%s\", \"review_image_url\": \"%s\"}",
-                placeId, reviewText, reviewImageUrl);
+        return String.format("{\"place_id\": %d, \"review_text\": \"%s\", \"review_image_url\": \"%s\", \"user_id\":%d}",
+                placeId, reviewText, reviewImageUrl, userId);
     }
 
     public RecommendTagsAIResponseDto recommend(Long userId, List<Long> placeIdList) {
