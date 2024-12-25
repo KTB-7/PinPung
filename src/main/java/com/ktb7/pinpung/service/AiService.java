@@ -50,7 +50,7 @@ public class AiService {
         GenerateTagsAIResponseDto response;
         try {
             String rawResponse = webClient.post()
-                    .uri("/gen_tags/")
+                    .uri("/gen_tags")
                     .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
                     .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
                     .body(Mono.just(buildRequestBody(placeId, reviewText, reviewImageUrl, userId)), String.class)
@@ -83,7 +83,7 @@ public class AiService {
 
         try {
             return webClient.post()
-                    .uri("/get_recs/ai/")
+                    .uri("/get_recs/ai")
                     .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
                     .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
                     .body(Mono.just(buildRecommendRequestBody(userId, placeIdList)), String.class)
@@ -116,7 +116,7 @@ public class AiService {
     }
 
     private String buildRecommendRequestBody(Long userId, List<Long> placeIdList) {
-        return String.format("{\"userId\": %d, \"placeIdList\": %s}",
+        return String.format("{\"user_id\": %d, \"place_ids\": %s}",
                 userId, placeIdList.toString());
     }
 
