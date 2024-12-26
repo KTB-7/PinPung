@@ -50,7 +50,7 @@ public class AiService {
         GenerateTagsAIResponseDto response;
         try {
             String rawResponse = webClient.post()
-                    .uri("/gen_tags")
+                    .uri("/gen_tags/")
                     .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
                     .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
                     .body(Mono.just(buildRequestBody(placeId, reviewText, reviewImageUrl, userId)), String.class)
